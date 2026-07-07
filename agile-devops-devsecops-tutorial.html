@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agile + DevOps + DevSecOps - Interactive Tutorial</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ag:#2D4A8A;--ag-l:#EEF1FA;--ag-m:#4A6BBF;
+  --dv:#0D6E5A;--dv-l:#E6F5F1;--dv-m:#1A9B7B;
+  --ds:#6B21A8;--ds-l:#F3E8FF;--ds-m:#9333EA;
+  --sc:#B45309;--sc-l:#FEF3C7;--sc-m:#D97706;
+  --bg:#FFFFFF;--bg-alt:#F7F8FA;
+  --tx:#111827;--mu:#6B7280;
+  --ok:#15803D;--ok-l:#DCFCE7;
+  --er:#B91C1C;--er-l:#FEE2E2;
+  --bd:#E5E7EB;--r:10px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:#fff;color:var(--tx);line-height:1.6;font-size:16px}
+h1,h2,h3,.syne{font-family:'Space Grotesk',system-ui,sans-serif;line-height:1.2}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.97);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;gap:1rem;padding:0 1.5rem;height:52px}
+.nav-logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:0.88rem;display:flex;gap:0.3rem;align-items:center;flex-wrap:wrap}
+.nav-logo .na{color:var(--ag)}.nav-logo .nd{color:var(--dv)}.nav-logo .ns{color:var(--ds-m)}
+.nav-logo .sep{color:var(--mu);font-size:0.7rem}
+nav ul{display:flex;gap:0.1rem;list-style:none;margin-left:auto}
+nav ul a{font-size:0.76rem;font-weight:500;color:var(--mu);text-decoration:none;
+  padding:0.28rem 0.5rem;border-radius:6px;transition:all 0.15s}
+nav ul a:hover{background:var(--bg-alt);color:var(--tx)}
+.prog-bar{position:fixed;top:52px;left:0;right:0;height:2px;background:var(--bd);z-index:99}
+.prog-fill{height:100%;width:0%;transition:width 0.2s;
+  background:linear-gradient(90deg,var(--ag),var(--dv),var(--ds-m))}
+
+/* HERO */
+#hero{min-height:90vh;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  text-align:center;padding:4rem 1.5rem}
+.hero-label{font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--mu);border:1px solid var(--bd);border-radius:20px;padding:0.3rem 0.85rem;
+  display:inline-block;margin-bottom:1rem}
+.hero-title{font-size:clamp(2rem,5.5vw,3.8rem);font-weight:800;margin-bottom:0.9rem}
+.hero-title .na{color:var(--ag)}.hero-title .nd{color:var(--dv)}.hero-title .ns{color:var(--ds-m)}
+.hero-sub{color:var(--mu);font-size:1rem;max-width:500px;margin-bottom:2.5rem}
+
+.layer-stack{display:flex;flex-direction:column;gap:0;margin-bottom:2.5rem;width:100%;max-width:500px;position:relative}
+.layer-block{padding:0.9rem 1.5rem;border-radius:var(--r);border:2px solid;text-align:left;
+  position:relative;transition:all 0.15s}
+.layer-block.lag{background:var(--ag-l);border-color:var(--ag-m)}
+.layer-block.ldv{background:var(--dv-l);border-color:var(--dv-m);margin-top:-2px}
+.layer-block.lds{background:var(--ds-l);border-color:var(--ds-m);margin-top:-2px}
+.layer-block .lb-tag{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em}
+.lag .lb-tag{color:var(--ag)}.ldv .lb-tag{color:var(--dv)}.lds .lb-tag{color:var(--ds-m)}
+.layer-block .lb-desc{font-size:0.8rem;color:var(--mu);margin-top:0.15rem}
+.lb-arrow{text-align:center;font-size:0.8rem;color:var(--mu);margin:0.1rem 0;line-height:1}
+
+.btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.65rem 1.5rem;border-radius:8px;
+  font-weight:600;font-size:0.9rem;cursor:pointer;text-decoration:none;border:none;
+  font-family:'Inter',sans-serif;transition:all 0.15s}
+.btn-dark{background:var(--tx);color:#fff}.btn-dark:hover{background:#374151;transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--tx);border:1.5px solid var(--bd)}.btn-outline:hover{border-color:var(--tx)}
+.btn:disabled{opacity:0.45;cursor:not-allowed;transform:none !important}
+
+.sec{padding:4.5rem 1.5rem;max-width:960px;margin:0 auto}
+.sec.alt{max-width:100%;background:var(--bg-alt);padding:4.5rem 1.5rem}
+.sec.alt .inner{max-width:960px;margin:0 auto}
+.sec-label{font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--mu);margin-bottom:0.6rem}
+.sec-title{font-size:1.75rem;font-weight:800;margin-bottom:0.65rem}
+.sec-sub{color:var(--mu);font-size:0.93rem;max-width:540px;margin-bottom:2rem}
+
+/* THREE LAYERS */
+.three-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.1rem}
+.layer-card{border-radius:var(--r);padding:1.6rem;border:2px solid}
+.layer-card.lag{background:var(--ag-l);border-color:var(--ag)}.layer-card.ldv{background:var(--dv-l);border-color:var(--dv)}.layer-card.lds{background:var(--ds-l);border-color:var(--ds-m)}
+.lc-badge{display:inline-block;padding:0.2rem 0.65rem;border-radius:20px;font-size:0.7rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.85rem}
+.lag .lc-badge{background:var(--ag);color:#fff}.ldv .lc-badge{background:var(--dv);color:#fff}.lds .lc-badge{background:var(--ds-m);color:#fff}
+.layer-card h3{font-size:0.95rem;margin-bottom:0.35rem}
+.layer-card p{font-size:0.82rem;color:var(--mu);margin-bottom:0.85rem;line-height:1.55}
+.layer-card ul{list-style:none}
+.layer-card ul li{font-size:0.8rem;padding:0.28rem 0;border-bottom:1px solid rgba(0,0,0,0.06);
+  display:flex;gap:0.4rem;align-items:flex-start}
+.layer-card ul li:last-child{border:none}
+.layer-card ul li::before{content:'→';font-weight:700;flex-shrink:0;font-size:0.75rem;margin-top:0.1rem}
+.lag ul li::before{color:var(--ag)}.ldv ul li::before{color:var(--dv)}.lds ul li::before{color:var(--ds-m)}
+.rel-box{margin-top:1.5rem;padding:1.1rem 1.25rem;background:#fff;border-radius:var(--r);
+  border:1.5px solid var(--bd);font-size:0.875rem;line-height:1.7}
+.rel-box strong{display:block;margin-bottom:0.3rem;font-size:0.9rem}
+
+/* PIPELINE */
+.tab-row{display:flex;border:1.5px solid var(--bd);border-radius:8px;overflow:hidden;width:fit-content;margin-bottom:1.75rem;flex-wrap:wrap}
+.tab-btn{padding:0.5rem 1.1rem;font-weight:600;font-size:0.82rem;cursor:pointer;border:none;
+  background:transparent;color:var(--mu);font-family:'Inter',sans-serif;transition:all 0.15s;white-space:nowrap}
+.tab-btn.a-on{background:var(--ag);color:#fff}
+.tab-btn.d-on{background:var(--dv);color:#fff}
+.tab-btn.s-on{background:var(--ds-m);color:#fff}
+
+.pipe-view{display:none}.pipe-view.shown{display:block}
+.pipe-note{font-size:0.82rem;color:var(--mu);margin-bottom:1.25rem;line-height:1.55}
+
+.pipe-flow{display:flex;align-items:flex-start;overflow-x:auto;padding:0.5rem 0 1rem;gap:0;
+  scrollbar-width:thin}
+.pipe-node{display:flex;flex-direction:column;align-items:center;min-width:100px}
+.pipe-box{width:92px;padding:0.6rem 0.4rem;border-radius:8px;text-align:center;font-size:0.72rem;
+  font-weight:600;opacity:0;animation:fadeUp 0.35s forwards;line-height:1.35}
+.pipe-box-name{font-size:0.72rem;font-weight:700}
+.pipe-box-sub{font-size:0.62rem;font-weight:400;opacity:0.8;margin-top:2px}
+.pipe-box.ag-box{background:var(--ag);color:#fff}
+.pipe-box.dv-box{background:var(--dv);color:#fff}
+.pipe-box.sc-box{background:var(--sc);color:#fff;border:2px dashed rgba(255,255,255,0.5)}
+.pipe-arr{width:22px;height:2px;position:relative;flex-shrink:0;margin-top:30px;opacity:0;animation:fadeUp 0.3s forwards}
+.pipe-arr.ag-arr{background:var(--ag-m)}.pipe-arr.dv-arr{background:var(--dv-m)}.pipe-arr.sc-arr{background:var(--sc-m)}
+.pipe-arr::after{content:'';position:absolute;right:-1px;top:-4px;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.pipe-arr.ag-arr::after{border-left:7px solid var(--ag-m)}
+.pipe-arr.dv-arr::after{border-left:7px solid var(--dv-m)}
+.pipe-arr.sc-arr::after{border-left:7px solid var(--sc-m)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.pipe-speed{margin-top:1.25rem;display:inline-flex;align-items:center;gap:0.6rem;
+  padding:0.6rem 1rem;border-radius:var(--r);font-size:0.82rem;font-weight:600}
+.pipe-speed.slow{background:var(--er-l);color:var(--er)}
+.pipe-speed.fast{background:var(--ok-l);color:var(--ok)}
+.pipe-speed.secure{background:var(--ds-l);color:var(--ds-m)}
+.legend{display:flex;gap:1rem;margin-top:1.25rem;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:0.4rem;font-size:0.75rem;font-weight:500}
+.legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.legend-dot.ag-dot{background:var(--ag)}.legend-dot.dv-dot{background:var(--dv)}
+.legend-dot.sc-dot{background:var(--sc);outline:2px dashed var(--sc);outline-offset:1px}
+
+/* DRAG AND DROP */
+.dnd3-layout{display:grid;grid-template-columns:1fr 1.8fr 0.85fr;gap:1.25rem;align-items:start}
+.pool-label{font-size:0.72rem;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:0.08em;text-align:center;margin-bottom:0.5rem}
+.card-pool{display:flex;flex-direction:column;gap:6px}
+.drag-card{background:#fff;border:1.5px solid var(--bd);border-radius:7px;padding:0.5rem 0.75rem;
+  font-size:0.79rem;font-weight:500;cursor:grab;user-select:none;transition:all 0.15s}
+.drag-card:hover{border-color:var(--tx);box-shadow:0 2px 8px rgba(0,0,0,0.08);transform:translateY(-1px)}
+.drag-card.selected{border-color:var(--tx);background:var(--bg-alt);font-weight:600}
+.drag-card.gone{display:none}
+.drop-zones3{display:flex;flex-direction:column;gap:0.85rem}
+.dz3{min-height:90px;border-radius:var(--r);border:2px dashed var(--bd);padding:0.75rem;transition:all 0.15s}
+.dz3.ag-z{border-color:var(--ag);background:var(--ag-l)}
+.dz3.dv-z{border-color:var(--dv);background:var(--dv-l)}
+.dz3.ds-z{border-color:var(--ds-m);background:var(--ds-l)}
+.dz3.drag-over{transform:scale(1.01);box-shadow:0 4px 14px rgba(0,0,0,0.09)}
+.dz3.clickable:hover{transform:scale(1.01);cursor:pointer}
+.dz3-label{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.45rem}
+.ag-z .dz3-label{color:var(--ag)}.dv-z .dz3-label{color:var(--dv)}.ds-z .dz3-label{color:var(--ds-m)}
+.dz3-chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip3{padding:0.25rem 0.6rem;border-radius:20px;font-size:0.72rem;font-weight:500;cursor:pointer}
+.ag-z .chip3{background:var(--ag);color:#fff}.dv-z .chip3{background:var(--dv);color:#fff}.ds-z .chip3{background:var(--ds-m);color:#fff}
+.chip3.correct::after{content:' ✓';font-weight:700}.chip3.wrong::after{content:' ✗';font-weight:700}.chip3.wrong{opacity:0.55}
+.dnd-sidebar{position:sticky;top:70px}
+.dnd-hint{font-size:0.79rem;color:var(--mu);text-align:center;margin-bottom:1rem;line-height:1.5}
+.dnd-result{padding:0.85rem;border-radius:var(--r);font-weight:600;font-size:0.875rem;
+  text-align:center;margin-top:0.75rem;display:none}
+.dnd-result.show{display:block}
+.dnd-result.good{background:var(--ok-l);color:var(--ok)}.dnd-result.bad{background:var(--er-l);color:var(--er)}
+
+/* SCENARIO */
+.scenario-wrap{background:#fff;border:1.5px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.scenario-head{color:#fff;padding:1.2rem 1.5rem}
+.scenario-head.lag-bg{background:var(--ag)}.scenario-head.ldv-bg{background:var(--dv)}.scenario-head.lds-bg{background:var(--ds-m)}
+.scenario-head h3{font-size:1rem;margin-bottom:0.25rem}
+.scenario-head p{font-size:0.8rem;opacity:0.75}
+.sc-progress{display:flex;gap:0;overflow:hidden;border-bottom:1px solid var(--bd)}
+.sc-prog-step{flex:1;padding:0.5rem 0.75rem;font-size:0.72rem;font-weight:600;text-align:center;
+  border-right:1px solid var(--bd);cursor:default;transition:all 0.2s}
+.sc-prog-step:last-child{border:none}
+.sc-prog-step.done{background:var(--bg-alt);color:var(--mu)}
+.sc-prog-step.active-ag{background:var(--ag-l);color:var(--ag)}
+.sc-prog-step.active-dv{background:var(--dv-l);color:var(--dv)}
+.sc-prog-step.active-ds{background:var(--ds-l);color:var(--ds-m)}
+.scenario-body{padding:1.5rem}
+.sc-step{display:none}.sc-step.active{display:block}
+.situation{padding:0.85rem 1.1rem;background:var(--bg-alt);border-left:3px solid var(--tx);
+  border-radius:0 var(--r) var(--r) 0;font-size:0.86rem;font-style:italic;margin-bottom:1.2rem;line-height:1.6}
+.sc-q{font-weight:700;font-size:0.88rem;margin-bottom:0.85rem}
+.choices2{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem}
+.choice2{padding:0.85rem;border-radius:var(--r);border:1.5px solid var(--bd);background:#fff;
+  cursor:pointer;text-align:left;font-size:0.82rem;font-family:'Inter',sans-serif;transition:all 0.15s;line-height:1.45}
+.choice2:hover{box-shadow:0 2px 10px rgba(0,0,0,0.08);transform:translateY(-1px)}
+.c2-tag{font-size:0.67rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:0.3rem}
+.choice2.ca .c2-tag{color:var(--ag)}.choice2.cb .c2-tag{color:var(--dv)}.choice2.cc .c2-tag{color:var(--ds-m)}
+.choice2.ca:hover{border-color:var(--ag);background:var(--ag-l)}
+.choice2.cb:hover{border-color:var(--dv);background:var(--dv-l)}
+.choice2.cc:hover{border-color:var(--ds-m);background:var(--ds-l)}
+.choice2.picked{pointer-events:none}.choice2.faded{opacity:0.32;pointer-events:none}
+.sc-feedback{margin-top:1rem;padding:1rem 1.1rem;border-radius:var(--r);font-size:0.84rem;
+  line-height:1.6;display:none;border-left:3px solid}
+.sc-feedback.shown{display:block}
+.sc-feedback.fa{background:var(--ag-l);border-color:var(--ag)}
+.sc-feedback.fb{background:var(--dv-l);border-color:var(--dv)}
+.sc-feedback.fc{background:var(--ds-l);border-color:var(--ds-m)}
+.sc-feedback strong{display:block;margin-bottom:0.25rem;font-size:0.88rem}
+.sc-feedback.fa strong{color:var(--ag)}.sc-feedback.fb strong{color:var(--dv)}.sc-feedback.fc strong{color:var(--ds-m)}
+.sc-nav{display:none;justify-content:flex-end;margin-top:1rem}.sc-nav.shown{display:flex}
+.step-dots{display:flex;gap:5px;padding:0.85rem 1.5rem;border-top:1px solid var(--bd)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--bd);transition:all 0.3s}
+.dot.done{background:var(--tx)}.dot.cur{width:20px;border-radius:4px}
+.dot.cur-ag{background:var(--ag)}.dot.cur-dv{background:var(--dv)}.dot.cur-ds{background:var(--ds-m)}
+
+/* QUIZ */
+.quiz-wrap{max-width:660px}
+.quiz-card{background:#fff;border:1.5px solid var(--bd);border-radius:var(--r);padding:1.5rem;display:none}
+.quiz-card.shown{display:block}
+.q-num{font-size:0.7rem;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.45rem}
+.q-text{font-size:0.95rem;font-weight:600;margin-bottom:1.1rem;line-height:1.5}
+.q-opts{display:flex;flex-direction:column;gap:0.4rem}
+.q-opt{padding:0.65rem 0.9rem;border-radius:7px;border:1.5px solid var(--bd);background:#fff;
+  cursor:pointer;font-size:0.84rem;text-align:left;font-family:'Inter',sans-serif;transition:all 0.15s}
+.q-opt:hover:not(.locked){border-color:var(--tx)}
+.q-opt.locked{pointer-events:none}
+.q-opt.correct{background:var(--ok-l);border-color:var(--ok);color:var(--ok);font-weight:600}
+.q-opt.wrong{background:var(--er-l);border-color:var(--er);color:var(--er)}
+.q-exp{margin-top:0.65rem;padding:0.65rem 0.9rem;background:var(--bg-alt);border-radius:7px;
+  font-size:0.79rem;color:var(--mu);line-height:1.6;display:none}
+.q-exp.shown{display:block}
+.quiz-footer{display:flex;justify-content:space-between;align-items:center;margin-top:1.2rem}
+.quiz-counter{font-size:0.82rem;color:var(--mu);font-weight:500}
+.quiz-result{background:var(--bg-alt);border-radius:var(--r);padding:2.5rem;text-align:center;display:none;margin-top:1.5rem}
+.quiz-result.shown{display:block}
+.big-score{font-size:3rem;font-weight:800;margin-bottom:0.4rem}
+.big-score.great{color:var(--ok)}.big-score.mid{color:var(--sc)}.big-score.low{color:var(--er)}
+.quiz-result p{color:var(--mu);margin-bottom:1.5rem;font-size:0.88rem}
+
+/* SUMMARY */
+.sum-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.1rem}
+.sum-col{border-radius:var(--r);padding:1.4rem;border:2px solid}
+.sum-col.lag{background:var(--ag-l);border-color:var(--ag)}.sum-col.ldv{background:var(--dv-l);border-color:var(--dv)}.sum-col.lds{background:var(--ds-l);border-color:var(--ds-m)}
+.sum-col h3{font-size:0.88rem;margin-bottom:0.85rem}
+.lag h3{color:var(--ag)}.ldv h3{color:var(--dv)}.lds h3{color:var(--ds-m)}
+.sum-row{display:flex;gap:0.6rem;margin-bottom:0.45rem;font-size:0.81rem}
+.sum-key{font-weight:600;min-width:72px;flex-shrink:0}
+.tool-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.1rem;margin-top:0.5rem}
+.tool-col{border-radius:var(--r);padding:1.2rem}
+.tool-col.lag{background:var(--ag-l)}.tool-col.ldv{background:var(--dv-l)}.tool-col.lds{background:var(--ds-l)}
+.tool-col h4{font-size:0.8rem;font-weight:700;margin-bottom:0.65rem}
+.lag h4{color:var(--ag)}.ldv h4{color:var(--dv)}.lds h4{color:var(--ds-m)}
+.tool-col ul{list-style:none;display:flex;flex-direction:column;gap:0.3rem}
+.tool-col ul li{font-size:0.77rem;display:flex;gap:0.4rem;line-height:1.4}
+.tool-col ul li::before{content:'•';font-weight:700;flex-shrink:0}
+.lag ul li::before{color:var(--ag)}.ldv ul li::before{color:var(--dv)}.lds ul li::before{color:var(--ds-m)}
+.final-box{margin-top:2.5rem;text-align:center;padding:2rem;background:var(--bg-alt);border-radius:var(--r)}
+.final-box p{color:var(--mu);font-size:0.88rem;max-width:500px;margin:0.5rem auto 1.5rem}
+.final-acts{display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap}
+
+@media(max-width:680px){
+  .three-grid,.sum-grid3,.tool-grid,.dnd3-layout,.choices2{grid-template-columns:1fr}
+  nav ul{display:none}
+  .pipe-flow{overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <span class="na">Agile</span><span class="sep">+</span>
+    <span class="nd">DevOps</span><span class="sep">+</span>
+    <span class="ns">DevSecOps</span>
+  </div>
+  <ul>
+    <li><a href="#layers">Layers</a></li>
+    <li><a href="#pipeline">Pipeline</a></li>
+    <li><a href="#drag">Activity</a></li>
+    <li><a href="#scenario">Scenario</a></li>
+    <li><a href="#quiz">Quiz</a></li>
+    <li><a href="#summary">Summary</a></li>
+  </ul>
+</nav>
+<div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+
+<!-- HERO -->
+<section id="hero">
+  <span class="hero-label">Modern Software Delivery</span>
+  <h1 class="hero-title syne">
+    <span class="na">Agile</span> + <span class="nd">DevOps</span> + <span class="ns">DevSecOps</span>
+  </h1>
+  <p class="hero-sub">Three complementary layers of modern software delivery - each building on the one below it. Learn what they are and how they fit together.</p>
+  <div class="layer-stack">
+    <div class="layer-block lag">
+      <span class="lb-tag">Agile</span>
+      <div class="lb-desc">How you plan and organize work - sprints, backlog, feedback cycles</div>
+    </div>
+    <div class="lb-arrow">+</div>
+    <div class="layer-block ldv">
+      <span class="lb-tag">DevOps</span>
+      <div class="lb-desc">How you build, test, and deploy automatically - CI/CD, automation, monitoring</div>
+    </div>
+    <div class="lb-arrow">+</div>
+    <div class="layer-block lds">
+      <span class="lb-tag">DevSecOps</span>
+      <div class="lb-desc">How you embed security into every stage of the pipeline - shift left, security as code</div>
+    </div>
+  </div>
+  <a href="#layers" class="btn btn-dark">Start Learning &darr;</a>
+</section>
+
+<!-- LAYERS -->
+<section class="alt" id="layers">
+  <div class="inner">
+    <p class="sec-label">Part 1 of 5 - The Three Layers</p>
+    <h2 class="sec-title syne">What does each layer actually do?</h2>
+    <p class="sec-sub">Each layer addresses a different problem. They are not alternatives to each other - they stack.</p>
+    <div class="three-grid">
+      <div class="layer-card lag">
+        <span class="lc-badge">Agile</span>
+        <h3 class="syne">Organize and prioritize work</h3>
+        <p>A project management philosophy using short, repeating cycles called sprints. The team builds small pieces, gets feedback, and adapts.</p>
+        <ul>
+          <li>Sprint planning and reviews</li>
+          <li>Backlog of prioritized tasks</li>
+          <li>Daily standups</li>
+          <li>Retrospectives after each sprint</li>
+          <li>User stories as requirements</li>
+        </ul>
+      </div>
+      <div class="layer-card ldv">
+        <span class="lc-badge">DevOps</span>
+        <h3 class="syne">Automate delivery and operations</h3>
+        <p>A set of practices and tools that automate the path from written code to running software. Developers and operations work as one team.</p>
+        <ul>
+          <li>Continuous Integration (CI)</li>
+          <li>Continuous Deployment (CD)</li>
+          <li>Infrastructure as Code (IaC)</li>
+          <li>Automated testing pipelines</li>
+          <li>Monitoring and alerting</li>
+        </ul>
+      </div>
+      <div class="layer-card lds">
+        <span class="lc-badge">DevSecOps</span>
+        <h3 class="syne">Embed security everywhere</h3>
+        <p>Security checks are automated and built into the CI/CD pipeline. Rather than a gate at the end, security is everyone's responsibility from day one.</p>
+        <ul>
+          <li>SAST - static code analysis</li>
+          <li>DAST - dynamic app testing</li>
+          <li>Dependency vulnerability scanning</li>
+          <li>Secrets detection in code</li>
+          <li>Policy and compliance as code</li>
+        </ul>
+      </div>
+    </div>
+    <div class="rel-box">
+      <strong>Why they need each other:</strong>
+      Agile creates the demand for frequent delivery - end of every sprint, something should ship. DevOps creates the technical capability to actually do that safely and automatically. Without DevOps, Agile sprints pile up as "done but not deployed" features. DevSecOps then ensures that speed does not create security debt: vulnerabilities caught in the pipeline cost 10-100x less to fix than those caught in production.
+    </div>
+  </div>
+</section>
+
+<!-- PIPELINE -->
+<div id="pipeline">
+<section class="sec">
+  <p class="sec-label">Part 2 of 5 - Animated Pipeline</p>
+  <h2 class="sec-title syne">Watch the pipeline evolve</h2>
+  <p class="sec-sub">Each layer adds new stages. Toggle through all three to see how code's journey from developer to production changes.</p>
+  <div class="tab-row">
+    <button class="tab-btn a-on" id="tabA" onclick="showPipe('ag')">Agile only</button>
+    <button class="tab-btn" id="tabD" onclick="showPipe('dv')">+ DevOps</button>
+    <button class="tab-btn" id="tabS" onclick="showPipe('ds')">+ DevSecOps</button>
+  </div>
+  <div class="pipe-view shown" id="pvAG">
+    <p class="pipe-note">Code travels manually from developer to production. Deployment depends on individuals, is error-prone, and takes days.</p>
+    <div class="pipe-flow" id="pfAG"></div>
+    <div class="pipe-speed slow">Deployment time: 3-5 days &nbsp;|&nbsp; Manual steps, high error risk</div>
+  </div>
+  <div class="pipe-view" id="pvDV">
+    <p class="pipe-note">Every code commit triggers an automated pipeline. Build, test, and deploy run without manual intervention. Failures are caught immediately.</p>
+    <div class="pipe-flow" id="pfDV"></div>
+    <div class="pipe-speed fast">Deployment time: under 1 hour &nbsp;|&nbsp; Automated, reliable</div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot ag-dot"></div>Agile stage</div>
+      <div class="legend-item"><div class="legend-dot dv-dot"></div>DevOps automation</div>
+    </div>
+  </div>
+  <div class="pipe-view" id="pvDS">
+    <p class="pipe-note">Security checks are woven into every stage. Vulnerabilities, exposed secrets, and risky dependencies are caught automatically before they ever reach production.</p>
+    <div class="pipe-flow" id="pfDS"></div>
+    <div class="pipe-speed secure">Deployment time: under 1 hour &nbsp;|&nbsp; Automated + security verified</div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot ag-dot"></div>Agile stage</div>
+      <div class="legend-item"><div class="legend-dot dv-dot"></div>DevOps automation</div>
+      <div class="legend-item"><div class="legend-dot sc-dot"></div>Security gate (DevSecOps)</div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- DRAG AND DROP -->
+<section class="alt" id="drag">
+  <div class="inner">
+    <p class="sec-label">Part 3 of 5 - Activity</p>
+    <h2 class="sec-title syne">Sort the practices</h2>
+    <p class="sec-sub">Drag cards into the correct layer - or click a card to select it, then click the drop zone. Drop them all, then check your answers.</p>
+    <div class="dnd3-layout">
+      <div>
+        <div class="pool-label">Practices to sort</div>
+        <div class="card-pool" id="cardPool3"></div>
+      </div>
+      <div class="drop-zones3">
+        <div class="dz3 ag-z" id="dzAG3"
+          ondragover="onDO(event)" ondrop="onDrop3(event,'ag')" ondragleave="onDL(event)"
+          onclick="onZC3('ag')">
+          <div class="dz3-label">Agile</div>
+          <div class="dz3-chips" id="chipsAG3"></div>
+        </div>
+        <div class="dz3 dv-z" id="dzDV3"
+          ondragover="onDO(event)" ondrop="onDrop3(event,'dv')" ondragleave="onDL(event)"
+          onclick="onZC3('dv')">
+          <div class="dz3-label">DevOps</div>
+          <div class="dz3-chips" id="chipsDV3"></div>
+        </div>
+        <div class="dz3 ds-z" id="dzDS3"
+          ondragover="onDO(event)" ondrop="onDrop3(event,'ds')" ondragleave="onDL(event)"
+          onclick="onZC3('ds')">
+          <div class="dz3-label">DevSecOps</div>
+          <div class="dz3-chips" id="chipsDS3"></div>
+        </div>
+      </div>
+      <div class="dnd-sidebar">
+        <p class="dnd-hint">Click a card to select it, then click a zone to place it. Click a chip to return it.</p>
+        <button class="btn btn-dark" style="width:100%" id="checkDnd3Btn" onclick="checkDnd3()" disabled>Check answers</button>
+        <button class="btn btn-outline" style="width:100%;margin-top:0.5rem;display:none" id="resetDnd3Btn" onclick="resetDnd3()">Try again</button>
+        <div class="dnd-result" id="dndResult3"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCENARIO -->
+<div id="scenario">
+<section class="sec">
+  <p class="sec-label">Part 4 of 5 - Scenario</p>
+  <h2 class="sec-title syne">Follow TechFlow through adoption</h2>
+  <p class="sec-sub">TechFlow is a startup building a SaaS platform. Watch them adopt each layer and see the real-world effect at each step.</p>
+  <div class="scenario-wrap">
+    <div class="scenario-head lag-bg" id="scHead">
+      <h3 id="scHeadTitle">Layer 1: Adopting Agile</h3>
+      <p id="scHeadSub">TechFlow has chaotic, reactive development. Can Agile fix it?</p>
+    </div>
+    <div class="sc-progress" id="scProgress">
+      <div class="sc-prog-step active-ag" id="sp0">1. Agile</div>
+      <div class="sc-prog-step" id="sp1">2. + DevOps</div>
+      <div class="sc-prog-step" id="sp2">3. + DevSecOps</div>
+    </div>
+    <div class="scenario-body" id="scenarioBody3"></div>
+    <div class="step-dots" id="stepDots3"></div>
+  </div>
+</section>
+</div>
+
+<!-- QUIZ -->
+<section class="alt" id="quiz">
+  <div class="inner">
+    <p class="sec-label">Part 5 of 5 - Knowledge Check</p>
+    <h2 class="sec-title syne">Test what you have learned</h2>
+    <p class="sec-sub">Five questions covering all three layers. Explanation provided after each answer.</p>
+    <div class="quiz-wrap">
+      <div id="quizCards3"></div>
+      <div class="quiz-footer" id="quizFooter3">
+        <span class="quiz-counter" id="quizCounter3">Question 1 of 5</span>
+        <button class="btn btn-dark" id="nextBtn3" onclick="nextQ3()" disabled>Next question &rarr;</button>
+      </div>
+      <div class="quiz-result" id="quizResult3">
+        <div class="big-score" id="bigScore3"></div>
+        <p id="resultMsg3"></p>
+        <button class="btn btn-outline" onclick="resetQuiz3()">Retry quiz</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SUMMARY -->
+<section class="sec" id="summary">
+  <p class="sec-label">Reference - Quick Cheat Sheet</p>
+  <h2 class="sec-title syne">Everything at a glance</h2>
+  <div class="sum-grid3">
+    <div class="sum-col lag">
+      <h3 class="syne">Agile</h3>
+      <div class="sum-row"><span class="sum-key">Focus</span><span>Work organization</span></div>
+      <div class="sum-row"><span class="sum-key">Cycle</span><span>Sprint (1-4 weeks)</span></div>
+      <div class="sum-row"><span class="sum-key">Team</span><span>Dev + Product Owner</span></div>
+      <div class="sum-row"><span class="sum-key">Artifact</span><span>Working increment</span></div>
+      <div class="sum-row"><span class="sum-key">Problem</span><span>Building the wrong thing</span></div>
+    </div>
+    <div class="sum-col ldv">
+      <h3 class="syne">DevOps</h3>
+      <div class="sum-row"><span class="sum-key">Focus</span><span>Delivery automation</span></div>
+      <div class="sum-row"><span class="sum-key">Cycle</span><span>Continuous (every commit)</span></div>
+      <div class="sum-row"><span class="sum-key">Team</span><span>Dev + Operations</span></div>
+      <div class="sum-row"><span class="sum-key">Artifact</span><span>CI/CD pipeline</span></div>
+      <div class="sum-row"><span class="sum-key">Problem</span><span>Slow, risky deployments</span></div>
+    </div>
+    <div class="sum-col lds">
+      <h3 class="syne">DevSecOps</h3>
+      <div class="sum-row"><span class="sum-key">Focus</span><span>Security integration</span></div>
+      <div class="sum-row"><span class="sum-key">Cycle</span><span>Every pipeline run</span></div>
+      <div class="sum-row"><span class="sum-key">Team</span><span>Dev + Ops + Security</span></div>
+      <div class="sum-row"><span class="sum-key">Artifact</span><span>Secure pipeline + policies</span></div>
+      <div class="sum-row"><span class="sum-key">Problem</span><span>Security found too late</span></div>
+    </div>
+  </div>
+  <h3 class="syne" style="margin-top:2.5rem;margin-bottom:0.75rem;font-size:1.05rem">Common tools by layer</h3>
+  <div class="tool-grid">
+    <div class="tool-col lag">
+      <h4>Agile tools</h4>
+      <ul>
+        <li>Jira / Linear (backlog)</li>
+        <li>Confluence (documentation)</li>
+        <li>Trello (kanban boards)</li>
+        <li>Notion (planning)</li>
+        <li>Azure DevOps Boards</li>
+      </ul>
+    </div>
+    <div class="tool-col ldv">
+      <h4>DevOps tools</h4>
+      <ul>
+        <li>GitHub Actions / GitLab CI</li>
+        <li>Jenkins (CI/CD)</li>
+        <li>Docker + Kubernetes</li>
+        <li>Terraform (IaC)</li>
+        <li>Prometheus + Grafana (monitoring)</li>
+      </ul>
+    </div>
+    <div class="tool-col lds">
+      <h4>DevSecOps tools</h4>
+      <ul>
+        <li>SonarQube / Semgrep (SAST)</li>
+        <li>OWASP ZAP / Burp Suite (DAST)</li>
+        <li>Snyk / Dependabot (deps)</li>
+        <li>Trivy / Clair (containers)</li>
+        <li>HashiCorp Vault (secrets)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="final-box">
+    <h3 class="syne" style="font-size:1.1rem">Tutorial complete!</h3>
+    <p>The three layers work best together. Agile without DevOps creates deployment bottlenecks. DevOps without DevSecOps creates security debt. All three together give you fast, reliable, and secure software delivery.</p>
+    <div class="final-acts">
+      <a href="#hero" class="btn btn-outline">Restart tutorial</a>
+      <a href="#quiz" class="btn btn-dark">Retake the quiz</a>
+    </div>
+  </div>
+</section>
+
+<script>
+window.addEventListener('scroll',()=>{
+  const p=(window.scrollY/(document.body.scrollHeight-window.innerHeight))*100;
+  document.getElementById('progFill').style.width=Math.min(p,100)+'%';
+});
+
+// ============ PIPELINE ============
+const pipelineData={
+  ag:[
+    {n:'Sprint plan',s:'Backlog task',t:'ag'},
+    {n:'Code',s:'Developer writes',t:'ag'},
+    {n:'Code review',s:'Peer checks',t:'ag'},
+    {n:'Manual test',s:'QA team',t:'ag'},
+    {n:'Manual deploy',s:'Ops team',t:'ag'},
+  ],
+  dv:[
+    {n:'Sprint plan',s:'Backlog task',t:'ag'},
+    {n:'Commit',s:'Push to repo',t:'ag'},
+    {n:'Build (CI)',s:'Auto compile',t:'dv'},
+    {n:'Unit tests',s:'Auto suite',t:'dv'},
+    {n:'Deploy (CD)',s:'Auto release',t:'dv'},
+    {n:'Monitor',s:'Logs + alerts',t:'dv'},
+  ],
+  ds:[
+    {n:'Sprint plan',s:'Backlog task',t:'ag'},
+    {n:'Commit',s:'Push to repo',t:'ag'},
+    {n:'SAST',s:'Code analysis',t:'sc'},
+    {n:'Build (CI)',s:'Auto compile',t:'dv'},
+    {n:'Dep scan',s:'CVE check',t:'sc'},
+    {n:'Tests',s:'Auto suite',t:'dv'},
+    {n:'DAST',s:'Live scan',t:'sc'},
+    {n:'Deploy (CD)',s:'Auto release',t:'dv'},
+    {n:'Runtime mon',s:'Sec + perf',t:'sc'},
+  ]
+};
+
+function buildPipeline(key){
+  const container=document.getElementById('pf'+key.toUpperCase());
+  const stages=pipelineData[key];
+  let html='';
+  stages.forEach((s,i)=>{
+    html+=`<div class="pipe-node">
+      <div class="pipe-box ${s.t}-box" style="animation-delay:${i*0.12}s">
+        <div class="pipe-box-name">${s.n}</div>
+        <div class="pipe-box-sub">${s.s}</div>
+      </div>
+    </div>`;
+    if(i<stages.length-1){
+      const arrT=stages[i+1].t==='sc'?'sc':s.t==='ag'?'ag':'dv';
+      html+=`<div class="pipe-arr ${arrT}-arr" style="animation-delay:${i*0.12+0.1}s"></div>`;
+    }
+  });
+  container.innerHTML=html;
+}
+
+function showPipe(key){
+  document.querySelectorAll('.pipe-view').forEach(v=>v.classList.remove('shown'));
+  ['tabA','tabD','tabS'].forEach(id=>document.getElementById(id).className='tab-btn');
+  const map={ag:['pvAG','tabA','a-on'],dv:['pvDV','tabD','d-on'],ds:['pvDS','tabS','s-on']};
+  document.getElementById(map[key][0]).classList.add('shown');
+  document.getElementById(map[key][1]).classList.add(map[key][2]);
+  buildPipeline(key);
+}
+
+buildPipeline('ag');
+buildPipeline('dv');
+buildPipeline('ds');
+
+// ============ DRAG AND DROP ============
+const dndItems3=[
+  {id:'i1',text:'Sprint retrospectives',ans:'ag'},
+  {id:'i2',text:'Automated CI/CD pipeline',ans:'dv'},
+  {id:'i3',text:'SAST code scanning',ans:'ds'},
+  {id:'i4',text:'Daily standups',ans:'ag'},
+  {id:'i5',text:'Infrastructure as Code',ans:'dv'},
+  {id:'i6',text:'Dependency vulnerability scanning',ans:'ds'},
+  {id:'i7',text:'Product backlog management',ans:'ag'},
+  {id:'i8',text:'Container orchestration',ans:'dv'},
+  {id:'i9',text:'Secrets detection in commits',ans:'ds'},
+  {id:'i10',text:'User story mapping',ans:'ag'},
+  {id:'i11',text:'Automated deployment monitoring',ans:'dv'},
+  {id:'i12',text:'Security policy as code',ans:'ds'},
+];
+
+let placed3={ag:[],dv:[],ds:[]};
+let selected3=null,dragging3=null,checked3=false;
+
+function initDnd3(){
+  placed3={ag:[],dv:[],ds:[]};selected3=null;dragging3=null;checked3=false;
+  const pool=document.getElementById('cardPool3');
+  pool.innerHTML='';
+  const shuffled=[...dndItems3].sort(()=>Math.random()-0.5);
+  shuffled.forEach(item=>{
+    const el=document.createElement('div');
+    el.className='drag-card';el.id='dc3-'+item.id;el.textContent=item.text;el.draggable=true;
+    el.addEventListener('dragstart',()=>{dragging3=item.id;});
+    el.addEventListener('dragend',()=>{dragging3=null;});
+    el.addEventListener('click',()=>selectCard3(item.id));
+    pool.appendChild(el);
+  });
+  ['AG3','DV3','DS3'].forEach(z=>{document.getElementById('chips'+z).innerHTML='';});
+  document.getElementById('dndResult3').className='dnd-result';
+  document.getElementById('checkDnd3Btn').disabled=true;
+  document.getElementById('resetDnd3Btn').style.display='none';
+  document.querySelectorAll('.dz3').forEach(z=>z.classList.remove('clickable'));
+}
+
+function selectCard3(id){
+  if(checked3)return;
+  const was=selected3===id;
+  document.querySelectorAll('.drag-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.dz3').forEach(z=>z.classList.remove('clickable'));
+  if(was){selected3=null;return;}
+  selected3=id;
+  document.getElementById('dc3-'+id).classList.add('selected');
+  document.querySelectorAll('.dz3').forEach(z=>z.classList.add('clickable'));
+}
+
+function onZC3(zone){if(!checked3&&selected3)placeCard3(selected3,zone);}
+function onDO(e){e.preventDefault();e.currentTarget.classList.add('drag-over');}
+function onDL(e){e.currentTarget.classList.remove('drag-over');}
+function onDrop3(e,zone){e.preventDefault();e.currentTarget.classList.remove('drag-over');if(dragging3)placeCard3(dragging3,zone);}
+
+function placeCard3(id,zone){
+  ['ag','dv','ds'].forEach(z=>{
+    const idx=placed3[z].indexOf(id);
+    if(idx>-1){placed3[z].splice(idx,1);
+      const c=document.querySelector(`#chips${z.toUpperCase()}3 [data-id="${id}"]`);
+      if(c)c.remove();}
+  });
+  placed3[zone].push(id);
+  const item=dndItems3.find(d=>d.id===id);
+  const chip=document.createElement('div');chip.className='chip3';chip.dataset.id=id;
+  chip.textContent=item.text;chip.title='Click to remove';
+  chip.onclick=()=>removeChip3(id,zone);
+  document.getElementById('chips'+zone.toUpperCase()+'3').appendChild(chip);
+  const poolCard=document.getElementById('dc3-'+id);
+  if(poolCard)poolCard.classList.add('gone');
+  selected3=null;
+  document.querySelectorAll('.drag-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.dz3').forEach(z=>z.classList.remove('clickable'));
+  updateCheck3();
+}
+
+function removeChip3(id,zone){
+  if(checked3)return;
+  const idx=placed3[zone].indexOf(id);
+  if(idx>-1)placed3[zone].splice(idx,1);
+  const chip=document.querySelector(`#chips${zone.toUpperCase()}3 [data-id="${id}"]`);
+  if(chip)chip.remove();
+  const poolCard=document.getElementById('dc3-'+id);
+  if(poolCard)poolCard.classList.remove('gone');
+  updateCheck3();
+}
+
+function updateCheck3(){
+  const total=placed3.ag.length+placed3.dv.length+placed3.ds.length;
+  document.getElementById('checkDnd3Btn').disabled=total<dndItems3.length;
+}
+
+function checkDnd3(){
+  checked3=true;let correct=0;
+  dndItems3.forEach(item=>{
+    const zone=['ag','dv','ds'].find(z=>placed3[z].includes(item.id));
+    if(!zone)return;
+    const chip=document.querySelector(`#chips${zone.toUpperCase()}3 [data-id="${item.id}"]`);
+    if(!chip)return;
+    const ok=zone===item.ans;chip.classList.add(ok?'correct':'wrong');
+    if(ok)correct++;
+  });
+  const pct=Math.round((correct/dndItems3.length)*100);
+  const r=document.getElementById('dndResult3');
+  r.textContent=`${correct} / ${dndItems3.length} correct (${pct}%)`;
+  r.className='dnd-result show '+(pct>=70?'good':'bad');
+  document.getElementById('checkDnd3Btn').disabled=true;
+  document.getElementById('resetDnd3Btn').style.display='block';
+}
+
+function resetDnd3(){initDnd3();}
+
+// ============ SCENARIO ============
+const sc3steps=[
+  {
+    headBg:'lag-bg',headTitle:'Layer 1: Adopting Agile',headSub:'TechFlow starts sprints and structured planning.',
+    progActive:'active-ag',
+    situation:"TechFlow's team of 8 developers works reactively - fixing bugs as they appear, deploying whenever someone remembers. Features take months with no clear order. The CTO wants structured delivery.",
+    q:"What does adopting Agile change for TechFlow?",
+    choices:[
+      {cls:'ca',tag:'?',text:"The team runs 2-week sprints. Each sprint has a clear goal, daily standups, and a retrospective. Features are prioritized in a backlog."},
+      {cls:'cb',tag:'?',text:"The team installs a CI/CD pipeline and starts deploying automatically on every commit."},
+    ],
+    results:{
+      ca:{cls:'fa',title:'Exactly right!',body:'Agile restructures how TechFlow plans and delivers. Sprints create a predictable rhythm - stakeholders now know what ships every 2 weeks. But TechFlow still deploys manually: it takes 3 days, involves 2 people, and breaks production roughly once a month. Agile solved planning but not delivery.'},
+      cb:{cls:'fb',title:'That is DevOps, not Agile.',body:'A CI/CD pipeline is a DevOps concept, not an Agile one. Agile deals with how you organize and prioritize work - sprints, backlogs, standups. DevOps deals with how that work gets built and deployed automatically. They are different problems.'},
+    }
+  },
+  {
+    headBg:'ldv-bg',headTitle:'Layer 2: Adding DevOps',headSub:'Automated pipelines replace manual deployments.',
+    progActive:'active-dv',
+    situation:"Sprints are working well. Stakeholders love the predictability. But each deployment still takes 3 days and a senior engineer's full attention. Last sprint's release broke the authentication service for 4 hours.",
+    q:"What does adding DevOps solve for TechFlow?",
+    choices:[
+      {cls:'ca',tag:'?',text:"The team adds SAST scanning and dependency vulnerability checks to catch security issues early."},
+      {cls:'cb',tag:'?',text:"The team builds a CI/CD pipeline. Every commit triggers automated build, test, and deployment. Broken builds are caught in minutes, not days."},
+    ],
+    results:{
+      ca:{cls:'fa',title:'That is DevSecOps, not DevOps.',body:'SAST and dependency scanning are DevSecOps practices - they embed security into the pipeline. DevOps itself focuses on the pipeline structure: automating build, test, and deployment. You need the DevOps pipeline to exist before you can add security gates to it.'},
+      cb:{cls:'fb',title:'Exactly right!',body:'TechFlow sets up GitHub Actions. Now every code push runs automated tests and deploys to staging in 12 minutes. Production deployments are one-click and take under an hour. The monthly production break vanishes - failures are caught in CI. But 6 weeks later, a security researcher reports a SQL injection vulnerability in an endpoint that has been live for 3 months.'},
+    }
+  },
+  {
+    headBg:'lds-bg',headTitle:'Layer 3: Adding DevSecOps',headSub:'Security becomes part of every pipeline run.',
+    progActive:'active-ds',
+    situation:"TechFlow's pipeline is fast and reliable. But the SQL injection incident cost $40,000 in remediation and damaged customer trust. Security was reviewed manually once a quarter by an external firm. That has to change.",
+    q:"What does adding DevSecOps change in the pipeline?",
+    choices:[
+      {cls:'ca',tag:'?',text:"SAST, DAST, and dependency scanning are added as pipeline stages. Any commit that introduces a critical vulnerability is automatically blocked from deploying."},
+      {cls:'cc',tag:'?',text:"The team starts doing more manual code reviews and schedules monthly security audits with an external penetration testing firm."},
+    ],
+    results:{
+      ca:{cls:'fc',title:'Exactly right!',body:'TechFlow integrates Semgrep for SAST, Snyk for dependency scanning, and OWASP ZAP for DAST. On the first day, Semgrep flags a SQL injection pattern in a new feature before it merges. Snyk alerts the team to a critical CVE in a logging library. Both are fixed within hours, not months. Security is no longer a quarterly surprise - it is a continuous automated check that every developer sees.'},
+      cc:{cls:'fa',title:'That is traditional AppSec, not DevSecOps.',body:'Manual reviews and quarterly pen tests were the old approach. They find vulnerabilities months after they were introduced, when they are expensive to fix. DevSecOps means automated security checks run on every single commit - the same way unit tests do. The goal is to catch issues in seconds, not months. Manual audits can supplement this, but they cannot replace the continuous automated layer.'},
+    }
+  }
+];
+
+let sc3Current=0;
+
+function buildScenario3(){
+  const body=document.getElementById('scenarioBody3');
+  body.innerHTML=sc3steps.map((s,i)=>`
+    <div class="sc-step${i===0?' active':''}" id="sc3-${i}">
+      <div class="situation">${s.situation}</div>
+      <div class="sc-q">${s.q}</div>
+      <div class="choices2">
+        ${s.choices.map(c=>`
+          <button class="choice2 ${c.cls}" onclick="pickSc3(${i},'${c.cls}')">
+            <span class="c2-tag">${c.tag}</span>${c.text}
+          </button>
+        `).join('')}
+      </div>
+      ${Object.keys(s.results).map(k=>`
+        <div class="sc-feedback ${s.results[k].cls}" id="sc3fb-${i}-${k}">
+          <strong>${s.results[k].title}</strong>${s.results[k].body}
+        </div>
+      `).join('')}
+      <div class="sc-nav" id="sc3nav-${i}">
+        ${i<sc3steps.length-1
+          ?`<button class="btn btn-dark" onclick="nextSc3(${i+1})">Next layer &rarr;</button>`
+          :`<button class="btn btn-dark" onclick="document.getElementById('quiz').scrollIntoView({behavior:'smooth'})">Go to quiz &rarr;</button>`
+        }
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('stepDots3').innerHTML=
+    sc3steps.map((_,i)=>`<div class="dot${i===0?' cur cur-ag':''}" id="d3-${i}"></div>`).join('');
+}
+
+function pickSc3(step,cls){
+  const r=sc3steps[step].results[cls];
+  document.getElementById(`sc3fb-${step}-${cls}`).classList.add('shown');
+  document.getElementById(`sc3nav-${step}`).classList.add('shown');
+  document.querySelectorAll(`#sc3-${step} .choice2`).forEach(c=>{
+    c.classList.add(c.classList.contains(cls)?'picked':'faded');
+  });
+}
+
+function nextSc3(next){
+  document.querySelectorAll('.sc-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById(`sc3-${next}`).classList.add('active');
+  sc3Current=next;
+  const colors=['cur-ag','cur-dv','cur-ds'];
+  document.querySelectorAll('.dot').forEach((d,i)=>{
+    d.className='dot'+(i<next?' done':(i===next?` cur ${colors[next]}`:''));
+  });
+  const s=sc3steps[next];
+  document.getElementById('scHead').className='scenario-head '+s.headBg;
+  document.getElementById('scHeadTitle').textContent=s.headTitle;
+  document.getElementById('scHeadSub').textContent=s.headSub;
+  ['sp0','sp1','sp2'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    el.className='sc-prog-step '+(i<next?'done':(i===next?s.progActive:''));
+  });
+  document.getElementById('scenarioBody3').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ============ QUIZ ============
+const qs3=[
+  {
+    q:"What does CI/CD stand for, and which layer introduces it?",
+    opts:["Continuous Integration / Continuous Deployment - introduced by Agile","Continuous Integration / Continuous Deployment - introduced by DevOps","Code Inspection / Code Delivery - introduced by DevSecOps","Continuous Iteration / Continuous Design - introduced by Agile"],
+    ans:1,
+    exp:"CI/CD stands for Continuous Integration and Continuous Deployment. It is the core automation practice of DevOps - every code commit is automatically built, tested, and deployed through a pipeline without manual steps."
+  },
+  {
+    q:"What does 'shift left security' mean in DevSecOps?",
+    opts:["Move security responsibilities to the left side of the organization chart","Perform security checks earlier in the development process, not at the end","Replace developers with security specialists","Run security audits on the first day of each sprint"],
+    ans:1,
+    exp:"'Shift left' refers to moving security earlier in the pipeline (to the 'left' of a timeline). Instead of a security gate at the very end, checks like SAST and dependency scanning run on every commit - catching vulnerabilities when they are cheapest to fix."
+  },
+  {
+    q:"A team has smooth Agile sprints but production deployments take 4 days and frequently break things. What are they missing?",
+    opts:["DevSecOps security gates","Better sprint retrospectives","DevOps automation - CI/CD pipeline","More detailed user stories"],
+    ans:2,
+    exp:"This is the classic Agile-without-DevOps problem. Agile gave them planning discipline, but delivery is still slow and manual. DevOps would introduce automated build, test, and deploy pipelines, reducing deployment time from days to minutes and eliminating the manual failure risk."
+  },
+  {
+    q:"Which of these is a DevSecOps tool?",
+    opts:["Jira (issue tracking)","Jenkins (build automation)","Snyk (dependency vulnerability scanning)","Terraform (infrastructure as code)"],
+    ans:2,
+    exp:"Snyk is a DevSecOps tool that scans project dependencies for known CVEs and automatically flags or blocks risky packages. Jira is Agile, Jenkins is DevOps (CI), and Terraform is DevOps (infrastructure as code)."
+  },
+  {
+    q:"Why does DevSecOps require DevOps to already exist?",
+    opts:["DevSecOps is simply a newer version of DevOps","Security gates must be embedded in a pipeline - if there is no pipeline, there is nothing to embed them in","DevSecOps replaces DevOps once a team matures","DevOps and DevSecOps are actually the same thing"],
+    ans:1,
+    exp:"DevSecOps adds security stages (SAST, DAST, dependency scanning, secrets detection) to the CI/CD pipeline. If there is no automated pipeline yet, there is no automated mechanism for those security checks to run. DevOps creates the pipeline; DevSecOps secures it."
+  }
+];
+
+let qC3=0,qS3=0,qA3=new Array(qs3.length).fill(null);
+
+function buildQuiz3(){
+  document.getElementById('quizCards3').innerHTML=qs3.map((q,i)=>`
+    <div class="quiz-card${i===0?' shown':''}" id="qc3-${i}">
+      <div class="q-num">Question ${i+1} of ${qs3.length}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-opts">
+        ${q.opts.map((o,oi)=>`<button class="q-opt" onclick="ansQ3(${i},${oi})">${o}</button>`).join('')}
+      </div>
+      <div class="q-exp" id="qe3-${i}">${q.exp}</div>
+    </div>
+  `).join('');
+}
+
+function ansQ3(qi,oi){
+  if(qA3[qi]!==null)return;
+  qA3[qi]=oi;if(oi===qs3[qi].ans)qS3++;
+  document.querySelectorAll(`#qc3-${qi} .q-opt`).forEach((b,i)=>{
+    b.classList.add('locked');
+    if(i===qs3[qi].ans)b.classList.add('correct');
+    else if(i===oi)b.classList.add('wrong');
+  });
+  document.getElementById(`qe3-${qi}`).classList.add('shown');
+  const nb=document.getElementById('nextBtn3');nb.disabled=false;
+  if(qi===qs3.length-1)nb.textContent='See results \u2192';
+}
+
+function nextQ3(){
+  if(qC3<qs3.length-1){
+    document.querySelectorAll('.quiz-card').forEach(c=>c.classList.remove('shown'));
+    qC3++;
+    document.getElementById(`qc3-${qC3}`).classList.add('shown');
+    document.getElementById('quizCounter3').textContent=`Question ${qC3+1} of ${qs3.length}`;
+    document.getElementById('nextBtn3').disabled=true;
+    document.getElementById('nextBtn3').textContent=qC3===qs3.length-1?'See results \u2192':'Next question \u2192';
+  } else {showQuizResult3();}
+}
+
+function showQuizResult3(){
+  document.getElementById('quizFooter3').style.display='none';
+  document.querySelectorAll('.quiz-card').forEach(c=>c.classList.remove('shown'));
+  const r=document.getElementById('quizResult3');r.classList.add('shown');
+  const pct=Math.round((qS3/qs3.length)*100);
+  const big=document.getElementById('bigScore3');
+  big.textContent=`${qS3} / ${qs3.length}`;
+  big.className='big-score '+(pct>=80?'great':pct>=60?'mid':'low');
+  document.getElementById('resultMsg3').textContent=
+    pct===100?'Perfect! You understand all three layers clearly.':
+    pct>=80?'Great work. You have a solid grasp of all three layers.':
+    pct>=60?'Good start. Review the pipeline and scenario sections for the parts you found tricky.':
+    'Revisit the tutorial from the pipeline section and try again.';
+}
+
+function resetQuiz3(){
+  qC3=0;qS3=0;qA3=new Array(qs3.length).fill(null);
+  document.getElementById('quizFooter3').style.display='flex';
+  document.getElementById('quizResult3').classList.remove('shown');
+  document.getElementById('nextBtn3').disabled=true;
+  document.getElementById('nextBtn3').textContent='Next question \u2192';
+  document.getElementById('quizCounter3').textContent='Question 1 of 5';
+  buildQuiz3();
+}
+
+// ============ INIT ============
+initDnd3();
+buildScenario3();
+buildQuiz3();
+</script>
+<footer style="background:#0D1B2A;padding:2.5rem 1.5rem;text-align:center">
+  <div style="max-width:280px;margin:0 auto">
+    <p style="font-size:0.68rem;color:#8892A4;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.65rem">Prepared by</p>
+    <div style="display:flex;align-items:center;justify-content:center;gap:0.55rem;margin-bottom:0.55rem">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" stroke="#D4523A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M19.5 7.125L18 8.625" stroke="#D4523A" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:1.35rem;font-weight:700;color:#D4523A;letter-spacing:0.04em">MR. Rostami</span>
+    </div>
+    <p style="font-size:0.68rem;color:#8892A4;letter-spacing:0.1em;text-transform:uppercase">DevSecOps Lab Series</p>
+  </div>
+</footer>
+</body>
+</html>
