@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case File: Denver Airport | DevSecOps</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D1B2A;--navy2:#162236;
+  --red:#C0392B;--red-bg:#FDECEA;
+  --grn:#1B7A4A;--grn-bg:#E8F5EE;
+  --amb:#B45309;--amb-bg:#FEF3C7;
+  --blu:#1D4ED8;--blu-bg:#EFF6FF;
+  --bg:#F4F6F9;--sur:#fff;
+  --bdr:#D0D5DD;--txt:#1A2332;--muted:#475569;
+  --sans:'IBM Plex Sans',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--txt);line-height:1.65;font-size:15px;-webkit-tap-highlight-color:transparent}
+.top-bar{background:var(--red);text-align:center;padding:5px 20px;font-family:var(--mono);font-size:10px;letter-spacing:3px;color:#fff;text-transform:uppercase}
+.hdr{background:var(--navy);color:#fff;padding:26px 40px;display:flex;justify-content:space-between;align-items:flex-start}
+.hdr h1{font-size:30px;font-weight:700;margin-bottom:6px}
+.hdr-sub{font-family:var(--mono);font-size:14px;opacity:.6}
+.hdr-meta{text-align:right;font-family:var(--mono);font-size:13px;opacity:.55;line-height:1.9}
+.main{max-width:880px;margin:0 auto;padding:36px 40px 60px}
+.role-box{background:var(--navy);color:#fff;border-radius:8px;padding:22px 28px;margin-bottom:32px;border-left:4px solid var(--red);display:flex;gap:16px;align-items:flex-start}
+.role-icon{font-size:28px;flex-shrink:0;margin-top:2px}
+.role-box .lbl{font-family:var(--mono);font-size:10px;letter-spacing:2.5px;color:var(--red);margin-bottom:8px;text-transform:uppercase}
+.role-box p{font-size:14px;opacity:.9;line-height:1.7}
+.role-box p+p{margin-top:6px;opacity:.6;font-size:13px}
+
+.sub-block{background:var(--sur);border:1px solid var(--bdr);border-radius:10px;padding:22px 26px;margin-bottom:18px}
+.sub-hdr{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.sub-letter{background:var(--navy);color:#fff;width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;font-family:var(--mono)}
+.sub-ttl{font-size:16px;font-weight:600}
+.sub-note{font-size:13.5px;color:var(--muted);line-height:1.65;margin-bottom:14px}
+
+textarea{width:100%;min-height:80px;padding:10px 12px;border:1px solid var(--bdr);border-radius:6px;font-family:var(--sans);font-size:14px;line-height:1.6;resize:vertical;color:var(--txt);background:#FAFBFC;transition:border-color .15s}
+textarea:focus{outline:none;border-color:var(--navy);background:#fff}
+textarea::placeholder{color:#B0BBC8}
+
+.opt-btn{min-height:44px;padding:9px 16px;border-radius:8px;border:1.5px solid var(--bdr);background:#fff;font-size:13px;font-weight:600;font-family:var(--sans);cursor:pointer;color:var(--muted);transition:all .15s;touch-action:manipulation}
+.opt-btn:hover{border-color:var(--navy);color:var(--navy)}
+.opt-btn.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.stance-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+
+.reveal-btn{margin-top:6px;width:100%;min-height:48px;border-radius:8px;border:none;background:var(--red);color:#fff;font-size:14px;font-weight:700;font-family:var(--sans);cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.reveal-btn:hover{background:#A33327}
+.reveal-hint{font-size:12.5px;color:var(--muted);text-align:center;margin-top:8px}
+
+#case-section{display:none}
+#case-section.show{display:block}
+
+.case-doc{background:#FFFDF5;border:1px solid #E5D095;border-radius:8px;padding:26px 30px;margin-bottom:18px;position:relative}
+.case-doc::after{content:'\1F4C1 CASE FILE - DIA 1995';position:absolute;top:14px;right:18px;font-size:9px;letter-spacing:2px;color:#A07B20;opacity:.65;text-transform:uppercase;font-family:var(--mono)}
+.case-doc h3{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #E5D095}
+.case-doc p{margin-bottom:14px;font-size:14.5px;line-height:1.8}
+.case-doc p:last-child{margin-bottom:0}
+
+.stat-row{display:flex;gap:12px;margin:18px 0;flex-wrap:wrap}
+.stat-card{flex:1;min-width:160px;background:var(--red-bg);border:1px solid #F5C6C2;border-radius:8px;padding:14px 16px;text-align:center}
+.stat-num{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--red);line-height:1.2}
+.stat-lbl{font-size:11.5px;color:#8B3A30;margin-top:3px}
+
+.diagram-wrap{background:var(--sur);border:1px solid var(--bdr);border-radius:8px;padding:16px;margin:18px 0}
+.diagram-cap{font-size:12px;color:var(--muted);text-align:center;margin-top:8px;font-style:italic}
+
+.q-list{display:flex;flex-direction:column;gap:14px;margin-top:6px}
+.q-card{background:var(--sur);border:1px solid var(--bdr);border-radius:8px;padding:16px 20px}
+.q-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:14.5px;line-height:1.6}
+.q-n{background:var(--navy);color:#fff;min-width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px}
+
+.close-note{background:var(--grn-bg);border:1px solid #86EFAC;border-radius:8px;padding:16px 20px;margin-top:20px;display:flex;gap:12px;align-items:flex-start}
+.close-icon{font-size:22px;flex-shrink:0}
+.close-note p{font-size:13.5px;color:#166534;line-height:1.7}
+
+.port-bar{background:var(--navy);border-radius:10px;padding:22px 28px;display:flex;justify-content:space-between;align-items:center;margin-top:36px;gap:16px}
+.port-bar h3{color:#fff;font-size:15px;font-weight:600;margin-bottom:4px}
+.port-bar p{color:rgba(255,255,255,.5);font-size:12px}
+.port-btns{display:flex;gap:10px;align-items:center;flex-shrink:0}
+.btn-clear{padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;font-family:var(--sans);cursor:pointer;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.55);transition:all .15s}
+.btn-clear:hover{background:rgba(192,57,43,.35);border-color:var(--red);color:#fff}
+.btn-save{padding:10px 22px;border-radius:8px;font-size:13px;font-weight:600;font-family:var(--sans);cursor:pointer;border:none;background:#fff;color:var(--navy);transition:background .15s;white-space:nowrap}
+.btn-save:hover{background:#EEF2F7}
+
+.footer{background:var(--navy);padding:18px 40px 20px}
+.footer-inner{max-width:880px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.1);padding-top:18px}
+.footer-right{font-size:10px;color:rgba(255,255,255,.3);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase}
+
+@media print{
+  .top-bar,.role-box,.port-bar,.reveal-btn,.reveal-hint,.footer{display:none}
+  .hdr{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #case-section{display:block !important}
+  textarea{background:#fff;border:1px solid #ccc;min-height:40px}
+}
+@media(max-width:600px){
+  .hdr{padding:16px 20px}.hdr h1{font-size:24px}
+  .main{padding:24px 18px 48px}
+  .stat-row{flex-direction:column}
+  .port-bar{flex-direction:column;align-items:stretch}
+  .port-btns{justify-content:flex-end}
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">For Training Use Only - DevSecOps Lab Series</div>
+
+<div class="hdr">
+  <div>
+    <h1>Case File: Denver Airport</h1>
+    <div class="hdr-sub">Warm-Up</div>
+  </div>
+  <div class="hdr-meta">Case ref. DIA-1995<br>DevSecOps Lab Series</div>
+</div>
+
+<div class="main">
+
+  <div class="role-box">
+    <div class="role-icon">🧐</div>
+    <div>
+      <div class="lbl">Before today's lecture</div>
+      <p>You are going to look at one real case from outside the software world. There is no theory to learn yet, just a situation to study. Make up your own mind first, then see what actually happened.</p>
+      <p>Work alone or with a partner. Keep your answers, your instructor will return to this case right after the lecture.</p>
+    </div>
+  </div>
+
+  <!-- PART A: PREDICT -->
+  <div class="sub-block">
+    <div class="sub-hdr"><div class="sub-letter">A</div><div class="sub-ttl">Make your prediction</div></div>
+    <p class="sub-note">Read the situation below. Decide what you think before you go any further. There is no case to look at yet, just your own judgment.</p>
+
+    <div class="case-doc" style="background:#F8FAFC;border-color:var(--bdr)">
+      <p style="margin-bottom:0"><strong>A team is asked to build a large system made of many connected parts</strong>, for example a new factory production line, a city's transit network, or a large piece of software. They plan every detail before starting. Instead of building and testing smaller parts one at a time as each is finished, they build the whole system as a single connected piece, then test all of it together for the first time once it is complete.</p>
+    </div>
+
+    <div class="stance-row">
+      <button class="opt-btn" data-group="stance" data-val="Low risk" onclick="pick(this)">Low risk</button>
+      <button class="opt-btn" data-group="stance" data-val="High risk" onclick="pick(this)">High risk</button>
+      <button class="opt-btn" data-group="stance" data-val="Depends" onclick="pick(this)">Depends</button>
+    </div>
+    <textarea data-key="predict-why" placeholder="Why do you think that? (two or three sentences)"></textarea>
+
+    <button class="reveal-btn" id="reveal-btn" onclick="revealCase()">See what actually happened &rarr;</button>
+    <div class="reveal-hint">This is a real case from 1995. Write your answer above before you look.</div>
+  </div>
+
+  <!-- PART B: CASE (hidden until revealed) -->
+  <div id="case-section">
+    <div class="sub-block">
+      <div class="sub-hdr"><div class="sub-letter">B</div><div class="sub-ttl">What actually happened</div></div>
+
+      <div class="case-doc">
+        <h3>Denver International Airport, automated baggage system</h3>
+        <p>In 1990, Denver began building a new airport with one automated baggage system meant to serve all three of its concourses. The system was designed as a single connected piece. It was not split into smaller parts that were built and tested separately as each one was finished.</p>
+
+        <div class="diagram-wrap">
+          <svg viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+            <rect x="20" y="20" width="140" height="50" rx="8" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="1.5"/>
+            <text x="90" y="50" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="600" fill="#1D4ED8">Concourse A</text>
+            <rect x="230" y="20" width="140" height="50" rx="8" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="1.5"/>
+            <text x="300" y="50" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="600" fill="#1D4ED8">Concourse B</text>
+            <rect x="440" y="20" width="140" height="50" rx="8" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="1.5"/>
+            <text x="510" y="50" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="600" fill="#1D4ED8">Concourse C</text>
+            <line x1="90" y1="70" x2="300" y2="135" stroke="#94A3B8" stroke-width="2"/>
+            <line x1="300" y1="70" x2="300" y2="135" stroke="#94A3B8" stroke-width="2"/>
+            <line x1="510" y1="70" x2="300" y2="135" stroke="#94A3B8" stroke-width="2"/>
+            <rect x="170" y="135" width="260" height="55" rx="8" fill="#0D1B2A"/>
+            <text x="300" y="158" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="700" fill="#fff" letter-spacing="1">ONE BAGGAGE SYSTEM</text>
+            <text x="300" y="175" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="rgba(255,255,255,0.6)">built and tested as a single connected whole</text>
+          </svg>
+          <div class="diagram-cap">All three concourses were served by one connected system, with no separate sections built or tested on their own.</div>
+        </div>
+
+        <p>Partway through construction, the airlines using the airport asked for changes that had not been part of the original plan, such as different handling for oversized bags and separate tracks for damaged equipment carts. By this point the system's design had already been finalized, so making these changes meant reworking parts of the system that were already considered finished.</p>
+
+        <p>The full system was tested only as one complete whole. Each time it was run this way, problems appeared: carts collided with each other, conveyor belts jammed, and the software could not coordinate the number of carts moving through the system at once. The airport's opening was postponed repeatedly while the team tried to fix the whole system at the same time.</p>
+
+        <div class="stat-row">
+          <div class="stat-card"><div class="stat-num">16 months</div><div class="stat-lbl">total opening delay</div></div>
+          <div class="stat-card"><div class="stat-num">~$560M</div><div class="stat-lbl">over the original budget</div></div>
+        </div>
+
+        <div class="diagram-wrap">
+          <svg viewBox="0 0 700 210" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+            <line x1="40" y1="120" x2="660" y2="120" stroke="#D0D5DD" stroke-width="2"/>
+            <circle cx="60" cy="120" r="6" fill="#1D4ED8"/>
+            <text x="60" y="95" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" font-weight="600" fill="#1D4ED8">Planned</text>
+            <text x="60" y="140" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#64748B">Oct 1993</text>
+
+            <rect x="150" y="110" width="400" height="20" rx="4" fill="#FDECEA" stroke="#C0392B" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <text x="350" y="95" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" font-weight="700" fill="#C0392B">Repeated tests of the full system</text>
+            <text x="350" y="145" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="#64748B">each attempt failed in a different way</text>
+
+            <rect x="155" y="160" width="120" height="22" rx="11" fill="#fff" stroke="#F5C6C2"/>
+            <text x="215" y="174" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="9.5" fill="#991B1B">Carts collided</text>
+            <rect x="290" y="160" width="120" height="22" rx="11" fill="#fff" stroke="#F5C6C2"/>
+            <text x="350" y="174" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="9.5" fill="#991B1B">Belts jammed</text>
+            <rect x="425" y="160" width="125" height="22" rx="11" fill="#fff" stroke="#F5C6C2"/>
+            <text x="487" y="174" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="9.5" fill="#991B1B">Software overload</text>
+
+            <circle cx="640" cy="120" r="7" fill="#1B7A4A"/>
+            <text x="640" y="95" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" font-weight="700" fill="#1B7A4A">Opened</text>
+            <text x="640" y="140" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#64748B">Feb 1995</text>
+            <text x="640" y="165" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#64748B">reduced scope</text>
+            <text x="640" y="178" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#64748B">+ manual backup</text>
+          </svg>
+          <div class="diagram-cap">The full system was tested repeatedly over this period. Documented sources name the failures above but do not give exact dates for each one, so this shows the pattern, not a precise schedule.</div>
+        </div>
+
+        <p>The airport eventually opened with a much smaller version of the system working in a single concourse, while a manual, human operated system handled baggage everywhere else.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PART C: DIAGNOSE -->
+  <div class="sub-block" id="diagnose-block" style="display:none">
+    <div class="sub-hdr"><div class="sub-letter">C</div><div class="sub-ttl">Look closer</div></div>
+    <p class="sub-note">Answer in your own words. There is no framework to apply yet, just your own reasoning about what you have read.</p>
+
+    <div class="q-list">
+      <div class="q-card">
+        <div class="q-row"><div class="q-n">1</div><div>The case mentions three different problems (carts colliding, belts jamming, software overload) that were all discovered only once the entire system was connected and run together. In your own words, why might a problem stay hidden when you only test everything together at the end, but show up earlier if smaller pieces are tested on their own as they are finished?</div></div>
+        <textarea data-key="diag1" placeholder="Your answer..."></textarea>
+      </div>
+      <div class="q-card">
+        <div class="q-row"><div class="q-n">2</div><div>The airlines' changes were requested after the plan had already been finalized, so making them meant reworking parts of the system that were already considered finished. What does this tell you about the cost of changing a plan after it is locked in, compared to if the same change had been known from the very start?</div></div>
+        <textarea data-key="diag2" placeholder="Your answer..."></textarea>
+      </div>
+      <div class="q-card">
+        <div class="q-row"><div class="q-n">3</div><div>Look back at your prediction in Part A. Was it right? In your own words, what does the Denver case actually show about building something as one large connected piece, then testing it all at once?</div></div>
+        <textarea data-key="diag3" placeholder="Your answer..."></textarea>
+      </div>
+    </div>
+
+    <div class="close-note">
+      <div class="close-icon">📌</div>
+      <div><p>Keep this case in mind. Your instructor will come back to it right after the lecture, this time using the right words for what went wrong and what could have been done differently.</p></div>
+    </div>
+  </div>
+
+  <div class="port-bar">
+    <div>
+      <h3>Save your answers</h3>
+      <p>Download this task as a PDF. Your work is saved on this device until you close the tab.</p>
+    </div>
+    <div class="port-btns">
+      <button class="btn-clear" onclick="clearAll()">Start fresh</button>
+      <button class="btn-save" id="pdf-btn" onclick="generatePDF()">Download PDF</button>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <canvas id="footer-canvas" style="user-select:none;pointer-events:none;display:block"></canvas>
+    <div class="footer-right">Case ref. DIA-1995</div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+var STORE='pre1_';
+
+function pick(b){
+  var g=b.dataset.group;
+  document.querySelectorAll('[data-group="'+g+'"]').forEach(function(x){x.classList.remove('on')});
+  b.classList.add('on');
+  saveState();
+}
+
+function revealCase(){
+  document.getElementById('case-section').classList.add('show');
+  document.getElementById('diagnose-block').style.display='block';
+  document.getElementById('reveal-btn').style.display='none';
+  document.querySelector('.reveal-hint').style.display='none';
+  sessionStorage.setItem(STORE+'revealed','1');
+  document.getElementById('case-section').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function saveState(){
+  document.querySelectorAll('textarea[data-key]').forEach(function(ta){
+    sessionStorage.setItem(STORE+ta.dataset.key,ta.value);
+  });
+  var stance=document.querySelector('[data-group="stance"].on');
+  sessionStorage.setItem(STORE+'stance',stance?stance.dataset.val:'');
+}
+
+function restoreState(){
+  document.querySelectorAll('textarea[data-key]').forEach(function(ta){
+    var v=sessionStorage.getItem(STORE+ta.dataset.key);
+    if(v!==null)ta.value=v;
+  });
+  var sv=sessionStorage.getItem(STORE+'stance');
+  if(sv){
+    var b=document.querySelector('[data-group="stance"][data-val="'+sv+'"]');
+    if(b)b.classList.add('on');
+  }
+  if(sessionStorage.getItem(STORE+'revealed')==='1'){
+    document.getElementById('case-section').classList.add('show');
+    document.getElementById('diagnose-block').style.display='block';
+    document.getElementById('reveal-btn').style.display='none';
+    document.querySelector('.reveal-hint').style.display='none';
+  }
+}
+
+function clearAll(){
+  if(!confirm('This will erase all your answers. Are you sure?'))return;
+  Object.keys(sessionStorage).filter(function(k){return k.indexOf(STORE)===0}).forEach(function(k){sessionStorage.removeItem(k)});
+  document.querySelectorAll('textarea').forEach(function(ta){ta.value=''});
+  document.querySelectorAll('.on').forEach(function(el){el.classList.remove('on')});
+  document.getElementById('case-section').classList.remove('show');
+  document.getElementById('diagnose-block').style.display='none';
+  document.getElementById('reveal-btn').style.display='flex';
+  document.querySelector('.reveal-hint').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function initFooter(){
+  var canvas=document.getElementById('footer-canvas');
+  if(!canvas)return;
+  document.fonts.ready.then(function(){drawFooter()});
+  new MutationObserver(function(){drawFooter()}).observe(document.querySelector('.footer'),{childList:true,subtree:true,characterData:true});
+}
+function drawFooter(){
+  var canvas=document.getElementById('footer-canvas');
+  if(!canvas)return;
+  var dpr=window.devicePixelRatio||1;
+  var cw=340,ch=72;
+  canvas.style.width=cw+'px';canvas.style.height=ch+'px';
+  canvas.width=Math.round(cw*dpr);canvas.height=Math.round(ch*dpr);
+  var ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);ctx.clearRect(0,0,cw,ch);
+  function dc(a){return a.map(function(n){return String.fromCharCode(n)}).join('')}
+  var lbl=dc([80,114,101,112,97,114,101,100,32,98,121]);
+  var nm=dc([77,82,46,32,82,111,115,116,97,109,105]);
+  var crs=dc([68,101,118,83,101,99,79,112,115,32,76,97,98,32,83,101,114,105,101,115]);
+  ctx.font='28px sans-serif';ctx.fillStyle='rgba(255,255,255,0.75)';ctx.fillText('\u270D\uFE0F',0,44);
+  ctx.font='400 12px IBM Plex Mono,monospace';ctx.fillStyle='rgba(255,255,255,0.45)';ctx.fillText(lbl,40,18);
+  ctx.font='700 20px IBM Plex Mono,monospace';ctx.fillStyle='#E05A4E';ctx.fillText(nm,40,42);
+  ctx.font='400 11px IBM Plex Mono,monospace';ctx.fillStyle='rgba(255,255,255,0.4)';ctx.fillText(crs,40,62);
+}
+
+function v(key){var ta=document.querySelector('textarea[data-key="'+key+'"]');return ta?ta.value:'';}
+
+function generatePDF(){
+  if(!window.jspdf){window.print();return;}
+  var jsPDF=window.jspdf.jsPDF;
+  var doc=new jsPDF({unit:'mm',format:'a4'});
+  var pw=210,ph=297,mg=14,cw=182;
+  var y=0;
+  function hdr(){
+    doc.setFillColor(192,57,43);doc.rect(0,0,pw,5,'F');
+    doc.setFillColor(13,27,42);doc.rect(0,5,pw,25,'F');
+    doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);
+    doc.text('Case File: Denver Airport',mg,17);
+    doc.setFont('helvetica','normal');doc.setFontSize(9);
+    doc.text('Case ref. DIA-1995  |  DevSecOps Lab Series',mg,23);
+    doc.setTextColor(40,40,40);y=36;
+  }
+  function foot(){
+    var n=doc.internal.getNumberOfPages();
+    for(var i=1;i<=n;i++){
+      doc.setPage(i);
+      doc.setFillColor(13,27,42);doc.rect(0,ph-12,pw,12,'F');
+      doc.setTextColor(160,160,160);doc.setFontSize(8);doc.setFont('helvetica','normal');
+      doc.text('Prepared by MR. Rostami  |  DevSecOps Lab Series',mg,ph-4);
+      doc.text('Page '+i+' of '+n,pw-mg,ph-4,{align:'right'});
+    }
+  }
+  function chk(n){if(y+n>ph-16){doc.addPage();hdr();}}
+  function sec(t){chk(12);doc.setFillColor(13,27,42);doc.rect(mg,y,cw,8,'F');doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text(t,mg+3,y+5.5);doc.setTextColor(40,40,40);y+=13;}
+  function addQ(lbl,ans){
+    chk(14);
+    var has=ans&&ans.trim();
+    doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(13,27,42);
+    var ls=doc.splitTextToSize(lbl,cw-4);
+    ls.forEach(function(l){chk(5);doc.text(l,mg,y);y+=5;});
+    doc.setFont('helvetica',has?'normal':'italic');doc.setFontSize(9);
+    doc.setTextColor(has?60:160,has?60:160,has?60:160);
+    var al=doc.splitTextToSize(has?ans:'(no answer)',cw-6);
+    al.forEach(function(l){chk(5);doc.text(l,mg+4,y);y+=5;});
+    y+=3;
+  }
+  hdr();
+  sec('Part A - Prediction');
+  var stance=document.querySelector('[data-group="stance"].on');
+  addQ('Stance: '+(stance?stance.dataset.val:'(not chosen)'),v('predict-why'));
+  sec('Part C - Diagnosis');
+  addQ('Q1 - Why might a problem stay hidden when tested only as a whole, but show up earlier in smaller pieces?',v('diag1'));
+  addQ('Q2 - What does the airlines\' late change requests show about the cost of changing a locked-in plan?',v('diag2'));
+  addQ('Q3 - Was your prediction right? What does the case actually show?',v('diag3'));
+  foot();
+  doc.save('denver-case-preliminary-task.pdf');
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('textarea[data-key]').forEach(function(ta){ta.addEventListener('input',saveState);});
+  restoreState();
+  initFooter();
+  if(!window.jspdf){var btn=document.getElementById('pdf-btn');if(btn){btn.textContent='Print';btn.onclick=function(){window.print();};}}
+});
+</script>
+</body>
+</html>

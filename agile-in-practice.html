@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agile in Practice | DevSecOps</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D1B2A;--navy2:#162236;
+  --red:#C0392B;--red-bg:#FDECEA;
+  --grn:#1B7A4A;--grn-bg:#E8F5EE;
+  --amb:#B45309;--amb-bg:#FEF3C7;
+  --blu:#1D4ED8;--blu-bg:#EFF6FF;
+  --bg:#F4F6F9;--sur:#fff;
+  --bdr:#D0D5DD;--txt:#1A2332;--muted:#475569;
+  --sans:'IBM Plex Sans',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--txt);line-height:1.65;font-size:15px;-webkit-tap-highlight-color:transparent}
+.top-bar{background:var(--red);text-align:center;padding:5px 20px;font-family:var(--mono);font-size:10px;letter-spacing:3px;color:#fff;text-transform:uppercase}
+.hdr{background:var(--navy);color:#fff;padding:26px 40px;display:flex;justify-content:space-between;align-items:flex-start}
+.hdr h1{font-size:32px;font-weight:700;margin-bottom:6px}
+.hdr-sub{font-family:var(--mono);font-size:14px;opacity:.6}
+.hdr-meta{text-align:right;font-family:var(--mono);font-size:13px;opacity:.55;line-height:1.9}
+.stepper{background:var(--navy2);padding:12px 40px;display:flex}
+.s-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;position:relative}
+.s-item::after{content:'';position:absolute;top:12px;left:50%;width:100%;height:2px;background:rgba(255,255,255,.12)}
+.s-item:last-child::after{display:none}
+.s-dot{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;z-index:1;transition:background .2s,border-color .2s}
+.s-item.active .s-dot{background:var(--red);border-color:var(--red)}
+.s-lbl{font-size:9px;color:rgba(255,255,255,.5);font-family:var(--mono)}
+.main{max-width:960px;margin:0 auto;padding:36px 40px 60px}
+.role-box{background:var(--navy);color:#fff;border-radius:8px;padding:22px 28px;margin-bottom:36px;border-left:4px solid var(--red);display:flex;gap:16px;align-items:flex-start}
+.role-icon{font-size:28px;flex-shrink:0;margin-top:2px}
+.role-box .lbl{font-family:var(--mono);font-size:10px;letter-spacing:2.5px;color:var(--red);margin-bottom:8px;text-transform:uppercase}
+.role-box p{font-size:14px;opacity:.9;line-height:1.7}
+.role-box p+p{margin-top:6px;opacity:.6;font-size:13px}
+.part{margin-bottom:48px;scroll-margin-top:60px}
+.p-icon{font-size:22px;flex-shrink:0}
+.p-num{background:var(--navy);color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.p-ttl{font-size:20px;font-weight:600;flex:1}
+.p-chevron{font-size:16px;color:var(--muted);transition:transform .3s ease;flex-shrink:0;line-height:1}
+.part-hdr{display:flex;align-items:center;gap:14px;margin-bottom:0;padding-bottom:14px;border-bottom:2px solid var(--bdr);cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.part-hdr:hover .p-ttl{color:var(--red)}
+.part-body{overflow:hidden;transition:max-height .35s ease}
+.part-body.open{max-height:none}
+.part-intro{font-size:14px;color:var(--muted);line-height:1.7;margin:14px 0 16px}
+.sub-block{background:var(--sur);border:1px solid var(--bdr);border-radius:10px;padding:20px 24px;margin-bottom:16px}
+.sub-hdr{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.sub-letter{background:var(--navy);color:#fff;width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;font-family:var(--mono)}
+.sub-ttl{font-size:15px;font-weight:600}
+.sub-note{font-size:13.5px;color:var(--muted);line-height:1.65;margin-bottom:14px}
+textarea{width:100%;min-height:72px;padding:10px 12px;border:1px solid var(--bdr);border-radius:6px;font-family:var(--sans);font-size:14px;line-height:1.6;resize:vertical;color:var(--txt);background:#FAFBFC;transition:border-color .15s}
+textarea:focus{outline:none;border-color:var(--navy);background:#fff}
+textarea::placeholder{color:#B0BBC8}
+.hint{background:var(--amb-bg);border:1px solid #FCD34D;border-radius:6px;padding:10px 14px;font-size:13px;color:#92400E;margin-top:12px}
+
+/* RECALL CHIP (replaces long definition boxes - vocabulary already taught in lecture) */
+.recall{display:inline-flex;align-items:center;gap:6px;background:#EFF6FF;border:1px solid #C7D7FE;border-radius:20px;padding:5px 14px;font-size:12.5px;color:#1E3A8A;margin:2px 0 16px;flex-wrap:wrap;line-height:1.5}
+.recall b{font-weight:700}
+
+/* Q BLOCK */
+.q-list{display:flex;flex-direction:column;gap:14px;margin-top:16px}
+.q-card{background:var(--sur);border:1px solid var(--bdr);border-radius:8px;padding:16px 20px}
+.q-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:14.5px;line-height:1.6}
+.q-n{background:var(--navy);color:#fff;min-width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px}
+
+/* SCRUM DIAGRAM */
+.scrum-diagram{display:flex;gap:0;border:1px solid var(--bdr);border-radius:10px;overflow:hidden;margin:6px 0 16px}
+.scrum-box{flex:1;padding:16px 14px;text-align:center;border-right:1px solid var(--bdr)}
+.scrum-box:last-child{border-right:none}
+.scrum-box .sc-icon{font-size:24px;margin-bottom:6px}
+.scrum-box .sc-role{font-size:13.5px;font-weight:700;color:var(--navy);margin-bottom:5px}
+.scrum-box .sc-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.scrum-box.sc-po{background:#EFF6FF}
+.scrum-box.sc-sm{background:#F0FDF4}
+.scrum-box.sc-dev{background:#FFFBEB}
+
+/* PROFILE CARDS */
+.profiles{display:flex;flex-direction:column;gap:10px;margin:14px 0}
+.profile-card{background:var(--sur);border:1px solid var(--bdr);border-radius:8px;padding:15px 18px;border-left:4px solid var(--navy)}
+.profile-top{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+.profile-avatar{font-size:28px;flex-shrink:0;line-height:1}
+.profile-name{font-weight:700;font-size:14px;color:var(--navy);margin-bottom:3px}
+.profile-bio{font-size:13.5px;color:var(--muted);line-height:1.55}
+.role-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.role-row-lbl{font-size:12px;color:var(--muted);font-family:var(--mono);flex-shrink:0}
+.role-btns{display:flex;gap:6px;flex-wrap:wrap}
+.role-btn{min-height:36px;padding:5px 14px;border-radius:20px;border:1.5px solid var(--bdr);background:#fff;font-size:12px;font-weight:600;font-family:var(--sans);cursor:pointer;color:var(--muted);transition:all .15s;touch-action:manipulation}
+.role-btn:hover{border-color:var(--navy);color:var(--navy)}
+.role-btn.on{background:var(--navy);border-color:var(--navy);color:#fff}
+
+/* SPRINT GOAL */
+.sprint-goal{background:var(--grn-bg);border:2px solid #86EFAC;border-radius:8px;padding:14px 18px;margin:14px 0}
+.sg-eyebrow{font-family:var(--mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--grn);margin-bottom:5px}
+.sg-text{font-size:15px;font-weight:600;color:#166534;line-height:1.5}
+
+/* BACKLOG */
+.bl-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.bl-note{font-size:13.5px;color:var(--muted)}
+.bl-counter{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--navy);background:#EEF2F7;padding:4px 12px;border-radius:20px}
+.bl-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.bl-card{background:var(--sur);border:2px solid var(--bdr);border-radius:8px;padding:12px 14px;cursor:pointer;transition:border-color .15s,background .15s,box-shadow .15s;touch-action:manipulation;display:flex;gap:10px;align-items:flex-start;min-height:44px}
+.bl-card:hover{border-color:var(--navy);background:#F4F7FB}
+.bl-card.on{border-color:var(--grn);background:var(--grn-bg);box-shadow:0 0 0 3px rgba(27,122,74,.08)}
+.bl-card.bl-max{opacity:.4;pointer-events:none}
+.bl-card .bl-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.bl-card .bl-text{font-size:13.5px;font-weight:500;line-height:1.45}
+.bl-card.on .bl-text{color:var(--grn);font-weight:600}
+.bl-tick{width:18px;height:18px;border-radius:50%;border:2px solid var(--bdr);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .15s}
+.bl-card.on .bl-tick{background:var(--grn);border-color:var(--grn);color:#fff}
+.bl-card.on .bl-tick::after{content:'✓'}
+
+/* KANBAN BOARD */
+
+/* WIDGET A: SPOT THE BUG (pair programming) */
+.widget-wrap{background:var(--sur);border:1px solid var(--bdr);border-radius:10px;padding:18px 20px;margin:14px 0}
+.widget-lead{font-size:13.5px;color:var(--muted);margin-bottom:12px;line-height:1.65}
+.bug-steps{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+.bug-step{background:#F8FAFC;border:1.5px solid var(--bdr);border-radius:8px;padding:11px 14px;font-size:13.5px;cursor:pointer;transition:border-color .15s,background .15s;line-height:1.55;touch-action:manipulation}
+.bug-step:hover{border-color:var(--navy);background:#F0F4F8}
+.bug-step .bs-n{font-family:var(--mono);font-weight:700;color:var(--blu);margin-right:6px}
+.bug-step.wrong{border-color:var(--amb);background:var(--amb-bg);animation:shake .3s}
+.bug-step.found{border-color:var(--grn);background:var(--grn-bg);cursor:default}
+.bug-step.found .bs-n{color:var(--grn)}
+.bug-step.locked{pointer-events:none;opacity:.55}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.widget-feedback{margin-top:12px;padding:11px 14px;border-radius:8px;font-size:13px;line-height:1.65;display:none}
+.widget-feedback.show{display:block}
+.widget-feedback.ok{background:var(--grn-bg);color:#166534;border:1px solid #86EFAC}
+.widget-feedback.no{background:var(--amb-bg);color:#92400E;border:1px solid #FCD34D}
+.widget-reflect{margin-top:14px;display:none}
+.widget-reflect.show{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* WIDGET B: REFACTOR TOGGLE */
+.refactor-toggle-btn{min-height:42px;padding:9px 20px;border-radius:8px;border:none;background:var(--navy);color:#fff;font-size:13px;font-weight:600;font-family:var(--sans);cursor:pointer;margin-bottom:14px}
+.rf-state{display:none}
+.rf-state.show{display:block;animation:fadeIn .35s ease}
+.rf-tag{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:8px;letter-spacing:.5px}
+.rf-tag.before{background:var(--amb-bg);color:var(--amb)}
+.rf-tag.after{background:var(--grn-bg);color:var(--grn)}
+.rf-block{background:#F8FAFC;border:1px solid var(--bdr);border-radius:8px;padding:13px 15px;font-size:13px;line-height:1.85;font-family:var(--mono);color:#334155}
+.rf-code{background:#0D1B2A;color:#E2E8F0;border-radius:6px;padding:13px 15px;font-family:var(--mono);font-size:12.5px;line-height:1.8}
+.rf-step{display:block}
+.rf-callouts{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.rf-callout{font-size:12px;color:#166534;background:var(--grn-bg);border-radius:6px;padding:7px 11px;line-height:1.5}
+
+.combo-block{background:var(--navy);color:#fff;border-radius:10px;padding:20px 24px;margin-top:20px}
+.combo-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:8px}
+.combo-q{font-size:14.5px;line-height:1.65;margin-bottom:14px;opacity:.9}
+.combo-block textarea{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.2);color:#fff}
+.combo-block textarea::placeholder{color:rgba(255,255,255,.3)}
+.combo-block textarea:focus{border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.1)}
+
+.close-note{background:var(--grn-bg);border:1px solid #86EFAC;border-radius:8px;padding:18px 22px;margin-top:24px;display:flex;gap:14px;align-items:flex-start}
+.close-icon{font-size:24px;flex-shrink:0}
+.close-lbl{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--grn);text-transform:uppercase;margin-bottom:8px;font-weight:600}
+.close-note p{font-size:14px;color:#166534;line-height:1.7}
+
+.port-bar{background:var(--navy);border-radius:10px;padding:22px 28px;display:flex;justify-content:space-between;align-items:center;margin-top:44px;gap:16px}
+.port-bar h3{color:#fff;font-size:15px;font-weight:600;margin-bottom:4px}
+.port-bar p{color:rgba(255,255,255,.5);font-size:12px}
+.port-btns{display:flex;gap:10px;align-items:center;flex-shrink:0}
+.btn-clear{padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;font-family:var(--sans);cursor:pointer;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.55);transition:all .15s}
+.btn-clear:hover{background:rgba(192,57,43,.35);border-color:var(--red);color:#fff}
+.btn-save{padding:10px 22px;border-radius:8px;font-size:13px;font-weight:600;font-family:var(--sans);cursor:pointer;border:none;background:#fff;color:var(--navy);transition:background .15s;white-space:nowrap}
+.btn-save:hover{background:#EEF2F7}
+
+.footer{background:var(--navy);padding:18px 40px 20px}
+.footer-inner{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.1);padding-top:18px}
+.footer-right{font-size:10px;color:rgba(255,255,255,.3);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase}
+
+@media print{
+  .top-bar,.stepper,.role-box,.port-bar,.footer,.refactor-toggle-btn{display:none}
+  .hdr{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .part{page-break-inside:avoid}
+  textarea{background:#fff;border:1px solid #ccc;min-height:40px}
+  .rf-state{display:block !important}
+}
+@media(max-width:600px){
+  .hdr{padding:16px 20px}.hdr h1{font-size:26px}
+  .main{padding:24px 18px 48px}
+  .stepper{padding:10px 16px}
+  .bl-grid{grid-template-columns:1fr}
+  .scrum-diagram{flex-direction:column}
+  .scrum-box{border-right:none;border-bottom:1px solid var(--bdr)}
+  .scrum-box:last-child{border-bottom:none}
+  .port-bar{flex-direction:column;align-items:stretch}
+  .port-btns{justify-content:flex-end}
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">For Training Use Only - DevSecOps Lab Series</div>
+
+<div class="hdr">
+  <div>
+    <h1>Agile in Practice</h1>
+    <div class="hdr-sub">Practice Task</div>
+  </div>
+  <div class="hdr-meta">Engagement no. SS-AGILE<br>DevSecOps Lab Series</div>
+</div>
+
+<div class="stepper">
+  <a href="#p1" class="s-item active"><div class="s-dot">1</div><div class="s-lbl">Recap</div></a>
+  <a href="#p2" class="s-item"><div class="s-dot">2</div><div class="s-lbl">Build the team</div></a>
+  <a href="#p3" class="s-item"><div class="s-dot">3</div><div class="s-lbl">Coding habits</div></a>
+</div>
+
+<div class="main">
+
+  <div class="role-box">
+    <div class="role-icon">🛠️</div>
+    <div>
+      <div class="lbl">What you are doing today</div>
+      <p>StackSafe is the fintech company you have been consulting for. It currently releases new versions twice a year and wants to start releasing every week. You will set up its development team, run a sprint, diagnose what goes wrong, and choose the right engineering habits. Everything you produce goes into your portfolio.</p>
+      <p>Work in pairs. Discuss every decision before you write it down.</p>
+    </div>
+  </div>
+
+  <!-- ── PART 1: BRIDGE FROM DENVER ─────────────────────── -->
+  <div class="part" id="p1">
+    <div class="part-hdr" onclick="togglePart('p1')">
+      <div class="p-icon">🔗</div>
+      <div class="p-num">1</div>
+      <div class="p-ttl">Picking up from Denver</div>
+      <div class="p-chevron" id="p1-chev">▾</div>
+    </div>
+    <div class="part-body" id="p1-body">
+    <div class="sub-block">
+      <p class="part-intro" style="margin-top:0">The Denver Airport case is a classic example of the pattern often called Waterfall: plan everything up front, build it as one connected piece, and test only once it is finished. Your lecture introduced the alternative: Agile, building and testing in short, repeated cycles instead. StackSafe wants to move from releasing twice a year to releasing every week, and has decided to use Agile to get there. Today you will set up StackSafe's team and put it into practice.</p>
+      <div class="recall">Recall: <b>Agile</b> = short cycles, frequent releases, adjust as you learn</div>
+    </div>
+    </div>
+  </div>
+
+  <!-- ── PART 2 ────────────────────────────────────────── -->
+  <div class="part" id="p2">
+    <div class="part-hdr" onclick="togglePart('p2')">
+      <div class="p-icon">👥</div>
+      <div class="p-num">2</div>
+      <div class="p-ttl">Build the Scrum team</div>
+      <div class="p-chevron" id="p2-chev">▾</div>
+    </div>
+    <div class="part-body" id="p2-body">
+    <p class="part-intro">StackSafe has decided to adopt Scrum. Before the first sprint can begin, assign the right roles to the right people, and choose what to build first.</p>
+
+    <!-- 2A: ROLES -->
+    <div class="sub-block">
+      <div class="sub-hdr"><div class="sub-letter">A</div><div class="sub-ttl">Assign roles</div></div>
+      <p class="sub-note">Assign each StackSafe team member to one of the three Scrum roles below. More than one person can be a developer. Justify your choices at the bottom.</p>
+
+      <div class="recall">Recall: <b>Scrum</b> = short sprints + 3 roles + regular check-ins</div>
+
+      <div class="scrum-diagram">
+        <div class="scrum-box sc-po">
+          <div class="sc-icon">🎯</div>
+          <div class="sc-role">Product Owner</div>
+          <div class="sc-desc">Decides what to build and in what order. One per team.</div>
+        </div>
+        <div class="scrum-box sc-sm">
+          <div class="sc-icon">🛡️</div>
+          <div class="sc-role">Scrum Master</div>
+          <div class="sc-desc">Helps the team follow Scrum, removes blockers. One per team.</div>
+        </div>
+        <div class="scrum-box sc-dev">
+          <div class="sc-icon">💻</div>
+          <div class="sc-role">Development Team</div>
+          <div class="sc-desc">Designs, builds, and tests the product. Several people.</div>
+        </div>
+      </div>
+
+      <div class="profiles">
+
+        <div class="profile-card">
+          <div class="profile-top">
+            <div class="profile-avatar">👩‍💼</div>
+            <div>
+              <div class="profile-name">Sara Okafor</div>
+              <div class="profile-bio">Five years in customer support. Knows what users find frustrating and what they ask for most. No coding experience. Speaks to clients weekly.</div>
+            </div>
+          </div>
+          <div class="role-row">
+            <div class="role-row-lbl">Assign:</div>
+            <div class="role-btns">
+              <button class="role-btn" data-group="role-sara" data-val="Product Owner" onclick="pick(this)">Product Owner</button>
+              <button class="role-btn" data-group="role-sara" data-val="Scrum Master" onclick="pick(this)">Scrum Master</button>
+              <button class="role-btn" data-group="role-sara" data-val="Developer" onclick="pick(this)">Developer</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-card">
+          <div class="profile-top">
+            <div class="profile-avatar">👨‍💻</div>
+            <div>
+              <div class="profile-name">James Park</div>
+              <div class="profile-bio">Senior developer, eight years of experience. Writes reliable code. Gets impatient in long meetings and prefers to stay focused on technical work alone.</div>
+            </div>
+          </div>
+          <div class="role-row">
+            <div class="role-row-lbl">Assign:</div>
+            <div class="role-btns">
+              <button class="role-btn" data-group="role-james" data-val="Product Owner" onclick="pick(this)">Product Owner</button>
+              <button class="role-btn" data-group="role-james" data-val="Scrum Master" onclick="pick(this)">Scrum Master</button>
+              <button class="role-btn" data-group="role-james" data-val="Developer" onclick="pick(this)">Developer</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-card">
+          <div class="profile-top">
+            <div class="profile-avatar">🧑‍🏫</div>
+            <div>
+              <div class="profile-name">Amir Nazari</div>
+              <div class="profile-bio">Three years as a team coordinator at a software company. Does not write code. Well known for helping groups reach decisions quickly and for keeping meetings on track.</div>
+            </div>
+          </div>
+          <div class="role-row">
+            <div class="role-row-lbl">Assign:</div>
+            <div class="role-btns">
+              <button class="role-btn" data-group="role-amir" data-val="Product Owner" onclick="pick(this)">Product Owner</button>
+              <button class="role-btn" data-group="role-amir" data-val="Scrum Master" onclick="pick(this)">Scrum Master</button>
+              <button class="role-btn" data-group="role-amir" data-val="Developer" onclick="pick(this)">Developer</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-card">
+          <div class="profile-top">
+            <div class="profile-avatar">👩‍🔬</div>
+            <div>
+              <div class="profile-name">Lena Müller</div>
+              <div class="profile-bio">Junior developer, two years of experience. Strong interest in testing and code quality. Writes careful, well-documented code.</div>
+            </div>
+          </div>
+          <div class="role-row">
+            <div class="role-row-lbl">Assign:</div>
+            <div class="role-btns">
+              <button class="role-btn" data-group="role-lena" data-val="Product Owner" onclick="pick(this)">Product Owner</button>
+              <button class="role-btn" data-group="role-lena" data-val="Scrum Master" onclick="pick(this)">Scrum Master</button>
+              <button class="role-btn" data-group="role-lena" data-val="Developer" onclick="pick(this)">Developer</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-card">
+          <div class="profile-top">
+            <div class="profile-avatar">👨‍💼</div>
+            <div>
+              <div class="profile-name">Tom Hargreaves</div>
+              <div class="profile-bio">Former project manager, ten years in finance. Has set StackSafe's product roadmap for two years. Meets business clients monthly. Not a developer.</div>
+            </div>
+          </div>
+          <div class="role-row">
+            <div class="role-row-lbl">Assign:</div>
+            <div class="role-btns">
+              <button class="role-btn" data-group="role-tom" data-val="Product Owner" onclick="pick(this)">Product Owner</button>
+              <button class="role-btn" data-group="role-tom" data-val="Scrum Master" onclick="pick(this)">Scrum Master</button>
+              <button class="role-btn" data-group="role-tom" data-val="Developer" onclick="pick(this)">Developer</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="hint">💡 Two people could reasonably be the Product Owner. There is no single correct answer, but you must be able to defend your choice.</div>
+    </div>
+
+    <!-- 2B: BACKLOG -->
+    <div class="sub-block">
+      <div class="sub-hdr"><div class="sub-letter">B</div><div class="sub-ttl">Choose the first sprint</div></div>
+      <div class="recall">Recall: <b>Product Backlog</b> = everything the team might build, ordered by value</div>
+      <p class="sub-note">Below is StackSafe's backlog. Your sprint goal is shown in green. Select exactly three items for the first two-week sprint.</p>
+
+      <div class="sprint-goal">
+        <div class="sg-eyebrow">Sprint goal</div>
+        <div class="sg-text">"A new user can register, log in, and send their first payment, in under five minutes."</div>
+      </div>
+
+      <div class="bl-meta">
+        <span class="bl-note">Select three items.</span>
+        <span class="bl-counter" id="bl-counter">0 of 3 selected</span>
+      </div>
+
+      <div class="bl-grid">
+        <div class="bl-card" data-id="bl1"><div class="bl-icon">👤</div><div class="bl-text">Create an account with email and password</div><div class="bl-tick"></div></div>
+        <div class="bl-card" data-id="bl2"><div class="bl-icon">💸</div><div class="bl-text">Send money to another StackSafe user</div><div class="bl-tick"></div></div>
+        <div class="bl-card" data-id="bl3"><div class="bl-icon">🔐</div><div class="bl-text">Log in and log out securely</div><div class="bl-tick"></div></div>
+        <div class="bl-card" data-id="bl4"><div class="bl-icon">📜</div><div class="bl-text">See a list of all past payments</div><div class="bl-tick"></div></div>
+        <div class="bl-card" data-id="bl5"><div class="bl-icon">📱</div><div class="bl-text">Verify phone number by SMS when registering</div><div class="bl-tick"></div></div>
+        <div class="bl-card" data-id="bl6"><div class="bl-icon">🔔</div><div class="bl-text">Receive an email when a payment arrives</div><div class="bl-tick"></div></div>
+        <div class="bl-card" data-id="bl7"><div class="bl-icon">🖼️</div><div class="bl-text">Upload a profile photo</div><div class="bl-tick"></div></div>
+        <div class="bl-card" data-id="bl8"><div class="bl-icon">💱</div><div class="bl-text">See the exchange rate before sending</div><div class="bl-tick"></div></div>
+      </div>
+      <textarea data-key="p2b-justify" placeholder="Why these three? How does each one connect to the sprint goal?"></textarea>
+    </div>
+    </div><!-- /p2-body -->
+  </div>
+
+  <!-- ── PART 3 ────────────────────────────────────────── -->
+  <div class="part" id="p3">
+    <div class="part-hdr" onclick="togglePart('p3')">
+      <div class="p-icon">🔬</div>
+      <div class="p-num">3</div>
+      <div class="p-ttl">Coding habits</div>
+      <div class="p-chevron" id="p3-chev">▾</div>
+    </div>
+    <div class="part-body" id="p3-body">
+    <p class="part-intro">Below are two coding practices shown through situations where their absence caused a real problem for StackSafe's team.</p>
+    <div class="recall">Recall: <b>XP</b> = Scrum's team rhythm + these coding habits, used together, not instead of each other</div>
+
+    <!-- WIDGET A: PAIR PROGRAMMING -->
+    <div class="sub-block">
+      <div class="sub-hdr"><div class="sub-letter">A</div><div class="sub-ttl">Pair programming: spot the bug</div></div>
+      <div class="widget-wrap">
+        <div class="widget-lead">James wrote the payment fee calculation alone over two days. Here are the steps his code follows. Click the step you think causes a problem.</div>
+        <div class="bug-steps" id="bug-steps">
+          <div class="bug-step" data-n="1" onclick="checkBugStep(this)"><span class="bs-n">1.</span>Take the amount the user wants to send, in their own currency.</div>
+          <div class="bug-step" data-n="2" onclick="checkBugStep(this)"><span class="bs-n">2.</span>Calculate the fee as 2% of that amount, in the user's own currency.</div>
+          <div class="bug-step" data-n="3" onclick="checkBugStep(this)"><span class="bs-n">3.</span>Convert the full amount into the receiver's currency, using today's exchange rate.</div>
+          <div class="bug-step" data-n="4" onclick="checkBugStep(this)"><span class="bs-n">4.</span>Subtract the fee from step 2 from the converted amount from step 3.</div>
+          <div class="bug-step" data-n="5" onclick="checkBugStep(this)"><span class="bs-n">5.</span>Send the final amount to the receiver.</div>
+        </div>
+        <div class="widget-feedback" id="bug-feedback"></div>
+        <div class="widget-reflect" id="bug-reflect">
+          <textarea data-key="p4-pair" placeholder="A second developer pairing with James, before this was written into the final code, would likely have asked one simple question. What question would have caught the problem early?"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- WIDGET B: REFACTORING -->
+    <div class="sub-block">
+      <div class="sub-hdr"><div class="sub-letter">B</div><div class="sub-ttl">Refactoring</div></div>
+      <div class="widget-wrap">
+        <div class="widget-lead">A developer who wrote StackSafe's payment module left the company. When Amir, the Scrum Master, asked the remaining team to explain a section of that code, nobody could quickly say what it did. Here is a simplified version of that code.</div>
+        <button class="refactor-toggle-btn" id="rf-btn" onclick="toggleRefactor()">See it refactored &rarr;</button>
+        <div class="rf-state show" id="rf-before">
+          <span class="rf-tag before">BEFORE</span>
+          <div class="rf-code"><span class="rf-step">function processPayment(amount):</span><span class="rf-step">&nbsp;&nbsp;if user.loggedIn == false: return error</span><span class="rf-step">&nbsp;&nbsp;fee = amount * 0.02</span><span class="rf-step">&nbsp;&nbsp;converted = amount * exchangeRate</span><span class="rf-step">&nbsp;&nbsp;result = converted - fee</span><span class="rf-step">&nbsp;&nbsp;display(result)</span><span class="rf-step">&nbsp;&nbsp;sendEmail(user.email, result)</span></div>
+          <div class="widget-lead" style="margin-top:10px;margin-bottom:0">Every step is in one unlabelled block, and the number 0.02 appears with no explanation of what it means.</div>
+        </div>
+        <div class="rf-state" id="rf-after">
+          <span class="rf-tag after">AFTER</span>
+          <div class="rf-code"><span class="rf-step">SERVICE_FEE_PERCENT = 2%</span><span class="rf-step">&nbsp;</span><span class="rf-step">function processPayment(amount):</span><span class="rf-step">&nbsp;&nbsp;checkUserLoggedIn(user)</span><span class="rf-step">&nbsp;&nbsp;fee = calculateFee(amount, SERVICE_FEE_PERCENT)</span><span class="rf-step">&nbsp;&nbsp;converted = convertCurrency(amount, exchangeRate)</span><span class="rf-step">&nbsp;&nbsp;result = converted - fee</span><span class="rf-step">&nbsp;&nbsp;showResult(result)</span><span class="rf-step">&nbsp;&nbsp;sendConfirmationEmail(user)</span></div>
+          <div class="rf-callouts">
+            <div class="rf-callout">The number 0.02 became a named value: SERVICE_FEE_PERCENT.</div>
+            <div class="rf-callout">One flat block became a sequence of clearly named steps.</div>
+            <div class="rf-callout"><strong>Nothing this returns to the user has changed.</strong> Only how the code is organised has changed.</div>
+          </div>
+        </div>
+        <div class="widget-reflect" id="rf-reflect" style="margin-top:14px">
+          <textarea data-key="p4-refactor" placeholder="How would a habit of refactoring regularly, instead of only when someone is forced to read old code, have changed what happened when that developer left?"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="combo-block">
+      <div class="combo-eyebrow">Discussion question</div>
+      <div class="combo-q">StackSafe is now running Scrum. The engineering lead also wants the team to adopt pair programming and regular refactoring, like you just saw. One developer says: <em>"We already follow Scrum, why change how we code too?"</em> How would you respond?</div>
+      <textarea data-key="p4-combo" placeholder="Your response..."></textarea>
+    </div>
+
+    <div class="close-note">
+      <div class="close-icon">📁</div>
+      <div><p>You now have a team structure, a sprint plan, and a set of engineering habits. Keep this in your portfolio.</p></div>
+    </div>
+    </div><!-- /p3-body -->
+  </div>
+
+  <div class="port-bar">
+    <div>
+      <h3>📎 Save to your portfolio</h3>
+      <p>Download your team handbook as a PDF. Your work is saved on this device until you close the tab.</p>
+    </div>
+    <div class="port-btns">
+      <button class="btn-clear" onclick="clearAll()">Start fresh</button>
+      <button class="btn-save" id="pdf-btn" onclick="generatePDF()">⬇️ Download PDF</button>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<footer class="footer">
+  <div class="footer-inner">
+    <canvas id="footer-canvas" style="user-select:none;pointer-events:none;display:block"></canvas>
+    <div class="footer-right">Engagement no. SS-AGILE</div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+var STORE='aip_';
+
+/* ── SINGLE-SELECT GROUPS ───────────────────────────────── */
+function pick(b){
+  var g=b.dataset.group;
+  document.querySelectorAll('[data-group="'+g+'"]').forEach(function(x){x.classList.remove('on');});
+  b.classList.add('on');
+  saveState();
+}
+
+/* ── BACKLOG ─────────────────────────────────────────────  */
+function initBacklog(){
+  document.querySelectorAll('.bl-card').forEach(function(c){c.addEventListener('click',function(){toggleBL(c);});});
+}
+function toggleBL(card){
+  var sel=document.querySelectorAll('.bl-card.on').length;
+  if(!card.classList.contains('on')&&sel>=3)return;
+  card.classList.toggle('on');
+  updateBLCount();
+  saveState();
+}
+function updateBLCount(){
+  var sel=document.querySelectorAll('.bl-card.on').length;
+  var ctr=document.getElementById('bl-counter');
+  if(ctr)ctr.textContent=sel+' of 3 selected';
+  document.querySelectorAll('.bl-card').forEach(function(c){c.classList.toggle('bl-max',!c.classList.contains('on')&&sel>=3);});
+}
+
+/* ── WIDGET A: SPOT THE BUG ──────────────────────────────  */
+var BUG_CORRECT=4;
+var bugFound=false;
+function checkBugStep(el){
+  if(bugFound)return;
+  var n=parseInt(el.dataset.n,10);
+  var fb=document.getElementById('bug-feedback');
+  if(n===BUG_CORRECT){
+    el.classList.add('found');
+    document.querySelectorAll('.bug-step').forEach(function(s){if(s!==el)s.classList.add('locked');});
+    fb.className='widget-feedback show ok';
+    fb.textContent='Found it. The fee was calculated in the sender\'s currency in step 2, but step 4 subtracts it from an amount that has already been converted to the receiver\'s currency in step 3. When the two currencies are very different in value, this produces the wrong final amount.';
+    document.getElementById('bug-reflect').classList.add('show');
+    bugFound=true;
+  }else{
+    el.classList.add('wrong');
+    setTimeout(function(){el.classList.remove('wrong');},400);
+    fb.className='widget-feedback show no';
+    fb.textContent='Not quite. Look again at which currency the numbers are in at each step.';
+  }
+  saveState();
+}
+function restoreBug(){
+  if(sessionStorage.getItem(STORE+'bugfound')==='1'){
+    bugFound=true;
+    var el=document.querySelector('.bug-step[data-n="'+BUG_CORRECT+'"]');
+    if(el)el.classList.add('found');
+    document.querySelectorAll('.bug-step').forEach(function(s){if(s!==el)s.classList.add('locked');});
+    var fb=document.getElementById('bug-feedback');
+    fb.className='widget-feedback show ok';
+    fb.textContent='Found it. The fee was calculated in the sender\'s currency in step 2, but step 4 subtracts it from an amount that has already been converted to the receiver\'s currency in step 3. When the two currencies are very different in value, this produces the wrong final amount.';
+    document.getElementById('bug-reflect').classList.add('show');
+  }
+}
+
+
+/* ── WIDGET C: REFACTOR TOGGLE ───────────────────────────  */
+var rfShowingAfter=false;
+function toggleRefactor(){
+  rfShowingAfter=!rfShowingAfter;
+  document.getElementById('rf-before').classList.toggle('show',!rfShowingAfter);
+  document.getElementById('rf-after').classList.toggle('show',rfShowingAfter);
+  document.getElementById('rf-btn').textContent=rfShowingAfter?'Show the original again':'See it refactored \u2192';
+  document.getElementById('rf-reflect').classList.add('show');
+  saveState();
+}
+function restoreRF(after){
+  if(after){
+    rfShowingAfter=true;
+    document.getElementById('rf-before').classList.remove('show');
+    document.getElementById('rf-after').classList.add('show');
+    document.getElementById('rf-btn').textContent='Show the original again';
+    document.getElementById('rf-reflect').classList.add('show');
+  }
+}
+
+/* ── SESSION STORAGE ─────────────────────────────────────  */
+function saveState(){
+  document.querySelectorAll('textarea[data-key]').forEach(function(ta){sessionStorage.setItem(STORE+ta.dataset.key,ta.value);});
+  var groups={};
+  document.querySelectorAll('[data-group]').forEach(function(b){
+    if(!(b.dataset.group in groups))groups[b.dataset.group]='';
+    if(b.classList.contains('on'))groups[b.dataset.group]=b.dataset.val;
+  });
+  sessionStorage.setItem(STORE+'groups',JSON.stringify(groups));
+  var bl=[];document.querySelectorAll('.bl-card.on').forEach(function(c){bl.push(c.dataset.id);});
+  sessionStorage.setItem(STORE+'backlog',JSON.stringify(bl));
+  sessionStorage.setItem(STORE+'bugfound',bugFound?'1':'0');
+  sessionStorage.setItem(STORE+'rfafter',rfShowingAfter?'1':'0');
+}
+function restoreState(){
+  document.querySelectorAll('textarea[data-key]').forEach(function(ta){
+    var v=sessionStorage.getItem(STORE+ta.dataset.key);
+    if(v!==null)ta.value=v;
+  });
+  try{
+    var gs=JSON.parse(sessionStorage.getItem(STORE+'groups')||'{}');
+    Object.keys(gs).forEach(function(g){
+      if(!gs[g])return;
+      var b=document.querySelector('[data-group="'+g+'"][data-val="'+gs[g]+'"]');
+      if(b)b.classList.add('on');
+    });
+  }catch(e){}
+  try{
+    var bl=JSON.parse(sessionStorage.getItem(STORE+'backlog')||'[]');
+    bl.forEach(function(id){var c=document.querySelector('.bl-card[data-id="'+id+'"]');if(c)c.classList.add('on');});
+  }catch(e){}
+  updateBLCount();
+  restoreBug();
+  restoreRF(sessionStorage.getItem(STORE+'rfafter')==='1');
+}
+function clearAll(){
+  if(!confirm('This will erase all your answers and reset every exercise. Are you sure?'))return;
+  Object.keys(sessionStorage).filter(function(k){return k.indexOf(STORE)===0;}).forEach(function(k){sessionStorage.removeItem(k);});
+  document.querySelectorAll('textarea').forEach(function(ta){ta.value='';});
+  document.querySelectorAll('.on').forEach(function(el){el.classList.remove('on');});
+  updateBLCount();
+  bugFound=false;
+  document.querySelectorAll('.bug-step').forEach(function(s){s.classList.remove('found','locked','wrong');});
+  document.getElementById('bug-feedback').className='widget-feedback';
+  document.getElementById('bug-reflect').classList.remove('show');
+  rfShowingAfter=false;
+  document.getElementById('rf-before').classList.add('show');
+  document.getElementById('rf-after').classList.remove('show');
+  document.getElementById('rf-btn').textContent='See it refactored \u2192';
+  document.getElementById('rf-reflect').classList.remove('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ── CANVAS FOOTER ────────────────────────────────────────  */
+function initFooter(){
+  var canvas=document.getElementById('footer-canvas');
+  if(!canvas)return;
+  document.fonts.ready.then(function(){drawFooter();});
+  new MutationObserver(function(){drawFooter();}).observe(document.querySelector('.footer'),{childList:true,subtree:true,characterData:true});
+}
+function drawFooter(){
+  var canvas=document.getElementById('footer-canvas');
+  if(!canvas)return;
+  var dpr=window.devicePixelRatio||1;
+  var cw=340,ch=72;
+  canvas.style.width=cw+'px';canvas.style.height=ch+'px';
+  canvas.width=Math.round(cw*dpr);canvas.height=Math.round(ch*dpr);
+  var ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);ctx.clearRect(0,0,cw,ch);
+  function dc(a){return a.map(function(n){return String.fromCharCode(n);}).join('');}
+  var lbl=dc([80,114,101,112,97,114,101,100,32,98,121]);
+  var nm=dc([77,82,46,32,82,111,115,116,97,109,105]);
+  var crs=dc([68,101,118,83,101,99,79,112,115,32,76,97,98,32,83,101,114,105,101,115]);
+  ctx.font='28px sans-serif';ctx.fillStyle='rgba(255,255,255,0.75)';ctx.fillText('\u270D\uFE0F',0,44);
+  ctx.font='400 12px IBM Plex Mono,monospace';ctx.fillStyle='rgba(255,255,255,0.45)';ctx.fillText(lbl,40,18);
+  ctx.font='700 20px IBM Plex Mono,monospace';ctx.fillStyle='#E05A4E';ctx.fillText(nm,40,42);
+  ctx.font='400 11px IBM Plex Mono,monospace';ctx.fillStyle='rgba(255,255,255,0.4)';ctx.fillText(crs,40,62);
+}
+
+/* ── PDF EXPORT ───────────────────────────────────────────  */
+function v(key){var ta=document.querySelector('textarea[data-key="'+key+'"]');return ta?ta.value:'';}
+function gv(g){var b=document.querySelector('[data-group="'+g+'"].on');return b?b.dataset.val:'';}
+
+function generatePDF(){
+  if(!window.jspdf){window.print();return;}
+  var jsPDF=window.jspdf.jsPDF;
+  var doc=new jsPDF({unit:'mm',format:'a4'});
+  var pw=210,ph=297,mg=14,cw=182;
+  var y=0;
+  function hdr(){
+    doc.setFillColor(192,57,43);doc.rect(0,0,pw,5,'F');
+    doc.setFillColor(13,27,42);doc.rect(0,5,pw,25,'F');
+    doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);
+    doc.text('Agile in Practice',mg,17);
+    doc.setFont('helvetica','normal');doc.setFontSize(9);
+    doc.text('Engagement no. SS-AGILE  |  DevSecOps Lab Series',mg,23);
+    doc.setTextColor(40,40,40);y=36;
+  }
+  function foot(){
+    var n=doc.internal.getNumberOfPages();
+    for(var i=1;i<=n;i++){
+      doc.setPage(i);
+      doc.setFillColor(13,27,42);doc.rect(0,ph-12,pw,12,'F');
+      doc.setTextColor(160,160,160);doc.setFontSize(8);doc.setFont('helvetica','normal');
+      doc.text('Prepared by MR. Rostami  |  DevSecOps Lab Series',mg,ph-4);
+      doc.text('Page '+i+' of '+n,pw-mg,ph-4,{align:'right'});
+    }
+  }
+  function chk(n){if(y+n>ph-16){doc.addPage();hdr();}}
+  function sec(t){chk(12);doc.setFillColor(13,27,42);doc.rect(mg,y,cw,8,'F');doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text(t,mg+3,y+5.5);doc.setTextColor(40,40,40);y+=13;}
+  function addQ(lbl,ans){
+    chk(14);
+    var has=ans&&ans.trim();
+    doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(13,27,42);
+    var ls=doc.splitTextToSize(lbl,cw-4);
+    ls.forEach(function(l){chk(5);doc.text(l,mg,y);y+=5;});
+    doc.setFont('helvetica',has?'normal':'italic');doc.setFontSize(9);
+    doc.setTextColor(has?60:160,has?60:160,has?60:160);
+    var al=doc.splitTextToSize(has?ans:'(no answer)',cw-6);
+    al.forEach(function(l){chk(5);doc.text(l,mg+4,y);y+=5;});
+    y+=3;
+  }
+  function addLine(t){chk(6);doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(60,60,60);doc.text(t,mg+4,y);y+=5;}
+
+  hdr();
+  sec('Part 1 - Picking up from Denver');
+
+  sec('Part 2A - Role assignments');
+  [['sara','Sara Okafor'],['james','James Park'],['amir','Amir Nazari'],['lena','Lena Müller'],['tom','Tom Hargreaves']].forEach(function(p){
+    var role=gv('role-'+p[0])||'(not assigned)';
+    chk(6);doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(13,27,42);doc.text(p[1]+': '+role,mg+4,y);y+=5;
+  });
+  y+=2;
+
+  sec('Part 2B - Sprint backlog selection');
+  var blItems=['Create an account','Send money to another user','Log in and log out','See past payments','Verify phone by SMS','Email on payment received','Upload profile photo','See exchange rate'];
+  var blSel=[];
+  document.querySelectorAll('.bl-card.on').forEach(function(c){
+    var map={bl1:0,bl2:1,bl3:2,bl4:3,bl5:4,bl6:5,bl7:6,bl8:7};
+    var idx=map[c.dataset.id];
+    if(idx!==undefined)blSel.push(blItems[idx]);
+  });
+  addLine('Selected: '+(blSel.length?blSel.join(' | '):'(none selected)'));
+  y+=2;
+  addQ('Why these items? How do they connect to the sprint goal?',v('p2b-justify'));
+
+  sec('Part 3 - Coding habits');
+
+  sec('Part 4 - Coding habits');
+  addLine('Pair programming: bug identified - '+(bugFound?'yes':'no'));
+  y+=1;
+  addQ('What question would a second developer have asked to catch this early?',v('p4-pair'));
+  addLine('Refactor view seen - '+(rfShowingAfter?'yes':'no'));
+  y+=1;
+  addQ('How would regular refactoring have changed what happened?',v('p4-refactor'));
+  addQ('Discussion - Scrum and coding practices together',v('p4-combo'));
+
+  foot();
+  doc.save('stacksafe-agile-in-practice.pdf');
+}
+
+/* ── COLLAPSIBLE SECTIONS ────────────────────────────────  */
+function togglePart(id){
+  var body=document.getElementById(id+'-body');
+  var chev=document.getElementById(id+'-chev');
+  if(!body||!chev)return;
+  var isOpen=body.getAttribute('data-open')==='1';
+  if(isOpen){
+    body.style.maxHeight=body.scrollHeight+'px';
+    requestAnimationFrame(function(){body.style.maxHeight='0px';});
+    body.setAttribute('data-open','0');
+    chev.style.transform='rotate(-90deg)';
+  }else{
+    body.style.maxHeight=body.scrollHeight+'px';
+    body.setAttribute('data-open','1');
+    chev.style.transform='rotate(0deg)';
+    setTimeout(function(){if(body.getAttribute('data-open')==='1')body.style.maxHeight='none';},380);
+
+  }
+  sessionStorage.setItem(STORE+'open_'+id,isOpen?'0':'1');
+}
+function initSections(){
+  ['p1','p2','p3'].forEach(function(id,i){
+    var body=document.getElementById(id+'-body');
+    var chev=document.getElementById(id+'-chev');
+    if(!body||!chev)return;
+    var saved=sessionStorage.getItem(STORE+'open_'+id);
+    var open=(saved!==null)?(saved==='1'):(i===0);
+    if(open){
+      body.setAttribute('data-open','1');
+      body.style.maxHeight='none';
+      chev.style.transform='rotate(0deg)';
+    }else{
+      body.setAttribute('data-open','0');
+      body.style.maxHeight='0px';
+      chev.style.transform='rotate(-90deg)';
+    }
+  });
+}
+
+/* ── STEPPER ──────────────────────────────────────────────  */
+var PARTS=['p1','p2','p3'];
+var dots=document.querySelectorAll('.s-item');
+window.addEventListener('scroll',function(){
+  var cur=0;
+  PARTS.forEach(function(id,i){var el=document.getElementById(id);if(el&&el.getBoundingClientRect().top<=100)cur=i;});
+  dots.forEach(function(d,i){d.classList.toggle('active',i===cur);});
+},{passive:true});
+
+/* ── INIT ─────────────────────────────────────────────────  */
+document.addEventListener('DOMContentLoaded',function(){
+  initBacklog();
+  document.querySelectorAll('textarea[data-key]').forEach(function(ta){ta.addEventListener('input',saveState);});
+  restoreState();
+  initSections();
+  initFooter();
+  if(!window.jspdf){var btn=document.getElementById('pdf-btn');if(btn){btn.textContent='🖨️ Print';btn.onclick=function(){window.print();};}}
+});
+</script>
+</body>
+</html>
