@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agile vs Waterfall - Interactive Tutorial</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --wf:#1B3A6B;--wf-l:#EBF0F8;--wf-m:#3B69B8;
+  --ag:#A85C00;--ag-l:#FEF0DC;--ag-m:#C97010;
+  --bg:#FFFFFF;--bg-alt:#F7F8FA;
+  --tx:#111827;--mu:#6B7280;
+  --ok:#15803D;--ok-l:#DCFCE7;
+  --er:#B91C1C;--er-l:#FEE2E2;
+  --bd:#E5E7EB;--r:10px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:#fff;color:var(--tx);line-height:1.6;font-size:16px}
+h1,h2,h3,.syne{font-family:'Space Grotesk',system-ui,sans-serif;line-height:1.2}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.97);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;gap:1rem;padding:0 1.5rem;height:52px}
+.nav-logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:0.95rem;display:flex;gap:0.3rem;align-items:center}
+.nav-logo span.w{color:var(--wf)}.nav-logo span.v{color:var(--mu)}.nav-logo span.a{color:var(--ag-m)}
+nav ul{display:flex;gap:0.1rem;list-style:none;margin-left:auto}
+nav ul a{font-size:0.78rem;font-weight:500;color:var(--mu);text-decoration:none;
+  padding:0.3rem 0.55rem;border-radius:6px;transition:all 0.15s}
+nav ul a:hover{background:var(--bg-alt);color:var(--tx)}
+
+/* PROGRESS */
+.prog-bar{position:fixed;top:52px;left:0;right:0;height:2px;background:var(--bd);z-index:99}
+.prog-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--wf),var(--ag-m));transition:width 0.2s}
+
+/* HERO */
+#hero{min-height:88vh;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  text-align:center;padding:4rem 1.5rem}
+.hero-label{font-size:0.73rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--mu);margin-bottom:1rem;border:1px solid var(--bd);border-radius:20px;
+  padding:0.3rem 0.85rem;display:inline-block}
+.hero-title{font-size:clamp(2.4rem,6vw,4.2rem);font-weight:800;margin-bottom:1rem}
+.hero-title .w{color:var(--wf)}.hero-title .a{color:var(--ag-m)}
+.hero-sub{color:var(--mu);font-size:1rem;max-width:460px;margin-bottom:2.5rem}
+
+.hero-cards{display:flex;gap:1.25rem;justify-content:center;flex-wrap:wrap;margin-bottom:2.5rem}
+.hero-card{background:var(--bg-alt);border:1.5px solid var(--bd);border-radius:var(--r);
+  padding:1.25rem;width:240px;text-align:left}
+.hero-card.wf{border-color:var(--wf-m)}.hero-card.ag{border-color:var(--ag-m)}
+.hero-card h3{font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.75rem}
+.hero-card.wf h3{color:var(--wf)}.hero-card.ag h3{color:var(--ag)}
+
+/* Waterfall staircase */
+.wf-stairs{display:flex;flex-direction:column;gap:3px}
+.wf-stair{height:26px;border-radius:4px;background:var(--wf-l);color:var(--wf);
+  font-size:0.7rem;font-weight:600;display:flex;align-items:center;padding:0 8px;
+  opacity:0;animation:stairIn 0.35s forwards}
+.wf-stair:nth-child(1){animation-delay:0.1s;margin-left:0px}
+.wf-stair:nth-child(2){animation-delay:0.5s;margin-left:12px}
+.wf-stair:nth-child(3){animation-delay:0.9s;margin-left:24px}
+.wf-stair:nth-child(4){animation-delay:1.3s;margin-left:36px}
+.wf-stair:nth-child(5){animation-delay:1.7s;margin-left:48px}
+@keyframes stairIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+
+/* Agile ring */
+.ag-ring-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:90px;position:relative}
+.ag-ring{width:76px;height:76px;border-radius:50%;border:3px solid var(--ag-l);
+  border-top:3px solid var(--ag-m);animation:spin 2s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ag-ring-labels{position:absolute;font-size:0.62rem;font-weight:600;color:var(--ag-m);text-align:center;line-height:1.5}
+.ag-ring-note{font-size:0.7rem;color:var(--mu);margin-top:0.4rem;text-align:center}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.65rem 1.5rem;border-radius:8px;
+  font-weight:600;font-size:0.9rem;cursor:pointer;text-decoration:none;border:none;
+  font-family:'Inter',sans-serif;transition:all 0.15s}
+.btn-dark{background:var(--tx);color:#fff}.btn-dark:hover{background:#374151;transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--tx);border:1.5px solid var(--bd)}.btn-outline:hover{border-color:var(--tx)}
+.btn:disabled{opacity:0.45;cursor:not-allowed;transform:none !important}
+
+/* SECTION WRAPPER */
+.sec{padding:4.5rem 1.5rem;max-width:940px;margin:0 auto}
+.sec.alt{max-width:100%;background:var(--bg-alt);padding:4.5rem 1.5rem}
+.sec.alt .inner{max-width:940px;margin:0 auto}
+.sec-label{font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--mu);margin-bottom:0.6rem}
+.sec-title{font-size:1.8rem;font-weight:800;margin-bottom:0.65rem}
+.sec-sub{color:var(--mu);font-size:0.95rem;max-width:520px;margin-bottom:2rem}
+
+/* CONCEPTS */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+.method-card{border-radius:var(--r);padding:1.75rem;border:2px solid}
+.method-card.wf{background:var(--wf-l);border-color:var(--wf)}
+.method-card.ag{background:var(--ag-l);border-color:var(--ag-m)}
+.badge{display:inline-block;padding:0.2rem 0.65rem;border-radius:20px;
+  font-size:0.72rem;font-weight:700;margin-bottom:0.9rem;letter-spacing:0.05em}
+.wf .badge{background:var(--wf);color:#fff}.ag .badge{background:var(--ag-m);color:#fff}
+.method-card h3{font-size:1.05rem;margin-bottom:0.4rem}
+.method-card p{font-size:0.875rem;color:var(--mu);margin-bottom:0.9rem}
+.method-card ul{list-style:none}
+.method-card ul li{font-size:0.85rem;padding:0.3rem 0;border-bottom:1px solid rgba(0,0,0,0.06);
+  display:flex;gap:0.45rem;align-items:flex-start}
+.method-card ul li:last-child{border:none}
+.method-card ul li::before{content:'→';font-weight:700;flex-shrink:0}
+.wf ul li::before{color:var(--wf)}.ag ul li::before{color:var(--ag-m)}
+.analogy-box{margin-top:1.5rem;padding:1.1rem 1.25rem;background:#fff;border-radius:var(--r);
+  border:1.5px solid var(--bd);font-size:0.875rem;line-height:1.7}
+
+/* TIMELINE */
+.tab-toggle{display:flex;border:1.5px solid var(--bd);border-radius:8px;overflow:hidden;width:fit-content;margin-bottom:1.75rem}
+.tab-btn{padding:0.55rem 1.2rem;font-weight:600;font-size:0.85rem;cursor:pointer;border:none;
+  background:transparent;color:var(--mu);transition:all 0.15s;font-family:'Inter',sans-serif}
+.tab-btn.active-wf{background:var(--wf);color:#fff}
+.tab-btn.active-ag{background:var(--ag-m);color:#fff}
+.timeline-view{display:none}.timeline-view.shown{display:block}
+.tl-note{font-size:0.83rem;color:var(--mu);margin-bottom:1.25rem}
+
+/* Waterfall horizontal flow */
+.wf-flow{display:flex;align-items:center;overflow-x:auto;padding:0.5rem 0 1rem;gap:0}
+.wf-node{display:flex;flex-direction:column;align-items:center;min-width:120px}
+.wf-box{width:108px;padding:0.65rem 0.5rem;border-radius:8px;text-align:center;
+  font-size:0.78rem;font-weight:600;opacity:0;animation:fadeUp 0.4s forwards}
+.wf-box.blue{background:var(--wf);color:#fff}
+.wf-box.green{background:#15803D;color:#fff}
+.wf-sub{font-size:0.65rem;color:var(--mu);margin-top:0.35rem;text-align:center}
+.wf-arr{width:28px;height:2px;background:var(--wf-m);position:relative;flex-shrink:0;opacity:0;animation:fadeUp 0.3s forwards}
+.wf-arr::after{content:'';position:absolute;right:-1px;top:-4px;
+  border-left:7px solid var(--wf-m);border-top:5px solid transparent;border-bottom:5px solid transparent}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.wf-note{margin-top:1.25rem;padding:0.9rem 1.1rem;background:var(--er-l);
+  border-left:3px solid var(--er);border-radius:0 var(--r) var(--r) 0;font-size:0.85rem;color:#7f1d1d}
+
+/* Agile sprint rows */
+.ag-sprint-list{display:flex;flex-direction:column;gap:0.85rem}
+.sprint-row{display:flex;align-items:center;gap:0.6rem}
+.sprint-lbl{font-size:0.72rem;font-weight:700;color:var(--ag-m);width:56px;flex-shrink:0}
+.sprint-mini-phases{display:flex;gap:3px;flex:1}
+.smp{flex:1;padding:0.45rem 0.2rem;background:var(--ag-l);border-radius:5px;
+  font-size:0.68rem;font-weight:600;color:var(--ag);text-align:center;
+  opacity:0;animation:popIn 0.25s forwards}
+@keyframes popIn{from{opacity:0;transform:scale(0.9)}to{opacity:1;transform:none}}
+.sprint-check{width:26px;height:26px;border-radius:50%;background:var(--ok-l);
+  border:2px solid var(--ok);display:flex;align-items:center;justify-content:center;
+  font-size:0.72rem;flex-shrink:0;opacity:0;animation:fadeUp 0.3s forwards;color:var(--ok);font-weight:700}
+.sprint-feat{font-size:0.7rem;color:var(--mu);width:110px}
+.ag-note{margin-top:1.25rem;padding:0.9rem 1.1rem;background:var(--ok-l);
+  border-left:3px solid var(--ok);border-radius:0 var(--r) var(--r) 0;font-size:0.85rem;color:#14532d}
+
+/* DRAG AND DROP */
+.dnd-layout{display:grid;grid-template-columns:1fr 1.6fr 0.9fr;gap:1.25rem;align-items:start}
+.pool-label{font-size:0.72rem;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:0.08em;text-align:center;margin-bottom:0.5rem}
+.card-pool{display:flex;flex-direction:column;gap:6px}
+.drag-card{background:#fff;border:1.5px solid var(--bd);border-radius:7px;padding:0.55rem 0.8rem;
+  font-size:0.8rem;font-weight:500;cursor:grab;user-select:none;transition:all 0.15s}
+.drag-card:hover{border-color:var(--tx);box-shadow:0 2px 8px rgba(0,0,0,0.08);transform:translateY(-1px)}
+.drag-card.selected{border-color:var(--tx);background:var(--bg-alt);font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.drag-card.gone{display:none}
+.drag-card:active{cursor:grabbing}
+
+.drop-zones{display:flex;flex-direction:column;gap:1rem}
+.dz{min-height:110px;border-radius:var(--r);border:2px dashed var(--bd);padding:0.85rem;transition:all 0.15s}
+.dz.wf-zone{border-color:var(--wf);background:var(--wf-l)}
+.dz.ag-zone{border-color:var(--ag-m);background:var(--ag-l)}
+.dz.drag-over{transform:scale(1.01);box-shadow:0 4px 16px rgba(0,0,0,0.1)}
+.dz.clickable:hover{transform:scale(1.01);cursor:pointer}
+.dz-label{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.5rem}
+.dz.wf-zone .dz-label{color:var(--wf)}.dz.ag-zone .dz-label{color:var(--ag-m)}
+.dz-chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{padding:0.3rem 0.65rem;border-radius:20px;font-size:0.74rem;font-weight:500;cursor:pointer}
+.dz.wf-zone .chip{background:var(--wf);color:#fff}.dz.ag-zone .chip{background:var(--ag-m);color:#fff}
+.chip.correct::after{content:' ✓';font-weight:700}.chip.wrong::after{content:' ✗';font-weight:700}
+.chip.correct{opacity:1}.chip.wrong{opacity:0.6}
+
+.dnd-sidebar{position:sticky;top:70px}
+.dnd-hint{font-size:0.8rem;color:var(--mu);text-align:center;margin-bottom:1rem;line-height:1.5}
+.dnd-result{padding:0.9rem;border-radius:var(--r);font-weight:600;font-size:0.875rem;
+  text-align:center;margin-top:0.75rem;display:none}
+.dnd-result.show{display:block}
+.dnd-result.good{background:var(--ok-l);color:var(--ok)}.dnd-result.bad{background:var(--er-l);color:var(--er)}
+
+/* SCENARIO */
+.scenario-wrap{background:#fff;border:1.5px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.scenario-head{background:var(--tx);color:#fff;padding:1.25rem 1.5rem}
+.scenario-head h3{font-size:1rem;margin-bottom:0.3rem}
+.scenario-head p{font-size:0.82rem;opacity:0.7}
+.scenario-body{padding:1.5rem}
+.sc-step{display:none}.sc-step.active{display:block}
+.situation{padding:0.9rem 1.1rem;background:var(--bg-alt);border-left:3px solid var(--tx);
+  border-radius:0 var(--r) var(--r) 0;font-size:0.88rem;font-style:italic;margin-bottom:1.25rem;line-height:1.6}
+.sc-q{font-weight:700;font-size:0.9rem;margin-bottom:0.9rem}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}
+.choice{padding:0.9rem;border-radius:var(--r);border:1.5px solid var(--bd);background:#fff;
+  cursor:pointer;text-align:left;font-size:0.83rem;font-family:'Inter',sans-serif;transition:all 0.15s;line-height:1.45}
+.choice:hover{box-shadow:0 2px 10px rgba(0,0,0,0.08);transform:translateY(-1px)}
+.choice .c-tag{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:0.35rem}
+.choice.wf-c .c-tag{color:var(--wf)}.choice.ag-c .c-tag{color:var(--ag-m)}
+.choice.wf-c:hover{border-color:var(--wf);background:var(--wf-l)}
+.choice.ag-c:hover{border-color:var(--ag-m);background:var(--ag-l)}
+.choice.picked-wf{border-color:var(--wf);background:var(--wf-l);pointer-events:none}
+.choice.picked-ag{border-color:var(--ag-m);background:var(--ag-l);pointer-events:none}
+.choice.faded{opacity:0.35;pointer-events:none}
+.sc-feedback{margin-top:1rem;padding:1rem 1.15rem;border-radius:var(--r);font-size:0.85rem;display:none;line-height:1.6}
+.sc-feedback.shown{display:block}
+.sc-feedback.wf-f{background:var(--wf-l);border-left:3px solid var(--wf)}
+.sc-feedback.ag-f{background:var(--ag-l);border-left:3px solid var(--ag-m)}
+.sc-feedback strong{display:block;margin-bottom:0.25rem;font-size:0.9rem}
+.sc-feedback.wf-f strong{color:var(--wf)}.sc-feedback.ag-f strong{color:var(--ag)}
+.sc-nav{display:flex;justify-content:flex-end;margin-top:1rem;display:none}
+.sc-nav.shown{display:flex}
+.step-dots{display:flex;gap:5px;padding:0.9rem 1.5rem;border-top:1px solid var(--bd)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--bd);transition:all 0.3s}
+.dot.done{background:var(--tx)}.dot.cur{background:var(--ag-m);width:20px;border-radius:4px}
+
+/* QUIZ */
+.quiz-wrap{max-width:660px}
+.quiz-card{background:#fff;border:1.5px solid var(--bd);border-radius:var(--r);padding:1.5rem;display:none}
+.quiz-card.shown{display:block}
+.q-num{font-size:0.72rem;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.5rem}
+.q-text{font-size:0.975rem;font-weight:600;margin-bottom:1.1rem;line-height:1.5}
+.q-opts{display:flex;flex-direction:column;gap:0.45rem}
+.q-opt{padding:0.7rem 0.9rem;border-radius:7px;border:1.5px solid var(--bd);background:#fff;
+  cursor:pointer;font-size:0.85rem;text-align:left;font-family:'Inter',sans-serif;transition:all 0.15s}
+.q-opt:hover:not(.locked){border-color:var(--tx)}
+.q-opt.locked{pointer-events:none}
+.q-opt.correct{background:var(--ok-l);border-color:var(--ok);color:var(--ok);font-weight:600}
+.q-opt.wrong{background:var(--er-l);border-color:var(--er);color:var(--er)}
+.q-exp{margin-top:0.7rem;padding:0.7rem 0.9rem;background:var(--bg-alt);border-radius:7px;
+  font-size:0.8rem;color:var(--mu);line-height:1.6;display:none}
+.q-exp.shown{display:block}
+.quiz-footer{display:flex;justify-content:space-between;align-items:center;margin-top:1.25rem}
+.quiz-counter{font-size:0.83rem;color:var(--mu);font-weight:500}
+.quiz-result{background:var(--bg-alt);border-radius:var(--r);padding:2.5rem;text-align:center;display:none;margin-top:1.5rem}
+.quiz-result.shown{display:block}
+.big-score{font-size:3rem;font-weight:800;margin-bottom:0.4rem}
+.big-score.great{color:var(--ok)}.big-score.mid{color:var(--ag-m)}.big-score.low{color:var(--er)}
+.quiz-result p{color:var(--mu);margin-bottom:1.5rem;font-size:0.9rem}
+
+/* SUMMARY */
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+.sum-col{border-radius:var(--r);padding:1.5rem;border:2px solid}
+.sum-col.wf{background:var(--wf-l);border-color:var(--wf)}.sum-col.ag{background:var(--ag-l);border-color:var(--ag-m)}
+.sum-col h3{font-size:0.95rem;margin-bottom:1rem}
+.sum-col.wf h3{color:var(--wf)}.sum-col.ag h3{color:var(--ag)}
+.sum-row{display:flex;gap:0.7rem;margin-bottom:0.5rem;font-size:0.84rem}
+.sum-key{font-weight:600;min-width:88px;flex-shrink:0}
+.when-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-top:1.5rem}
+.when-card{border-radius:var(--r);padding:1.2rem}
+.when-card.wf{background:var(--wf-l)}.when-card.ag{background:var(--ag-l)}
+.when-card h4{font-size:0.82rem;font-weight:700;margin-bottom:0.65rem}
+.when-card.wf h4{color:var(--wf)}.when-card.ag h4{color:var(--ag)}
+.when-card ul{list-style:none;display:flex;flex-direction:column;gap:0.35rem}
+.when-card ul li{font-size:0.8rem;display:flex;gap:0.45rem;line-height:1.4}
+.when-card ul li::before{content:'•';font-weight:700;flex-shrink:0}
+.when-card.wf ul li::before{color:var(--wf)}.when-card.ag ul li::before{color:var(--ag-m)}
+.final-box{margin-top:3rem;text-align:center;padding:2rem;background:var(--bg-alt);border-radius:var(--r)}
+.final-box p{color:var(--mu);font-size:0.9rem;max-width:480px;margin:0.5rem auto 1.5rem}
+.final-actions{display:flex;gap:0.75rem;justify-content:center}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .compare-grid,.choices,.sum-grid,.when-grid{grid-template-columns:1fr}
+  .dnd-layout{grid-template-columns:1fr}
+  nav ul{display:none}
+  .wf-flow{overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <span class="w">Waterfall</span>
+    <span class="v">vs</span>
+    <span class="a">Agile</span>
+  </div>
+  <ul>
+    <li><a href="#concepts">Concepts</a></li>
+    <li><a href="#timeline">Timeline</a></li>
+    <li><a href="#drag">Activity</a></li>
+    <li><a href="#scenario">Scenario</a></li>
+    <li><a href="#quiz">Quiz</a></li>
+    <li><a href="#summary">Summary</a></li>
+  </ul>
+</nav>
+<div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+
+<!-- =================== HERO =================== -->
+<section id="hero">
+  <span class="hero-label">Project Management</span>
+  <h1 class="hero-title syne"><span class="w">Waterfall</span> vs <span class="a">Agile</span></h1>
+  <p class="hero-sub">Two completely different ways to run a project. Learn what they are, see them in action, and discover when to use each one.</p>
+  <div class="hero-cards">
+    <div class="hero-card wf">
+      <h3>Waterfall</h3>
+      <div class="wf-stairs">
+        <div class="wf-stair">1. Requirements</div>
+        <div class="wf-stair">2. Design</div>
+        <div class="wf-stair">3. Build</div>
+        <div class="wf-stair">4. Test</div>
+        <div class="wf-stair">5. Deploy</div>
+      </div>
+    </div>
+    <div class="hero-card ag">
+      <h3>Agile</h3>
+      <div class="ag-ring-wrap">
+        <div class="ag-ring"></div>
+        <div class="ag-ring-labels">Plan<br>Build<br>Review</div>
+      </div>
+      <div class="ag-ring-note">Repeat every 1-4 weeks</div>
+    </div>
+  </div>
+  <a href="#concepts" class="btn btn-dark">Start Learning &darr;</a>
+</section>
+
+<!-- =================== CONCEPTS =================== -->
+<section class="alt" id="concepts">
+  <div class="inner">
+    <p class="sec-label">Part 1 of 5 - Core Concepts</p>
+    <h2 class="sec-title syne">What are these two approaches?</h2>
+    <p class="sec-sub">Both methods manage projects from start to finish - but they think about planning, delivery, and change very differently.</p>
+    <div class="compare-grid">
+      <div class="method-card wf">
+        <span class="badge">Waterfall</span>
+        <h3 class="syne">Plan everything, then build.</h3>
+        <p>Like constructing a building - you finalize the blueprint before laying a single brick. Each phase must finish before the next begins.</p>
+        <ul>
+          <li>All requirements defined upfront</li>
+          <li>Strict sequential phases</li>
+          <li>Detailed documentation throughout</li>
+          <li>Changes are expensive and disruptive</li>
+          <li>Final product delivered at the end</li>
+        </ul>
+      </div>
+      <div class="method-card ag">
+        <span class="badge">Agile</span>
+        <h3 class="syne">Build small. Learn fast. Adapt.</h3>
+        <p>Like cooking by tasting as you go - you deliver something working quickly, get real feedback, and improve it through short repeating cycles called sprints.</p>
+        <ul>
+          <li>Requirements evolve based on feedback</li>
+          <li>Short sprints (1-4 weeks each)</li>
+          <li>Working software over heavy documentation</li>
+          <li>Change is expected and welcomed</li>
+          <li>Working features delivered continuously</li>
+        </ul>
+      </div>
+    </div>
+    <div class="analogy-box">
+      <strong>A simple analogy:</strong> If you order a pizza, Waterfall means the chef finalizes the full menu, sources all ingredients, cooks everything at once, then serves you - exactly as planned. Agile means the chef brings you a small slice first, asks "more spice?", adjusts, brings another slice, and keeps improving until you're happy.
+    </div>
+  </div>
+</section>
+
+<!-- =================== TIMELINE =================== -->
+<div id="timeline">
+<section class="sec">
+  <p class="sec-label">Part 2 of 5 - Animated Comparison</p>
+  <h2 class="sec-title syne">See how each method flows</h2>
+  <p class="sec-sub">Toggle between views to see how a typical 4-month software project looks under each approach.</p>
+
+  <div class="tab-toggle">
+    <button class="tab-btn active-wf" id="tabWF" onclick="showTab('wf')">Waterfall view</button>
+    <button class="tab-btn" id="tabAG" onclick="showTab('ag')">Agile view</button>
+  </div>
+
+  <div class="timeline-view shown" id="tlWF">
+    <p class="tl-note">Each phase must finish before the next starts. The customer sees nothing until the very end.</p>
+    <div class="wf-flow" id="wfFlow">
+      <div class="wf-node">
+        <div class="wf-box blue" style="animation-delay:0.1s">Requirements<br><small style="font-weight:400;opacity:0.75">Weeks 1-3</small></div>
+        <div class="wf-sub">All needs defined</div>
+      </div>
+      <div class="wf-arr" style="animation-delay:0.35s"></div>
+      <div class="wf-node">
+        <div class="wf-box blue" style="animation-delay:0.55s">Design<br><small style="font-weight:400;opacity:0.75">Weeks 4-6</small></div>
+        <div class="wf-sub">Architecture set</div>
+      </div>
+      <div class="wf-arr" style="animation-delay:0.8s"></div>
+      <div class="wf-node">
+        <div class="wf-box blue" style="animation-delay:1.0s">Build<br><small style="font-weight:400;opacity:0.75">Weeks 7-13</small></div>
+        <div class="wf-sub">Everything coded</div>
+      </div>
+      <div class="wf-arr" style="animation-delay:1.25s"></div>
+      <div class="wf-node">
+        <div class="wf-box blue" style="animation-delay:1.45s">Testing<br><small style="font-weight:400;opacity:0.75">Weeks 14-16</small></div>
+        <div class="wf-sub">QA &amp; fixes</div>
+      </div>
+      <div class="wf-arr" style="animation-delay:1.7s"></div>
+      <div class="wf-node">
+        <div class="wf-box green" style="animation-delay:1.9s">Deploy<br><small style="font-weight:400;opacity:0.75">Week 17</small></div>
+        <div class="wf-sub">First delivery!</div>
+      </div>
+    </div>
+    <div class="wf-note">
+      Customers see the product for the <strong>first time at week 17</strong>. If their needs changed, or if requirements were wrong from the start, it is very costly to fix.
+    </div>
+  </div>
+
+  <div class="timeline-view" id="tlAG">
+    <p class="tl-note">Each sprint delivers something working. Customers give feedback after every sprint - the team adjusts course continuously.</p>
+    <div class="ag-sprint-list" id="agSprintList"></div>
+    <div class="ag-note">
+      Customers see <strong>working features from week 2 onward</strong>. Feedback shapes each sprint, so the team always builds what users actually need.
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- =================== DRAG AND DROP =================== -->
+<section class="alt" id="drag">
+  <div class="inner">
+    <p class="sec-label">Part 3 of 5 - Activity</p>
+    <h2 class="sec-title syne">Sort the characteristics</h2>
+    <p class="sec-sub">Drag cards into the correct bucket - or click a card to select it, then click the drop zone to place it. Drop them all, then check your answers.</p>
+
+    <div class="dnd-layout">
+      <div>
+        <div class="pool-label">Cards to sort</div>
+        <div class="card-pool" id="cardPool"></div>
+      </div>
+      <div class="drop-zones">
+        <div class="dz wf-zone" id="dzWF"
+          ondragover="onDragOver(event)" ondrop="onDrop(event,'wf')" ondragleave="onDragLeave(event)"
+          onclick="onZoneClick('wf')">
+          <div class="dz-label">Waterfall</div>
+          <div class="dz-chips" id="chipsWF"></div>
+        </div>
+        <div class="dz ag-zone" id="dzAG"
+          ondragover="onDragOver(event)" ondrop="onDrop(event,'ag')" ondragleave="onDragLeave(event)"
+          onclick="onZoneClick('ag')">
+          <div class="dz-label">Agile</div>
+          <div class="dz-chips" id="chipsAG"></div>
+        </div>
+      </div>
+      <div class="dnd-sidebar">
+        <p class="dnd-hint">Drag cards, or click a card then click a zone to place it.</p>
+        <button class="btn btn-dark" style="width:100%" id="checkDndBtn" onclick="checkDnd()" disabled>Check answers</button>
+        <button class="btn btn-outline" style="width:100%;margin-top:0.5rem;display:none" id="resetDndBtn" onclick="resetDnd()">Try again</button>
+        <div class="dnd-result" id="dndResult"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== SCENARIO =================== -->
+<div id="scenario">
+<section class="sec">
+  <p class="sec-label">Part 4 of 5 - Scenario-Based Decisions</p>
+  <h2 class="sec-title syne">You are the project manager</h2>
+  <p class="sec-sub">A startup has hired you to build their new mobile app. Make three key decisions and see how each approach plays out.</p>
+  <div class="scenario-wrap">
+    <div class="scenario-head">
+      <h3>Project: QuickFit - a fitness tracking app for a startup</h3>
+      <p>You have 3 months, limited budget, and a competitive market. User preferences are unclear.</p>
+    </div>
+    <div class="scenario-body" id="scenarioBody"></div>
+    <div class="step-dots" id="stepDots"></div>
+  </div>
+</section>
+</div>
+
+<!-- =================== QUIZ =================== -->
+<section class="alt" id="quiz">
+  <div class="inner">
+    <p class="sec-label">Part 5 of 5 - Knowledge Check</p>
+    <h2 class="sec-title syne">Test what you have learned</h2>
+    <p class="sec-sub">Five questions. Take your time - explanation provided after each answer.</p>
+    <div class="quiz-wrap">
+      <div id="quizCards"></div>
+      <div class="quiz-footer" id="quizFooter">
+        <span class="quiz-counter" id="quizCounter">Question 1 of 5</span>
+        <button class="btn btn-dark" id="nextBtn" onclick="nextQ()" disabled>Next question &rarr;</button>
+      </div>
+      <div class="quiz-result" id="quizResult">
+        <div class="big-score" id="bigScore"></div>
+        <p id="resultMsg"></p>
+        <button class="btn btn-outline" onclick="resetQuiz()">Retry quiz</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== SUMMARY =================== -->
+<section class="sec" id="summary">
+  <p class="sec-label">Reference - Quick Cheat Sheet</p>
+  <h2 class="sec-title syne">Everything at a glance</h2>
+  <p class="sec-sub">A reference card to revisit whenever needed.</p>
+  <div class="sum-grid">
+    <div class="sum-col wf">
+      <h3 class="syne">Waterfall at a glance</h3>
+      <div class="sum-row"><span class="sum-key">Cycle</span><span>Single long cycle</span></div>
+      <div class="sum-row"><span class="sum-key">Planning</span><span>All upfront, very detailed</span></div>
+      <div class="sum-row"><span class="sum-key">Changes</span><span>Very costly to make</span></div>
+      <div class="sum-row"><span class="sum-key">Delivery</span><span>Once, at the end</span></div>
+      <div class="sum-row"><span class="sum-key">Feedback</span><span>Only after delivery</span></div>
+      <div class="sum-row"><span class="sum-key">Teams</span><span>Specialized per phase</span></div>
+      <div class="sum-row"><span class="sum-key">Docs</span><span>Heavy documentation</span></div>
+    </div>
+    <div class="sum-col ag">
+      <h3 class="syne">Agile at a glance</h3>
+      <div class="sum-row"><span class="sum-key">Cycle</span><span>Many short sprints (1-4 weeks)</span></div>
+      <div class="sum-row"><span class="sum-key">Planning</span><span>Just enough, just in time</span></div>
+      <div class="sum-row"><span class="sum-key">Changes</span><span>Expected and welcomed</span></div>
+      <div class="sum-row"><span class="sum-key">Delivery</span><span>Continuously, each sprint</span></div>
+      <div class="sum-row"><span class="sum-key">Feedback</span><span>After every sprint</span></div>
+      <div class="sum-row"><span class="sum-key">Teams</span><span>Cross-functional</span></div>
+      <div class="sum-row"><span class="sum-key">Docs</span><span>Minimal - only what is needed</span></div>
+    </div>
+  </div>
+  <h3 class="syne" style="margin-top:2.5rem;margin-bottom:0.4rem;font-size:1.1rem">When to use each?</h3>
+  <div class="when-grid">
+    <div class="when-card wf">
+      <h4>Choose Waterfall when...</h4>
+      <ul>
+        <li>Requirements are fixed and fully known from day one</li>
+        <li>Regulatory sign-offs require sequential phase completion</li>
+        <li>You are building physical infrastructure (bridges, hardware)</li>
+        <li>The client cannot be involved frequently during the project</li>
+        <li>Risk of change mid-project is very low</li>
+      </ul>
+    </div>
+    <div class="when-card ag">
+      <h4>Choose Agile when...</h4>
+      <ul>
+        <li>Requirements are unclear or likely to evolve</li>
+        <li>Speed to market and early user feedback matter</li>
+        <li>The product is digital and can be iterated quickly</li>
+        <li>The team is cross-functional and collaborative</li>
+        <li>The client can participate in regular reviews</li>
+      </ul>
+    </div>
+  </div>
+  <div class="final-box">
+    <h3 class="syne" style="font-size:1.15rem">Tutorial complete!</h3>
+    <p>You now understand the two most common project management methodologies. Real-world teams often blend both - this is called a "hybrid" approach. The best method always depends on the context.</p>
+    <div class="final-actions">
+      <a href="#hero" class="btn btn-outline">Restart tutorial</a>
+      <a href="#quiz" class="btn btn-dark">Retake the quiz</a>
+    </div>
+  </div>
+</section>
+
+<script>
+// =================== PROGRESS BAR ===================
+window.addEventListener('scroll',()=>{
+  const pct=(window.scrollY/(document.body.scrollHeight-window.innerHeight))*100;
+  document.getElementById('progFill').style.width=Math.min(pct,100)+'%';
+});
+
+// =================== TIMELINE TABS ===================
+function showTab(tab){
+  document.querySelectorAll('.timeline-view').forEach(v=>v.classList.remove('shown'));
+  document.getElementById('tabWF').className='tab-btn';
+  document.getElementById('tabAG').className='tab-btn';
+  if(tab==='wf'){
+    document.getElementById('tlWF').classList.add('shown');
+    document.getElementById('tabWF').classList.add('active-wf');
+    restartWFAnim();
+  } else {
+    document.getElementById('tlAG').classList.add('shown');
+    document.getElementById('tabAG').classList.add('active-ag');
+    buildAgileTimeline();
+  }
+}
+
+function restartWFAnim(){
+  document.querySelectorAll('#wfFlow .wf-box, #wfFlow .wf-arr').forEach(el=>{
+    el.style.animation='none';
+    void el.offsetWidth;
+    el.style.animation='';
+  });
+}
+
+function buildAgileTimeline(){
+  const container=document.getElementById('agSprintList');
+  const phases=['Plan','Build','Test','Review'];
+  const sprints=[
+    {lbl:'Sprint 1',feat:'Login + profile',baseDelay:0},
+    {lbl:'Sprint 2',feat:'Workout tracker',baseDelay:0.2},
+    {lbl:'Sprint 3',feat:'Progress charts',baseDelay:0.4},
+    {lbl:'Sprint 4',feat:'Social sharing',baseDelay:0.6},
+  ];
+  container.innerHTML=sprints.map(s=>`
+    <div class="sprint-row">
+      <div class="sprint-lbl">${s.lbl}</div>
+      <div class="sprint-mini-phases">
+        ${phases.map((p,i)=>`<div class="smp" style="animation-delay:${s.baseDelay+i*0.07}s">${p}</div>`).join('')}
+      </div>
+      <div class="sprint-check" style="animation-delay:${s.baseDelay+0.35}s">&#10003;</div>
+      <div class="sprint-feat">${s.feat}</div>
+    </div>
+  `).join('');
+}
+
+// =================== DRAG AND DROP ===================
+const dndData=[
+  {id:'d1',text:'All requirements defined upfront',ans:'wf'},
+  {id:'d2',text:'Daily standup meetings',ans:'ag'},
+  {id:'d3',text:'One phase at a time, in strict order',ans:'wf'},
+  {id:'d4',text:'Sprint retrospectives',ans:'ag'},
+  {id:'d5',text:'Final delivery only at project end',ans:'wf'},
+  {id:'d6',text:'Working software every sprint',ans:'ag'},
+  {id:'d7',text:'Extensive documentation before coding',ans:'wf'},
+  {id:'d8',text:'Customer feedback after each sprint',ans:'ag'},
+  {id:'d9',text:'Phase-gate sign-offs required',ans:'wf'},
+  {id:'d10',text:'Flexible, prioritized backlog',ans:'ag'},
+];
+
+let dndPlaced={wf:[],ag:[]};
+let dndSelected=null;
+let draggingId=null;
+let dndChecked=false;
+
+function initDnd(){
+  dndPlaced={wf:[],ag:[]};
+  dndSelected=null;
+  draggingId=null;
+  dndChecked=false;
+  const pool=document.getElementById('cardPool');
+  pool.innerHTML='';
+  const shuffled=[...dndData].sort(()=>Math.random()-0.5);
+  shuffled.forEach(item=>{
+    const el=document.createElement('div');
+    el.className='drag-card';
+    el.id='dc-'+item.id;
+    el.textContent=item.text;
+    el.draggable=true;
+    el.addEventListener('dragstart',()=>{draggingId=item.id;});
+    el.addEventListener('dragend',()=>{draggingId=null;});
+    el.addEventListener('click',()=>selectCard(item.id));
+    pool.appendChild(el);
+  });
+  document.getElementById('chipsWF').innerHTML='';
+  document.getElementById('chipsAG').innerHTML='';
+  document.getElementById('dndResult').className='dnd-result';
+  document.getElementById('dndResult').textContent='';
+  document.getElementById('checkDndBtn').disabled=true;
+  document.getElementById('resetDndBtn').style.display='none';
+  document.querySelectorAll('.dz').forEach(z=>z.classList.remove('clickable'));
+}
+
+function selectCard(id){
+  if(dndChecked) return;
+  const alreadySelected=dndSelected===id;
+  document.querySelectorAll('.drag-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.dz').forEach(z=>z.classList.remove('clickable'));
+  if(alreadySelected){dndSelected=null;return;}
+  dndSelected=id;
+  const el=document.getElementById('dc-'+id);
+  if(el) el.classList.add('selected');
+  document.querySelectorAll('.dz').forEach(z=>z.classList.add('clickable'));
+}
+
+function onZoneClick(zone){
+  if(dndChecked) return;
+  if(dndSelected){
+    placeCard(dndSelected,zone);
+  }
+}
+
+function placeCard(id,zone){
+  ['wf','ag'].forEach(z=>{
+    const idx=dndPlaced[z].indexOf(id);
+    if(idx>-1){
+      dndPlaced[z].splice(idx,1);
+      const chip=document.querySelector(`#chips${z.toUpperCase()} [data-id="${id}"]`);
+      if(chip) chip.remove();
+    }
+  });
+  dndPlaced[zone].push(id);
+  const item=dndData.find(d=>d.id===id);
+  const chip=document.createElement('div');
+  chip.className='chip';
+  chip.dataset.id=id;
+  chip.textContent=item.text;
+  chip.title='Click to remove';
+  chip.onclick=()=>removeChip(id,zone);
+  document.getElementById('chips'+zone.toUpperCase()).appendChild(chip);
+  const poolCard=document.getElementById('dc-'+id);
+  if(poolCard) poolCard.classList.add('gone');
+  dndSelected=null;
+  document.querySelectorAll('.drag-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.dz').forEach(z=>z.classList.remove('clickable'));
+  updateCheckBtn();
+}
+
+function removeChip(id,zone){
+  if(dndChecked) return;
+  const idx=dndPlaced[zone].indexOf(id);
+  if(idx>-1) dndPlaced[zone].splice(idx,1);
+  const chip=document.querySelector(`#chips${zone.toUpperCase()} [data-id="${id}"]`);
+  if(chip) chip.remove();
+  const poolCard=document.getElementById('dc-'+id);
+  if(poolCard) poolCard.classList.remove('gone');
+  updateCheckBtn();
+}
+
+function onDragOver(e){e.preventDefault();e.currentTarget.classList.add('drag-over');}
+function onDragLeave(e){e.currentTarget.classList.remove('drag-over');}
+function onDrop(e,zone){
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if(draggingId) placeCard(draggingId,zone);
+}
+
+function updateCheckBtn(){
+  const total=dndPlaced.wf.length+dndPlaced.ag.length;
+  document.getElementById('checkDndBtn').disabled=total<dndData.length;
+}
+
+function checkDnd(){
+  dndChecked=true;
+  let correct=0;
+  dndData.forEach(item=>{
+    const zone=dndPlaced.wf.includes(item.id)?'wf':(dndPlaced.ag.includes(item.id)?'ag':null);
+    if(!zone) return;
+    const chip=document.querySelector(`#chips${zone.toUpperCase()} [data-id="${item.id}"]`);
+    if(!chip) return;
+    const isCorrect=zone===item.ans;
+    chip.classList.add(isCorrect?'correct':'wrong');
+    if(isCorrect) correct++;
+  });
+  const pct=Math.round((correct/dndData.length)*100);
+  const r=document.getElementById('dndResult');
+  r.textContent=`${correct} / ${dndData.length} correct (${pct}%)`;
+  r.className='dnd-result show '+(pct>=70?'good':'bad');
+  document.getElementById('checkDndBtn').disabled=true;
+  document.getElementById('resetDndBtn').style.display='block';
+}
+
+function resetDnd(){initDnd();}
+
+// =================== SCENARIO ===================
+const scenarios=[
+  {
+    situation:"You have just been hired. The startup says the app needs workout tracking, social sharing, nutrition logging, and AI coaching - but they are not sure which features users will actually want most.",
+    q:"How do you plan the project?",
+    choices:[
+      {type:'wf',tag:'Waterfall approach',text:"Document all requirements in full. Create a detailed 3-month plan with every feature specified before writing any code."},
+      {type:'ag',tag:'Agile approach',text:"Identify the most important features. Build a basic working version in the first sprint and test it with real users."},
+    ],
+    results:{
+      wf:{title:"The plan looks thorough...",body:"Three weeks in, you have a 40-page requirements document and no working code. Competitors are already shipping. If the client changes their mind later - and they will - the plan must be rewritten from scratch."},
+      ag:{title:"Smart move!",body:"After 2 weeks, users test a basic workout logger. They love it but say social features do not matter - they want better progress charts. You update the backlog and focus on what users actually need. No wasted effort."},
+    }
+  },
+  {
+    situation:"Midway through the project, the startup's biggest competitor ships a viral 'fitness challenge' feature. The client urgently wants something similar.",
+    q:"How do you handle this new requirement?",
+    choices:[
+      {type:'wf',tag:'Waterfall approach',text:"Log a formal change request. The impact on scope, budget, and all documentation must be reviewed and approved before anything changes."},
+      {type:'ag',tag:'Agile approach',text:"Add the challenge feature to the product backlog, prioritize it for the next sprint, and drop a lower-priority item to make room."},
+    ],
+    results:{
+      wf:{title:"Change is very painful here...",body:"The change request takes 2 weeks to process. The requirements document, design specs, and test plans all need updating. The schedule slips by a month. The client is frustrated. This is Waterfall's biggest weakness: changes mid-project are extremely expensive."},
+      ag:{title:"No problem at all!",body:"The challenge feature is reprioritized and delivered in the next sprint - within 2 weeks. This is Agile's biggest strength: the backlog absorbs new requirements naturally. Change is not an exception here; it is the norm."},
+    }
+  },
+  {
+    situation:"The project is wrapping up. You need to present your results to investors who will decide whether to fund a second phase.",
+    q:"What can you show them?",
+    choices:[
+      {type:'wf',tag:'Waterfall approach',text:"Present the complete final product - fully built and documented. This is the first time anything real is shown to the outside world."},
+      {type:'ag',tag:'Agile approach',text:"Demo four rounds of working features with user feedback data attached, showing a product that has already been used and refined by real people."},
+    ],
+    results:{
+      wf:{title:"A high-stakes first impression...",body:"Investors see the product for the first time. Some features miss the mark. There is no user data. The team built for 3 months in isolation. Fixing problems now means starting over. This is the risk of delivering everything only at the end."},
+      ag:{title:"Investors are impressed!",body:"You show real data: 300 users, 4-star average rating, four iterations of improvement. The sprint history proves the team can adapt. Investors fund Phase 2 the same day. Agile creates visible, evidence-based progress at every step."},
+    }
+  }
+];
+
+let scStep=0;
+
+function buildScenario(){
+  const body=document.getElementById('scenarioBody');
+  body.innerHTML=scenarios.map((s,i)=>`
+    <div class="sc-step${i===0?' active':''}" id="sc-${i}">
+      <div class="situation">${s.situation}</div>
+      <div class="sc-q">${s.q}</div>
+      <div class="choices">
+        ${s.choices.map(c=>`
+          <button class="choice ${c.type}-c" onclick="pickScenario(${i},'${c.type}')">
+            <span class="c-tag">${c.tag}</span>${c.text}
+          </button>
+        `).join('')}
+      </div>
+      <div class="sc-feedback wf-f" id="sf-${i}-wf">
+        <strong>${s.results.wf.title}</strong>${s.results.wf.body}
+      </div>
+      <div class="sc-feedback ag-f" id="sf-${i}-ag">
+        <strong>${s.results.ag.title}</strong>${s.results.ag.body}
+      </div>
+      <div class="sc-nav" id="sn-${i}">
+        ${i<scenarios.length-1
+          ?`<button class="btn btn-dark" onclick="nextScenario(${i+1})">Next situation &rarr;</button>`
+          :`<button class="btn btn-dark" onclick="document.getElementById('quiz').scrollIntoView({behavior:'smooth'})">Go to quiz &rarr;</button>`
+        }
+      </div>
+    </div>
+  `).join('');
+
+  const dots=document.getElementById('stepDots');
+  dots.innerHTML=scenarios.map((_,i)=>
+    `<div class="dot${i===0?' cur':''}" id="dot-${i}"></div>`
+  ).join('');
+}
+
+function pickScenario(step,type){
+  document.getElementById(`sf-${step}-${type}`).classList.add('shown');
+  document.getElementById(`sn-${step}`).classList.add('shown');
+  document.querySelectorAll(`#sc-${step} .choice`).forEach(c=>{
+    if(c.classList.contains(`${type}-c`)){
+      c.classList.add(`picked-${type}`);
+    } else {
+      c.classList.add('faded');
+    }
+  });
+}
+
+function nextScenario(next){
+  document.querySelectorAll('.sc-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById(`sc-${next}`).classList.add('active');
+  scStep=next;
+  document.querySelectorAll('.dot').forEach((d,i)=>{
+    d.className='dot'+(i<next?' done':(i===next?' cur':''));
+  });
+  document.getElementById('scenarioBody').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// =================== QUIZ ===================
+const questions=[
+  {
+    q:"In a Waterfall project, when does the customer typically see a working product for the first time?",
+    opts:["After the first sprint","After the design phase","At the very end of the project","During requirements gathering"],
+    ans:2,
+    exp:"Waterfall delivers the complete product only after all phases finish. Customers wait until the very end to see anything working - which is why late requirement changes are so costly."
+  },
+  {
+    q:"What is a 'sprint' in Agile?",
+    opts:["A fast-paced meeting","A short, fixed-length work cycle (usually 1-4 weeks)","The final delivery of a project","A type of requirements document"],
+    ans:1,
+    exp:"A sprint is a time-boxed iteration, typically 1-4 weeks. At the end of each sprint, the team delivers something working and collects feedback to guide the next sprint."
+  },
+  {
+    q:"A construction firm is building a bridge. Regulations require all engineering designs to be approved before any physical work begins. Which method fits best?",
+    opts:["Agile","Waterfall","Either works equally","Neither applies"],
+    ans:1,
+    exp:"Waterfall fits here - requirements are fixed (regulated specs), phases must be sequential by law, and physical construction cannot be 'iterated' the same way software can. Agile's strengths do not apply."
+  },
+  {
+    q:"Which of these is a core principle from the Agile Manifesto?",
+    opts:["Comprehensive documentation over working software","Following a plan over responding to change","Responding to change over following a plan","Customer involvement only at the beginning and end"],
+    ans:2,
+    exp:"The Agile Manifesto states: 'Responding to change over following a plan.' Agile values adaptability. This does not mean planning is ignored - it means plans are expected to evolve."
+  },
+  {
+    q:"A startup is building a social app. They are not sure what features users want, and requirements will likely change. What is the right approach?",
+    opts:["Waterfall - document everything thoroughly first","Agile - build small, release early, learn and adapt","Waterfall - sequential phases give stability","Neither method applies to startups"],
+    ans:1,
+    exp:"Agile is ideal when requirements are uncertain. Short sprints let the team learn from real users quickly and change direction before investing heavily in the wrong features."
+  }
+];
+
+let qCurrent=0,qScore=0,qAnswered=new Array(questions.length).fill(null);
+
+function buildQuiz(){
+  const c=document.getElementById('quizCards');
+  c.innerHTML=questions.map((q,i)=>`
+    <div class="quiz-card${i===0?' shown':''}" id="qq-${i}">
+      <div class="q-num">Question ${i+1} of ${questions.length}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-opts">
+        ${q.opts.map((o,oi)=>`<button class="q-opt" onclick="answerQ(${i},${oi})">${o}</button>`).join('')}
+      </div>
+      <div class="q-exp" id="qe-${i}">${q.exp}</div>
+    </div>
+  `).join('');
+}
+
+function answerQ(qi,oi){
+  if(qAnswered[qi]!==null) return;
+  qAnswered[qi]=oi;
+  if(oi===questions[qi].ans) qScore++;
+  document.querySelectorAll(`#qq-${qi} .q-opt`).forEach((b,i)=>{
+    b.classList.add('locked');
+    if(i===questions[qi].ans) b.classList.add('correct');
+    else if(i===oi) b.classList.add('wrong');
+  });
+  document.getElementById(`qe-${qi}`).classList.add('shown');
+  const nb=document.getElementById('nextBtn');
+  nb.disabled=false;
+  if(qi===questions.length-1) nb.textContent='See results \u2192';
+}
+
+function nextQ(){
+  if(qCurrent<questions.length-1){
+    document.querySelectorAll('.quiz-card').forEach(c=>c.classList.remove('shown'));
+    qCurrent++;
+    document.getElementById(`qq-${qCurrent}`).classList.add('shown');
+    document.getElementById('quizCounter').textContent=`Question ${qCurrent+1} of ${questions.length}`;
+    document.getElementById('nextBtn').disabled=true;
+    document.getElementById('nextBtn').textContent=qCurrent===questions.length-1?'See results \u2192':'Next question \u2192';
+  } else {
+    showQuizResult();
+  }
+}
+
+function showQuizResult(){
+  document.getElementById('quizFooter').style.display='none';
+  document.querySelectorAll('.quiz-card').forEach(c=>c.classList.remove('shown'));
+  const r=document.getElementById('quizResult');
+  r.classList.add('shown');
+  const pct=Math.round((qScore/questions.length)*100);
+  const big=document.getElementById('bigScore');
+  big.textContent=`${qScore} / ${questions.length}`;
+  big.className='big-score '+(pct>=80?'great':pct>=60?'mid':'low');
+  document.getElementById('resultMsg').textContent=
+    pct===100?'Perfect score! You have mastered the core concepts.':
+    pct>=80?'Great work! You have a solid understanding of both methods.':
+    pct>=60?'Good effort! Review the sections you found tricky and try again.':
+    'Keep going - revisit the tutorial sections and give it another try.';
+}
+
+function resetQuiz(){
+  qCurrent=0;qScore=0;qAnswered=new Array(questions.length).fill(null);
+  document.getElementById('quizFooter').style.display='flex';
+  document.getElementById('quizResult').classList.remove('shown');
+  document.getElementById('nextBtn').disabled=true;
+  document.getElementById('nextBtn').textContent='Next question \u2192';
+  document.getElementById('quizCounter').textContent='Question 1 of 5';
+  buildQuiz();
+}
+
+// =================== INIT ===================
+initDnd();
+buildScenario();
+buildQuiz();
+</script>
+<footer style="background:#0D1B2A;padding:2.5rem 1.5rem;text-align:center">
+  <div style="max-width:280px;margin:0 auto">
+    <p style="font-size:0.68rem;color:#8892A4;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.65rem">Prepared by</p>
+    <div style="display:flex;align-items:center;justify-content:center;gap:0.55rem;margin-bottom:0.55rem">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" stroke="#D4523A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M19.5 7.125L18 8.625" stroke="#D4523A" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:1.35rem;font-weight:700;color:#D4523A;letter-spacing:0.04em">MR. Rostami</span>
+    </div>
+    <p style="font-size:0.68rem;color:#8892A4;letter-spacing:0.1em;text-transform:uppercase">DevSecOps Lab Series</p>
+  </div>
+</footer>
+</body>
+</html>
