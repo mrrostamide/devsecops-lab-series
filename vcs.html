@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VCS, IaC, Containers & Cloud - Tutorial</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --vc:#B34A15;--vc-l:#FEF0E7;--vc-m:#D4621E;
+  --ia:#1A6B40;--ia-l:#E8F5EE;--ia-m:#239B5C;
+  --ct:#1B4DA8;--ct-l:#EEF2FA;--ct-m:#2D6FD4;
+  --cl:#6B21A8;--cl-l:#F3E8FF;--cl-m:#9333EA;
+  --bg:#FFFFFF;--bg-alt:#F7F8FA;
+  --tx:#111827;--mu:#6B7280;
+  --ok:#15803D;--ok-l:#DCFCE7;
+  --er:#B91C1C;--er-l:#FEE2E2;
+  --bd:#E5E7EB;--r:10px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:#fff;color:var(--tx);line-height:1.6;font-size:16px}
+h1,h2,h3,.sg{font-family:'Space Grotesk',system-ui,sans-serif;line-height:1.2}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.97);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;gap:0.75rem;padding:0 1.5rem;height:52px}
+.nav-logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:0.82rem;
+  display:flex;gap:0.25rem;align-items:center;flex-shrink:0}
+.nav-logo .nv{color:var(--vc)}.nav-logo .ni{color:var(--ia)}
+.nav-logo .nc{color:var(--ct)}.nav-logo .nk{color:var(--cl)}
+.nav-logo .sep{color:var(--mu);font-size:0.65rem}
+nav ul{display:flex;gap:0.05rem;list-style:none;margin-left:auto}
+nav ul a{font-size:0.74rem;font-weight:500;color:var(--mu);text-decoration:none;
+  padding:0.27rem 0.48rem;border-radius:6px;transition:all 0.15s;white-space:nowrap}
+nav ul a:hover{background:var(--bg-alt);color:var(--tx)}
+.prog-bar{position:fixed;top:52px;left:0;right:0;height:2px;background:var(--bd);z-index:99}
+.prog-fill{height:100%;width:0%;transition:width 0.2s;
+  background:linear-gradient(90deg,var(--vc),var(--ia),var(--ct),var(--cl))}
+
+/* HERO */
+#hero{min-height:88vh;display:flex;flex-direction:column;justify-content:center;
+  align-items:center;text-align:center;padding:4rem 1.5rem}
+.hero-label{font-size:0.7rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--mu);border:1px solid var(--bd);border-radius:20px;padding:0.28rem 0.85rem;
+  display:inline-block;margin-bottom:1rem}
+.hero-title{font-size:clamp(1.9rem,5vw,3.5rem);font-weight:700;margin-bottom:0.85rem;line-height:1.15}
+.hero-title .tv{color:var(--vc)}.hero-title .ti{color:var(--ia)}
+.hero-title .tc{color:var(--ct)}.hero-title .tk{color:var(--cl)}
+.hero-sub{color:var(--mu);font-size:0.97rem;max-width:500px;margin-bottom:2.25rem}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.85rem;margin-bottom:2.25rem;width:100%;max-width:480px}
+.hero-pill{border-radius:var(--r);padding:0.85rem 1rem;text-align:left;border:2px solid}
+.hero-pill.vc{background:var(--vc-l);border-color:var(--vc-m)}
+.hero-pill.ia{background:var(--ia-l);border-color:var(--ia-m)}
+.hero-pill.ct{background:var(--ct-l);border-color:var(--ct-m)}
+.hero-pill.cl{background:var(--cl-l);border-color:var(--cl-m)}
+.hero-pill .hp-tag{font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;display:block;margin-bottom:0.25rem}
+.vc .hp-tag{color:var(--vc)}.ia .hp-tag{color:var(--ia)}.ct .hp-tag{color:var(--ct)}.cl .hp-tag{color:var(--cl)}
+.hero-pill .hp-name{font-family:'Space Grotesk',sans-serif;font-size:0.92rem;font-weight:700}
+.hero-pill .hp-sub{font-size:0.74rem;color:var(--mu);margin-top:0.15rem}
+
+.btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.65rem 1.5rem;border-radius:8px;
+  font-weight:600;font-size:0.9rem;cursor:pointer;text-decoration:none;border:none;
+  font-family:'Inter',sans-serif;transition:all 0.15s}
+.btn-dark{background:var(--tx);color:#fff}.btn-dark:hover{background:#374151;transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--tx);border:1.5px solid var(--bd)}.btn-outline:hover{border-color:var(--tx)}
+.btn:disabled{opacity:0.45;cursor:not-allowed;transform:none !important}
+
+.sec{padding:4.5rem 1.5rem;max-width:960px;margin:0 auto}
+.sec.alt{max-width:100%;background:var(--bg-alt);padding:4.5rem 1.5rem}
+.sec.alt .inner{max-width:960px;margin:0 auto}
+.sec-label{font-size:0.7rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--mu);margin-bottom:0.55rem}
+.sec-title{font-size:1.75rem;font-weight:700;margin-bottom:0.6rem}
+.sec-sub{color:var(--mu);font-size:0.92rem;max-width:540px;margin-bottom:2rem}
+
+/* PILLARS */
+.pillars-tabs{display:flex;gap:0;border:1.5px solid var(--bd);border-radius:8px;overflow:hidden;width:fit-content;margin-bottom:1.75rem;flex-wrap:wrap}
+.pt-btn{padding:0.5rem 1.05rem;font-weight:600;font-size:0.8rem;cursor:pointer;border:none;
+  background:transparent;color:var(--mu);font-family:'Inter',sans-serif;transition:all 0.15s;white-space:nowrap}
+.pt-btn.on-vc{background:var(--vc);color:#fff}.pt-btn.on-ia{background:var(--ia);color:#fff}
+.pt-btn.on-ct{background:var(--ct);color:#fff}.pt-btn.on-cl{background:var(--cl);color:#fff}
+.pillar-panel{display:none}.pillar-panel.shown{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.pp-explain{border-radius:var(--r);padding:1.6rem;border:2px solid}
+.pp-explain.vc{background:var(--vc-l);border-color:var(--vc)}
+.pp-explain.ia{background:var(--ia-l);border-color:var(--ia)}
+.pp-explain.ct{background:var(--ct-l);border-color:var(--ct)}
+.pp-explain.cl{background:var(--cl-l);border-color:var(--cl)}
+.pp-badge{display:inline-block;padding:0.2rem 0.65rem;border-radius:20px;font-size:0.7rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.85rem}
+.vc .pp-badge{background:var(--vc);color:#fff}.ia .pp-badge{background:var(--ia);color:#fff}
+.ct .pp-badge{background:var(--ct);color:#fff}.cl .pp-badge{background:var(--cl);color:#fff}
+.pp-explain h3{font-size:1rem;margin-bottom:0.35rem}
+.pp-explain p{font-size:0.83rem;color:var(--mu);margin-bottom:0.85rem;line-height:1.55}
+.pp-explain ul{list-style:none}
+.pp-explain ul li{font-size:0.81rem;padding:0.27rem 0;border-bottom:1px solid rgba(0,0,0,0.06);
+  display:flex;gap:0.4rem;align-items:flex-start}
+.pp-explain ul li:last-child{border:none}
+.pp-explain ul li::before{content:'→';font-weight:700;flex-shrink:0;font-size:0.74rem;margin-top:0.1rem}
+.vc ul li::before{color:var(--vc)}.ia ul li::before{color:var(--ia)}.ct ul li::before{color:var(--ct)}.cl ul li::before{color:var(--cl)}
+.pp-analogy{border-radius:var(--r);padding:1.5rem;border:1.5px solid var(--bd);background:#fff}
+.pp-analogy .an-label{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--mu);margin-bottom:0.6rem}
+.pp-analogy .an-title{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;margin-bottom:0.5rem}
+.pp-analogy p{font-size:0.83rem;color:var(--mu);line-height:1.6;margin-bottom:0.85rem}
+.pp-analogy .an-problem{background:var(--er-l);border-left:3px solid var(--er);padding:0.65rem 0.9rem;
+  border-radius:0 6px 6px 0;font-size:0.8rem;line-height:1.5}
+.pp-analogy .an-problem strong{display:block;font-size:0.75rem;color:var(--er);margin-bottom:0.2rem;text-transform:uppercase;letter-spacing:0.06em}
+
+/* PIPELINE JOURNEY */
+.journey-wrap{overflow-x:auto;padding:0.5rem 0 1rem;scrollbar-width:thin}
+.journey-flow{display:flex;align-items:flex-start;gap:0;min-width:fit-content;padding:0.5rem 0}
+.j-node{display:flex;flex-direction:column;align-items:center;min-width:110px}
+.j-box{width:100px;padding:0.7rem 0.45rem;border-radius:8px;text-align:center;
+  font-size:0.72rem;line-height:1.35;opacity:0;animation:fadeUp 0.35s forwards;cursor:default}
+.j-box-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:0.73rem}
+.j-box-sub{font-size:0.61rem;margin-top:2px;opacity:0.82}
+.j-box-layer{font-size:0.59rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;
+  margin-top:4px;padding:1px 5px;border-radius:3px;display:inline-block;opacity:0.85}
+.j-box.bvc{background:var(--vc);color:#fff}
+.j-box.bia{background:var(--ia);color:#fff}
+.j-box.bct{background:var(--ct);color:#fff}
+.j-box.bcl{background:var(--cl);color:#fff}
+.j-box .j-box-layer.bvc{background:rgba(255,255,255,0.22)}
+.j-box .j-box-layer.bia{background:rgba(255,255,255,0.22)}
+.j-box .j-box-layer.bct{background:rgba(255,255,255,0.22)}
+.j-box .j-box-layer.bcl{background:rgba(255,255,255,0.22)}
+.j-arr{width:22px;height:2px;position:relative;flex-shrink:0;margin-top:33px;opacity:0;animation:fadeUp 0.25s forwards}
+.j-arr.avc{background:var(--vc-m)}.j-arr.aia{background:var(--ia-m)}.j-arr.act{background:var(--ct-m)}.j-arr.acl{background:var(--cl-m)}
+.j-arr::after{content:'';position:absolute;right:-1px;top:-4px;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.j-arr.avc::after{border-left:7px solid var(--vc-m)}.j-arr.aia::after{border-left:7px solid var(--ia-m)}
+.j-arr.act::after{border-left:7px solid var(--ct-m)}.j-arr.acl::after{border-left:7px solid var(--cl-m)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.j-legend{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.25rem}
+.j-leg-item{display:flex;align-items:center;gap:0.4rem;font-size:0.75rem;font-weight:500}
+.j-leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.j-desc{margin-top:1.5rem;padding:1rem 1.25rem;background:var(--bg-alt);border-radius:var(--r);
+  font-size:0.85rem;line-height:1.65;border:1.5px solid var(--bd)}
+.j-desc strong{display:block;margin-bottom:0.3rem;font-family:'Space Grotesk',sans-serif}
+
+/* DND */
+.dnd4-layout{display:grid;grid-template-columns:1fr 2fr 0.85fr;gap:1.25rem;align-items:start}
+.pool-label{font-size:0.7rem;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:0.08em;text-align:center;margin-bottom:0.5rem}
+.card-pool{display:flex;flex-direction:column;gap:5px}
+.drag-card{background:#fff;border:1.5px solid var(--bd);border-radius:7px;padding:0.48rem 0.72rem;
+  font-size:0.78rem;font-weight:500;cursor:grab;user-select:none;transition:all 0.15s}
+.drag-card:hover{border-color:var(--tx);box-shadow:0 2px 8px rgba(0,0,0,0.08);transform:translateY(-1px)}
+.drag-card.selected{border-color:var(--tx);background:var(--bg-alt);font-weight:600}
+.drag-card.gone{display:none}
+.drop-zones4{display:flex;flex-direction:column;gap:0.75rem}
+.dz4{min-height:80px;border-radius:var(--r);border:2px dashed var(--bd);padding:0.7rem;transition:all 0.15s}
+.dz4.vc-z{border-color:var(--vc);background:var(--vc-l)}
+.dz4.ia-z{border-color:var(--ia);background:var(--ia-l)}
+.dz4.ct-z{border-color:var(--ct);background:var(--ct-l)}
+.dz4.cl-z{border-color:var(--cl);background:var(--cl-l)}
+.dz4.drag-over{transform:scale(1.01);box-shadow:0 4px 14px rgba(0,0,0,0.09)}
+.dz4.clickable:hover{transform:scale(1.01);cursor:pointer}
+.dz4-label{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.4rem}
+.vc-z .dz4-label{color:var(--vc)}.ia-z .dz4-label{color:var(--ia)}.ct-z .dz4-label{color:var(--ct)}.cl-z .dz4-label{color:var(--cl)}
+.dz4-chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip4{padding:0.22rem 0.56rem;border-radius:20px;font-size:0.7rem;font-weight:500;cursor:pointer}
+.vc-z .chip4{background:var(--vc);color:#fff}.ia-z .chip4{background:var(--ia);color:#fff}
+.ct-z .chip4{background:var(--ct);color:#fff}.cl-z .chip4{background:var(--cl);color:#fff}
+.chip4.correct::after{content:' ✓';font-weight:700}.chip4.wrong::after{content:' ✗';font-weight:700}.chip4.wrong{opacity:0.55}
+.dnd-sidebar{position:sticky;top:70px}
+.dnd-hint{font-size:0.78rem;color:var(--mu);text-align:center;margin-bottom:0.9rem;line-height:1.5}
+.dnd-result{padding:0.85rem;border-radius:var(--r);font-weight:600;font-size:0.875rem;text-align:center;margin-top:0.75rem;display:none}
+.dnd-result.show{display:block}
+.dnd-result.good{background:var(--ok-l);color:var(--ok)}.dnd-result.bad{background:var(--er-l);color:var(--er)}
+
+/* SCENARIO */
+.scenario-wrap{background:#fff;border:1.5px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.sc-head{color:#fff;padding:1.2rem 1.5rem}
+.sc-head.h-vc{background:var(--vc)}.sc-head.h-ia{background:var(--ia)}.sc-head.h-ct{background:var(--ct)}.sc-head.h-cl{background:var(--cl)}
+.sc-head h3{font-size:0.98rem;margin-bottom:0.25rem}
+.sc-head p{font-size:0.79rem;opacity:0.75}
+.sc-prog{display:flex;border-bottom:1px solid var(--bd)}
+.sc-prog-step{flex:1;padding:0.48rem 0.7rem;font-size:0.7rem;font-weight:600;text-align:center;
+  border-right:1px solid var(--bd);transition:all 0.2s}
+.sc-prog-step:last-child{border:none}
+.sc-prog-step.done{background:var(--bg-alt);color:var(--mu)}
+.sc-prog-step.a-vc{background:var(--vc-l);color:var(--vc)}.sc-prog-step.a-ia{background:var(--ia-l);color:var(--ia)}
+.sc-prog-step.a-ct{background:var(--ct-l);color:var(--ct)}.sc-prog-step.a-cl{background:var(--cl-l);color:var(--cl)}
+.sc-body{padding:1.4rem}
+.sc-step{display:none}.sc-step.active{display:block}
+.situation{padding:0.82rem 1.05rem;background:var(--bg-alt);border-left:3px solid var(--tx);
+  border-radius:0 var(--r) var(--r) 0;font-size:0.85rem;font-style:italic;margin-bottom:1.1rem;line-height:1.6}
+.sc-q{font-weight:700;font-size:0.88rem;margin-bottom:0.8rem}
+.choices2{display:grid;grid-template-columns:1fr 1fr;gap:0.65rem}
+.choice2{padding:0.85rem;border-radius:var(--r);border:1.5px solid var(--bd);background:#fff;
+  cursor:pointer;text-align:left;font-size:0.81rem;font-family:'Inter',sans-serif;transition:all 0.15s;line-height:1.45}
+.choice2:hover{box-shadow:0 2px 10px rgba(0,0,0,0.08);transform:translateY(-1px)}
+.c2-tag{font-size:0.66rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:0.3rem}
+.c2-tag{color:var(--mu)}
+.choice2:hover{border-color:var(--tx)}
+.choice2.picked{pointer-events:none}.choice2.faded{opacity:0.32;pointer-events:none}
+.choice2.reveal-ok{border-color:var(--ok);background:var(--ok-l);opacity:1}
+.choice2.reveal-ok .c2-tag{color:var(--ok)}
+.choice2.reveal-bad{border-color:var(--er);background:var(--er-l);opacity:1}
+.choice2.reveal-bad .c2-tag{color:var(--er)}
+.choice2.you-picked{box-shadow:0 0 0 2px var(--tx) inset}
+.sc-feedback{margin-top:1rem;padding:0.95rem 1.1rem;border-radius:var(--r);font-size:0.83rem;
+  line-height:1.6;display:none;border-left:3px solid}
+.sc-feedback.shown{display:block}
+.sc-feedback.f-ok{background:var(--ok-l);border-color:var(--ok)}.sc-feedback.f-ok strong{color:var(--ok)}
+.sc-feedback.f-er{background:var(--er-l);border-color:var(--er)}.sc-feedback.f-er strong{color:var(--er)}
+.sc-feedback strong{display:block;margin-bottom:0.25rem;font-size:0.87rem}
+.sc-nav{display:none;justify-content:flex-end;margin-top:1rem}.sc-nav.shown{display:flex}
+.step-dots{display:flex;gap:5px;padding:0.82rem 1.5rem;border-top:1px solid var(--bd)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--bd);transition:all 0.3s}
+.dot.done{background:var(--tx)}.dot.cur{width:20px;border-radius:4px}
+.dot.c-vc{background:var(--vc)}.dot.c-ia{background:var(--ia)}.dot.c-ct{background:var(--ct)}.dot.c-cl{background:var(--cl)}
+
+/* QUIZ */
+.quiz-wrap{max-width:660px}
+.quiz-card{background:#fff;border:1.5px solid var(--bd);border-radius:var(--r);padding:1.5rem;display:none}
+.quiz-card.shown{display:block}
+.q-num{font-size:0.7rem;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.4rem}
+.q-text{font-size:0.94rem;font-weight:600;margin-bottom:1.05rem;line-height:1.5}
+.q-opts{display:flex;flex-direction:column;gap:0.4rem}
+.q-opt{padding:0.65rem 0.9rem;border-radius:7px;border:1.5px solid var(--bd);background:#fff;
+  cursor:pointer;font-size:0.83rem;text-align:left;font-family:'Inter',sans-serif;transition:all 0.15s}
+.q-opt:hover:not(.locked){border-color:var(--tx)}
+.q-opt.locked{pointer-events:none}
+.q-opt.correct{background:var(--ok-l);border-color:var(--ok);color:var(--ok);font-weight:600}
+.q-opt.wrong{background:var(--er-l);border-color:var(--er);color:var(--er)}
+.q-exp{margin-top:0.65rem;padding:0.65rem 0.9rem;background:var(--bg-alt);border-radius:7px;
+  font-size:0.78rem;color:var(--mu);line-height:1.6;display:none}
+.q-exp.shown{display:block}
+.quiz-footer{display:flex;justify-content:space-between;align-items:center;margin-top:1.2rem}
+.quiz-counter{font-size:0.8rem;color:var(--mu);font-weight:500}
+.quiz-result{background:var(--bg-alt);border-radius:var(--r);padding:2.5rem;text-align:center;display:none;margin-top:1.5rem}
+.quiz-result.shown{display:block}
+.big-score{font-size:3rem;font-weight:700;margin-bottom:0.4rem}
+.big-score.great{color:var(--ok)}.big-score.mid{color:var(--vc-m)}.big-score.low{color:var(--er)}
+.quiz-result p{color:var(--mu);margin-bottom:1.5rem;font-size:0.88rem}
+
+/* SUMMARY */
+.sum4-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
+.sum-col{border-radius:var(--r);padding:1.4rem;border:2px solid}
+.sum-col.svc{background:var(--vc-l);border-color:var(--vc)}.sum-col.sia{background:var(--ia-l);border-color:var(--ia)}
+.sum-col.sct{background:var(--ct-l);border-color:var(--ct)}.sum-col.scl{background:var(--cl-l);border-color:var(--cl)}
+.sum-col h3{font-size:0.9rem;margin-bottom:0.8rem}
+.svc h3{color:var(--vc)}.sia h3{color:var(--ia)}.sct h3{color:var(--ct)}.scl h3{color:var(--cl)}
+.sum-row{display:flex;gap:0.6rem;margin-bottom:0.42rem;font-size:0.8rem}
+.sum-key{font-weight:600;min-width:72px;flex-shrink:0}
+.tool-grid4{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;margin-top:0.5rem}
+.tool-col{border-radius:var(--r);padding:1.15rem}
+.tool-col.tvc{background:var(--vc-l)}.tool-col.tia{background:var(--ia-l)}.tool-col.tct{background:var(--ct-l)}.tool-col.tcl{background:var(--cl-l)}
+.tool-col h4{font-size:0.8rem;font-weight:700;margin-bottom:0.6rem}
+.tvc h4{color:var(--vc)}.tia h4{color:var(--ia)}.tct h4{color:var(--ct)}.tcl h4{color:var(--cl)}
+.tool-col ul{list-style:none;display:flex;flex-direction:column;gap:0.28rem}
+.tool-col ul li{font-size:0.77rem;display:flex;gap:0.4rem;line-height:1.35}
+.tool-col ul li::before{content:'•';font-weight:700;flex-shrink:0}
+.tvc ul li::before{color:var(--vc)}.tia ul li::before{color:var(--ia)}.tct ul li::before{color:var(--ct)}.tcl ul li::before{color:var(--cl)}
+.final-box{margin-top:2.5rem;text-align:center;padding:2rem;background:var(--bg-alt);border-radius:var(--r)}
+.final-box p{color:var(--mu);font-size:0.88rem;max-width:500px;margin:0.5rem auto 1.5rem}
+.final-acts{display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap}
+
+@media(max-width:680px){
+  .hero-grid,.pillar-panel,.sum4-grid,.tool-grid4,.choices2,.dnd4-layout{grid-template-columns:1fr}
+  nav ul{display:none}.journey-wrap{overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <span class="nv">VCS</span><span class="sep">+</span>
+    <span class="ni">IaC</span><span class="sep">+</span>
+    <span class="nc">Containers</span><span class="sep">+</span>
+    <span class="nk">Cloud</span>
+  </div>
+  <ul>
+    <li><a href="#pillars">Concepts</a></li>
+    <li><a href="#journey">Pipeline</a></li>
+    <li><a href="#drag">Activity</a></li>
+    <li><a href="#scenario">Scenario</a></li>
+    <li><a href="#quiz">Quiz</a></li>
+    <li><a href="#summary">Summary</a></li>
+  </ul>
+</nav>
+<div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+
+<!-- HERO -->
+<section id="hero">
+  <span class="hero-label">Modern DevOps Infrastructure</span>
+  <h1 class="hero-title sg">
+    <span class="tv">Version Control</span> &middot; <span class="ti">IaC</span> &middot; <span class="tc">Containers</span> &middot; <span class="tk">Cloud</span>
+  </h1>
+  <p class="hero-sub">Four foundational layers of modern software infrastructure. Together, they take code from a developer's laptop to a globally running application.</p>
+  <div class="hero-grid">
+    <div class="hero-pill vc">
+      <span class="hp-tag">VCS</span>
+      <div class="hp-name">Version Control</div>
+      <div class="hp-sub">Track every change to your code</div>
+    </div>
+    <div class="hero-pill ia">
+      <span class="hp-tag">IaC</span>
+      <div class="hp-name">Infra as Code</div>
+      <div class="hp-sub">Define servers and networks in files</div>
+    </div>
+    <div class="hero-pill ct">
+      <span class="hp-tag">Containers</span>
+      <div class="hp-name">Containers</div>
+      <div class="hp-sub">Package apps that run anywhere</div>
+    </div>
+    <div class="hero-pill cl">
+      <span class="hp-tag">Cloud</span>
+      <div class="hp-name">Cloud Computing</div>
+      <div class="hp-sub">On-demand infrastructure at scale</div>
+    </div>
+  </div>
+  <a href="#pillars" class="btn btn-dark">Start Learning &darr;</a>
+</section>
+
+<!-- PILLARS -->
+<section class="alt" id="pillars">
+  <div class="inner">
+    <p class="sec-label">Part 1 of 5 - Core Concepts</p>
+    <h2 class="sec-title sg">What does each layer do?</h2>
+    <p class="sec-sub">Select a topic to explore the concept, what problem it solves, and a real-world analogy.</p>
+    <div class="pillars-tabs">
+      <button class="pt-btn on-vc" id="pt0" onclick="showPillar(0)">Version Control</button>
+      <button class="pt-btn" id="pt1" onclick="showPillar(1)">IaC</button>
+      <button class="pt-btn" id="pt2" onclick="showPillar(2)">Containers</button>
+      <button class="pt-btn" id="pt3" onclick="showPillar(3)">Cloud</button>
+    </div>
+    <div class="pillar-panel shown" id="pp0">
+      <div class="pp-explain vc">
+        <span class="pp-badge">Version Control (VCS)</span>
+        <h3 class="sg">Track every change to your code</h3>
+        <p>A Version Control System records every modification to your codebase, who made it, and when. It lets multiple developers collaborate on the same code without overwriting each other's work.</p>
+        <ul>
+          <li>Commits - snapshots of code at a point in time</li>
+          <li>Branches - parallel lines of development</li>
+          <li>Merging - combining branches back together</li>
+          <li>Pull requests - proposing and reviewing changes</li>
+          <li>Git is the dominant VCS; GitHub/GitLab host repositories</li>
+        </ul>
+      </div>
+      <div class="pp-analogy">
+        <div class="an-label">Analogy</div>
+        <div class="an-title sg">Google Docs version history - but for code</div>
+        <p>Like Google Docs lets you see every edit ever made and revert to any version, Git does the same for code - but far more powerfully. Multiple people can work on separate "copies" (branches) simultaneously and merge them together without conflict.</p>
+        <div class="an-problem">
+          <strong>Problem it solves</strong>
+          "My colleague and I both edited the same file and overwrote each other's work." / "I deleted code that was working and can't get it back." / "Who changed this function and why?"
+        </div>
+      </div>
+    </div>
+    <div class="pillar-panel" id="pp1">
+      <div class="pp-explain ia">
+        <span class="pp-badge">Infrastructure as Code (IaC)</span>
+        <h3 class="sg">Define your infrastructure in files</h3>
+        <p>Instead of manually clicking through a cloud console to create servers, networks, and databases, IaC lets you describe all of that in configuration files - then apply them automatically and repeatedly.</p>
+        <ul>
+          <li>Declarative - you describe the desired state, not the steps</li>
+          <li>Idempotent - run it 10 times, get the same result</li>
+          <li>Terraform provisions cloud resources (AWS, Azure, GCP)</li>
+          <li>Ansible configures software on existing servers</li>
+          <li>Infrastructure lives in Git, reviewed like any code</li>
+        </ul>
+      </div>
+      <div class="pp-analogy">
+        <div class="an-label">Analogy</div>
+        <div class="an-title sg">A recipe for your infrastructure</div>
+        <p>A chef's recipe specifies exactly what ingredients and steps produce a dish - anyone can follow it and get the same result. IaC is a recipe for servers: you write it once, and anyone on any cloud can execute it to get an identical, reproducible environment.</p>
+        <div class="an-problem">
+          <strong>Problem it solves</strong>
+          "Setting up a new environment takes 3 days of manual work." / "Staging and production are slightly different and we don't know why." / "The engineer who set this up left and no one knows how to recreate it."
+        </div>
+      </div>
+    </div>
+    <div class="pillar-panel" id="pp2">
+      <div class="pp-explain ct">
+        <span class="pp-badge">Containers</span>
+        <h3 class="sg">Package apps that run anywhere</h3>
+        <p>A container bundles an application with everything it needs to run - code, runtime, libraries, settings - into a single portable unit. It behaves identically on a developer's laptop, a test server, and in production.</p>
+        <ul>
+          <li>Docker creates and runs containers from images</li>
+          <li>Container image - the packaged, portable blueprint</li>
+          <li>Container registry - where images are stored (Docker Hub)</li>
+          <li>Kubernetes orchestrates many containers at scale</li>
+          <li>Microservices - one service per container, loosely coupled</li>
+        </ul>
+      </div>
+      <div class="pp-analogy">
+        <div class="an-label">Analogy</div>
+        <div class="an-title sg">A standardized shipping container</div>
+        <p>Shipping containers transformed global trade by standardizing transport: regardless of contents, every container fits the same ship, crane, and truck. Docker containers do the same for software - they run on any machine regardless of what operating system or dependencies are installed underneath.</p>
+        <div class="an-problem">
+          <strong>Problem it solves</strong>
+          "It works on my machine but crashes on the server." / "Upgrading Python for one app broke three others." / "Deploying takes forever because every server needs different setup scripts."
+        </div>
+      </div>
+    </div>
+    <div class="pillar-panel" id="pp3">
+      <div class="pp-explain cl">
+        <span class="pp-badge">Cloud Computing</span>
+        <h3 class="sg">On-demand infrastructure at scale</h3>
+        <p>Cloud providers (AWS, Azure, GCP) offer computing, storage, networking, and databases as on-demand services over the internet. You pay for what you use and can scale up or down in seconds.</p>
+        <ul>
+          <li>IaaS - raw VMs and networks (you manage the OS)</li>
+          <li>PaaS - managed platform (you just deploy code)</li>
+          <li>SaaS - fully managed software (e.g. Gmail, Salesforce)</li>
+          <li>Auto-scaling - add or remove capacity automatically</li>
+          <li>Multi-region - deploy globally in minutes</li>
+        </ul>
+      </div>
+      <div class="pp-analogy">
+        <div class="an-label">Analogy</div>
+        <div class="an-title sg">Renting a hotel room vs buying a house</div>
+        <p>Buying a house means paying upfront, maintaining everything, and being stuck with fixed capacity. A hotel lets you book exactly the rooms you need for exactly as long as you need - and the hotel maintains the building. Cloud is the hotel model for computing: pay as you go, scale instantly, no hardware ownership.</p>
+        <div class="an-problem">
+          <strong>Problem it solves</strong>
+          "We bought $500k of servers that sit at 10% utilization most of the time." / "Traffic spiked 10x overnight and our servers crashed." / "It takes 6 weeks to provision new hardware for a project."
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- JOURNEY PIPELINE -->
+<div id="journey">
+<section class="sec">
+  <p class="sec-label">Part 2 of 5 - The Code to Cloud Journey</p>
+  <h2 class="sec-title sg">How all four layers connect</h2>
+  <p class="sec-sub">In a modern DevOps workflow, all four technologies form a continuous pipeline. Here is how a developer's code travels from their machine to a live application.</p>
+  <div class="journey-wrap">
+    <div class="journey-flow" id="journeyFlow"></div>
+  </div>
+  <div class="j-legend">
+    <div class="j-leg-item"><div class="j-leg-dot" style="background:var(--vc)"></div>Version Control</div>
+    <div class="j-leg-item"><div class="j-leg-dot" style="background:var(--ia)"></div>Infrastructure as Code</div>
+    <div class="j-leg-item"><div class="j-leg-dot" style="background:var(--ct)"></div>Containers</div>
+    <div class="j-leg-item"><div class="j-leg-dot" style="background:var(--cl)"></div>Cloud</div>
+  </div>
+  <div class="j-desc">
+    <strong>Reading this pipeline</strong>
+    The developer writes code and commits it to a Git repository (VCS). That commit triggers CI/CD: Terraform provisions or updates any cloud infrastructure needed (IaC). Docker then builds a container image of the application (Containers) and pushes it to a registry. Kubernetes - running on cloud infrastructure - pulls the image and deploys it. The live application runs on cloud compute, exposed through a cloud load balancer. Each layer depends on the one before it.
+  </div>
+</section>
+</div>
+
+<!-- DRAG AND DROP -->
+<section class="alt" id="drag">
+  <div class="inner">
+    <p class="sec-label">Part 3 of 5 - Activity</p>
+    <h2 class="sec-title sg">Sort the concepts and tools</h2>
+    <p class="sec-sub">Drag cards into the correct layer - or click a card to select it, then click a drop zone. Place them all, then check your answers.</p>
+    <div class="dnd4-layout">
+      <div>
+        <div class="pool-label">Items to sort</div>
+        <div class="card-pool" id="cardPool4"></div>
+      </div>
+      <div class="drop-zones4">
+        <div class="dz4 vc-z" id="dz4VC" ondragover="onDO4(event)" ondrop="onDrop4(event,'vc')" ondragleave="onDL4(event)" onclick="onZC4('vc')">
+          <div class="dz4-label">Version Control</div><div class="dz4-chips" id="chips4VC"></div>
+        </div>
+        <div class="dz4 ia-z" id="dz4IA" ondragover="onDO4(event)" ondrop="onDrop4(event,'ia')" ondragleave="onDL4(event)" onclick="onZC4('ia')">
+          <div class="dz4-label">Infrastructure as Code</div><div class="dz4-chips" id="chips4IA"></div>
+        </div>
+        <div class="dz4 ct-z" id="dz4CT" ondragover="onDO4(event)" ondrop="onDrop4(event,'ct')" ondragleave="onDL4(event)" onclick="onZC4('ct')">
+          <div class="dz4-label">Containers</div><div class="dz4-chips" id="chips4CT"></div>
+        </div>
+        <div class="dz4 cl-z" id="dz4CL" ondragover="onDO4(event)" ondrop="onDrop4(event,'cl')" ondragleave="onDL4(event)" onclick="onZC4('cl')">
+          <div class="dz4-label">Cloud Computing</div><div class="dz4-chips" id="chips4CL"></div>
+        </div>
+      </div>
+      <div class="dnd-sidebar">
+        <p class="dnd-hint">Click a card to select it, then click the right zone to place it. Click a chip to return it.</p>
+        <button class="btn btn-dark" style="width:100%" id="checkDnd4Btn" onclick="checkDnd4()" disabled>Check answers</button>
+        <button class="btn btn-outline" style="width:100%;margin-top:0.5rem;display:none" id="resetDnd4Btn" onclick="resetDnd4()">Try again</button>
+        <div class="dnd-result" id="dndResult4"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCENARIO -->
+<div id="scenario">
+<section class="sec">
+  <p class="sec-label">Part 4 of 5 - Scenario</p>
+  <h2 class="sec-title sg">Building TechFlow's new service</h2>
+  <p class="sec-sub">TechFlow needs to build and ship a new payments microservice. Follow the team through four key decisions - one for each layer.</p>
+  <div class="scenario-wrap">
+    <div class="sc-head h-vc" id="scHead4">
+      <h3 id="scHead4Title">Decision 1: Managing the code</h3>
+      <p id="scHead4Sub">The payments service has three developers working on it simultaneously.</p>
+    </div>
+    <div class="sc-prog" id="scProg4">
+      <div class="sc-prog-step a-vc" id="scp0">1. VCS</div>
+      <div class="sc-prog-step" id="scp1">2. IaC</div>
+      <div class="sc-prog-step" id="scp2">3. Containers</div>
+      <div class="sc-prog-step" id="scp3">4. Cloud</div>
+    </div>
+    <div class="sc-body" id="scBody4"></div>
+    <div class="step-dots" id="scDots4"></div>
+  </div>
+</section>
+</div>
+
+<!-- QUIZ -->
+<section class="alt" id="quiz">
+  <div class="inner">
+    <p class="sec-label">Part 5 of 5 - Knowledge Check</p>
+    <h2 class="sec-title sg">Test what you have learned</h2>
+    <p class="sec-sub">Five questions, one per concept plus one connecting all four. Explanation after each answer.</p>
+    <div class="quiz-wrap">
+      <div id="quizCards4"></div>
+      <div class="quiz-footer" id="quizFooter4">
+        <span class="quiz-counter" id="quizCounter4">Question 1 of 5</span>
+        <button class="btn btn-dark" id="nextBtn4" onclick="nextQ4()" disabled>Next question &rarr;</button>
+      </div>
+      <div class="quiz-result" id="quizResult4">
+        <div class="big-score" id="bigScore4"></div>
+        <p id="resultMsg4"></p>
+        <button class="btn btn-outline" onclick="resetQuiz4()">Retry quiz</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SUMMARY -->
+<section class="sec" id="summary">
+  <p class="sec-label">Reference - Quick Cheat Sheet</p>
+  <h2 class="sec-title sg">Everything at a glance</h2>
+  <div class="sum4-grid">
+    <div class="sum-col svc">
+      <h3 class="sg">Version Control</h3>
+      <div class="sum-row"><span class="sum-key">Core tool</span><span>Git</span></div>
+      <div class="sum-row"><span class="sum-key">Hosts</span><span>GitHub, GitLab, Bitbucket</span></div>
+      <div class="sum-row"><span class="sum-key">Key concept</span><span>Commit, branch, merge</span></div>
+      <div class="sum-row"><span class="sum-key">Solves</span><span>Collaboration & history</span></div>
+      <div class="sum-row"><span class="sum-key">Triggers</span><span>CI/CD pipeline starts here</span></div>
+    </div>
+    <div class="sum-col sia">
+      <h3 class="sg">Infrastructure as Code</h3>
+      <div class="sum-row"><span class="sum-key">Core tools</span><span>Terraform, Ansible, Pulumi</span></div>
+      <div class="sum-row"><span class="sum-key">Approach</span><span>Declarative configuration files</span></div>
+      <div class="sum-row"><span class="sum-key">Key concept</span><span>Idempotency, desired state</span></div>
+      <div class="sum-row"><span class="sum-key">Solves</span><span>Reproducible environments</span></div>
+      <div class="sum-row"><span class="sum-key">Stored in</span><span>Git repositories</span></div>
+    </div>
+    <div class="sum-col sct">
+      <h3 class="sg">Containers</h3>
+      <div class="sum-row"><span class="sum-key">Core tool</span><span>Docker</span></div>
+      <div class="sum-row"><span class="sum-key">Orchestration</span><span>Kubernetes (K8s)</span></div>
+      <div class="sum-row"><span class="sum-key">Registry</span><span>Docker Hub, ECR, GCR</span></div>
+      <div class="sum-row"><span class="sum-key">Key concept</span><span>Image, pod, namespace</span></div>
+      <div class="sum-row"><span class="sum-key">Solves</span><span>"Works on my machine"</span></div>
+    </div>
+    <div class="sum-col scl">
+      <h3 class="sg">Cloud Computing</h3>
+      <div class="sum-row"><span class="sum-key">Providers</span><span>AWS, Azure, GCP</span></div>
+      <div class="sum-row"><span class="sum-key">Models</span><span>IaaS / PaaS / SaaS</span></div>
+      <div class="sum-row"><span class="sum-key">Key concept</span><span>Auto-scaling, managed services</span></div>
+      <div class="sum-row"><span class="sum-key">Solves</span><span>Scalability, cost, global reach</span></div>
+      <div class="sum-row"><span class="sum-key">Where</span><span>Containers and IaC run here</span></div>
+    </div>
+  </div>
+  <h3 class="sg" style="margin-top:2.5rem;margin-bottom:0.75rem;font-size:1.05rem">Key tools by layer</h3>
+  <div class="tool-grid4">
+    <div class="tool-col tvc">
+      <h4>Version Control tools</h4>
+      <ul>
+        <li>Git (the protocol)</li>
+        <li>GitHub (hosted repos + CI)</li>
+        <li>GitLab (self-hosted option)</li>
+        <li>Conventional Commits</li>
+        <li>Git Flow (branching strategy)</li>
+      </ul>
+    </div>
+    <div class="tool-col tia">
+      <h4>IaC tools</h4>
+      <ul>
+        <li>Terraform (cloud provisioning)</li>
+        <li>Ansible (configuration management)</li>
+        <li>AWS CloudFormation</li>
+        <li>Pulumi (code-first IaC)</li>
+        <li>Helm (K8s package manager)</li>
+      </ul>
+    </div>
+    <div class="tool-col tct">
+      <h4>Container tools</h4>
+      <ul>
+        <li>Docker (build and run)</li>
+        <li>Kubernetes (orchestration)</li>
+        <li>Docker Compose (local multi-container)</li>
+        <li>Podman (daemonless alternative)</li>
+        <li>containerd (runtime standard)</li>
+      </ul>
+    </div>
+    <div class="tool-col tcl">
+      <h4>Cloud services</h4>
+      <ul>
+        <li>AWS EC2 / EKS / S3 / RDS</li>
+        <li>Azure AKS / Blob / Functions</li>
+        <li>GCP GKE / Cloud Run / BigQuery</li>
+        <li>Cloudflare (CDN + edge)</li>
+        <li>Vercel / Railway (PaaS)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="final-box">
+    <h3 class="sg" style="font-size:1.1rem">Tutorial complete!</h3>
+    <p>These four layers are the backbone of modern DevOps and DevSecOps infrastructure. In practice they work as one: code is versioned in Git, infrastructure is declared in Terraform, apps are packaged in Docker, and everything runs on cloud compute - all automated through a CI/CD pipeline.</p>
+    <div class="final-acts">
+      <a href="#hero" class="btn btn-outline">Restart tutorial</a>
+      <a href="#quiz" class="btn btn-dark">Retake the quiz</a>
+    </div>
+  </div>
+</section>
+
+<footer style="background:#0D1B2A;padding:2.5rem 1.5rem;text-align:center">
+  <div style="max-width:280px;margin:0 auto">
+    <p style="font-size:0.68rem;color:#8892A4;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.65rem">Prepared by</p>
+    <div style="display:flex;align-items:center;justify-content:center;gap:0.55rem;margin-bottom:0.55rem">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" stroke="#D4523A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M19.5 7.125L18 8.625" stroke="#D4523A" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:1.35rem;font-weight:700;color:#D4523A;letter-spacing:0.04em">MR. Rostami</span>
+    </div>
+    <p style="font-size:0.68rem;color:#8892A4;letter-spacing:0.1em;text-transform:uppercase">DevSecOps Lab Series</p>
+  </div>
+</footer>
+
+<script>
+// PROGRESS
+window.addEventListener('scroll',()=>{
+  const p=(window.scrollY/(document.body.scrollHeight-window.innerHeight))*100;
+  document.getElementById('progFill').style.width=Math.min(p,100)+'%';
+});
+
+// PILLAR TABS
+const pillarColors=['on-vc','on-ia','on-ct','on-cl'];
+function showPillar(idx){
+  document.querySelectorAll('.pt-btn').forEach((b,i)=>{b.className='pt-btn'+(i===idx?' '+pillarColors[i]:'');});
+  document.querySelectorAll('.pillar-panel').forEach((p,i)=>{p.className='pillar-panel'+(i===idx?' shown':'');});
+}
+
+// JOURNEY PIPELINE
+const journeyStages=[
+  {n:'Write code',s:'Local dev',t:'bvc',at:'avc'},
+  {n:'git push',s:'Commit to repo',t:'bvc',at:'avc'},
+  {n:'Code review',s:'Pull request',t:'bvc',at:'aia'},
+  {n:'Terraform',s:'Provision infra',t:'bia',at:'aia'},
+  {n:'Docker build',s:'Create image',t:'bct',at:'act'},
+  {n:'Push image',s:'Container registry',t:'bct',at:'act'},
+  {n:'K8s deploy',s:'Orchestrate pods',t:'bct',at:'acl'},
+  {n:'Cloud run',s:'Live production',t:'bcl',at:null},
+];
+(function buildJourney(){
+  const f=document.getElementById('journeyFlow');
+  let html='';
+  journeyStages.forEach((s,i)=>{
+    html+=`<div class="j-node">
+      <div class="j-box ${s.t}" style="animation-delay:${i*0.13}s">
+        <div class="j-box-name">${s.n}</div>
+        <div class="j-box-sub">${s.s}</div>
+      </div>
+    </div>`;
+    if(s.at){
+      html+=`<div class="j-arr ${s.at}" style="animation-delay:${i*0.13+0.1}s"></div>`;
+    }
+  });
+  f.innerHTML=html;
+})();
+
+// DND
+const dndItems4=[
+  {id:'v1',text:'git commit',ans:'vc'},
+  {id:'v2',text:'Branch strategy',ans:'vc'},
+  {id:'v3',text:'Pull request review',ans:'vc'},
+  {id:'i1',text:'terraform apply',ans:'ia'},
+  {id:'i2',text:'Desired state config',ans:'ia'},
+  {id:'i3',text:'Ansible playbook',ans:'ia'},
+  {id:'c1',text:'Docker image',ans:'ct'},
+  {id:'c2',text:'Kubernetes pod',ans:'ct'},
+  {id:'c3',text:'Container registry',ans:'ct'},
+  {id:'l1',text:'Auto-scaling policy',ans:'cl'},
+  {id:'l2',text:'Managed database (RDS)',ans:'cl'},
+  {id:'l3',text:'Multi-region deployment',ans:'cl'},
+];
+let placed4={vc:[],ia:[],ct:[],cl:[]},sel4=null,drag4=null,checked4=false;
+
+function initDnd4(){
+  placed4={vc:[],ia:[],ct:[],cl:[]};sel4=null;drag4=null;checked4=false;
+  const pool=document.getElementById('cardPool4');pool.innerHTML='';
+  const shuffled=[...dndItems4].sort(()=>Math.random()-0.5);
+  shuffled.forEach(item=>{
+    const el=document.createElement('div');
+    el.className='drag-card';el.id='dc4-'+item.id;el.textContent=item.text;el.draggable=true;
+    el.addEventListener('dragstart',()=>{drag4=item.id;});
+    el.addEventListener('dragend',()=>{drag4=null;});
+    el.addEventListener('click',()=>selCard4(item.id));
+    pool.appendChild(el);
+  });
+  ['VC','IA','CT','CL'].forEach(z=>{document.getElementById('chips4'+z).innerHTML='';});
+  document.getElementById('dndResult4').className='dnd-result';
+  document.getElementById('checkDnd4Btn').disabled=true;
+  document.getElementById('resetDnd4Btn').style.display='none';
+  document.querySelectorAll('.dz4').forEach(z=>z.classList.remove('clickable'));
+}
+
+function selCard4(id){
+  if(checked4)return;
+  const was=sel4===id;
+  document.querySelectorAll('.drag-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.dz4').forEach(z=>z.classList.remove('clickable'));
+  if(was){sel4=null;return;}
+  sel4=id;document.getElementById('dc4-'+id).classList.add('selected');
+  document.querySelectorAll('.dz4').forEach(z=>z.classList.add('clickable'));
+}
+function onZC4(zone){if(!checked4&&sel4)placeCard4(sel4,zone);}
+function onDO4(e){e.preventDefault();e.currentTarget.classList.add('drag-over');}
+function onDL4(e){e.currentTarget.classList.remove('drag-over');}
+function onDrop4(e,zone){e.preventDefault();e.currentTarget.classList.remove('drag-over');if(drag4)placeCard4(drag4,zone);}
+
+function placeCard4(id,zone){
+  ['vc','ia','ct','cl'].forEach(z=>{
+    const idx=placed4[z].indexOf(id);
+    if(idx>-1){placed4[z].splice(idx,1);
+      const c=document.querySelector(`#chips4${z.toUpperCase()} [data-id="${id}"]`);if(c)c.remove();}
+  });
+  placed4[zone].push(id);
+  const item=dndItems4.find(d=>d.id===id);
+  const chip=document.createElement('div');chip.className='chip4';chip.dataset.id=id;
+  chip.textContent=item.text;chip.title='Click to remove';
+  chip.onclick=()=>rmChip4(id,zone);
+  document.getElementById('chips4'+zone.toUpperCase()).appendChild(chip);
+  const pc=document.getElementById('dc4-'+id);if(pc)pc.classList.add('gone');
+  sel4=null;
+  document.querySelectorAll('.drag-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.dz4').forEach(z=>z.classList.remove('clickable'));
+  updateChk4();
+}
+function rmChip4(id,zone){
+  if(checked4)return;
+  placed4[zone]=placed4[zone].filter(x=>x!==id);
+  const chip=document.querySelector(`#chips4${zone.toUpperCase()} [data-id="${id}"]`);if(chip)chip.remove();
+  const pc=document.getElementById('dc4-'+id);if(pc)pc.classList.remove('gone');
+  updateChk4();
+}
+function updateChk4(){
+  const t=Object.values(placed4).reduce((a,b)=>a+b.length,0);
+  document.getElementById('checkDnd4Btn').disabled=t<dndItems4.length;
+}
+function checkDnd4(){
+  checked4=true;let correct=0;
+  dndItems4.forEach(item=>{
+    const zone=['vc','ia','ct','cl'].find(z=>placed4[z].includes(item.id));
+    if(!zone)return;
+    const chip=document.querySelector(`#chips4${zone.toUpperCase()} [data-id="${item.id}"]`);
+    if(!chip)return;
+    const ok=zone===item.ans;chip.classList.add(ok?'correct':'wrong');if(ok)correct++;
+  });
+  const pct=Math.round((correct/dndItems4.length)*100);
+  const r=document.getElementById('dndResult4');
+  r.textContent=`${correct} / ${dndItems4.length} correct (${pct}%)`;
+  r.className='dnd-result show '+(pct>=70?'good':'bad');
+  document.getElementById('checkDnd4Btn').disabled=true;
+  document.getElementById('resetDnd4Btn').style.display='block';
+}
+function resetDnd4(){initDnd4();}
+
+// SCENARIO
+const sc4=[
+  {
+    hBg:'h-vc',hTitle:'Decision 1: Managing the code',hSub:'Three developers are all working on the payments service at the same time.',
+    prog:'a-vc',
+    sit:"Developer A is building the payment gateway. Developer B is building refund logic. Developer C is fixing a critical bug. They are all editing the same codebase. Without coordination, they will overwrite each other's work.",
+    q:"How should TechFlow manage concurrent code changes?",
+    choices:[
+      {cls:'ca',tag:'Best approach',text:"Use Git with a branching strategy. Each developer works on a separate branch, submits a pull request, gets it reviewed, and merges into main."},
+      {cls:'cb',tag:'Poor approach',text:"Keep a shared folder on a network drive. Developers coordinate verbally about who is editing which file at any time."},
+    ],
+    results:{
+      ca:{cls:'f-ok',title:'Correct!',body:"Git branches let all three developers work independently without conflict. Pull requests add a review step - a critical security and quality gate. The full history of every change is preserved. If the bug fix breaks the payment gateway, git bisect finds exactly which commit caused it in seconds."},
+      cb:{cls:'f-er',title:'This breaks immediately.',body:"Shared folders have no merge capability. Developer B overwrites Developer A's change. There is no history, no way to revert, and no review process. This is how teams worked in the 1990s. VCS was invented precisely to solve this - even solo developers should use Git."},
+    }
+  },
+  {
+    hBg:'h-ia',hTitle:'Decision 2: Provisioning environments',hSub:'The payments service needs identical dev, staging, and production environments.',
+    prog:'a-ia',
+    sit:"The payments service requires a database, a message queue, a cache layer, and two virtual machines. QA just found a bug that only appears in staging - and no one is sure why staging differs from development.",
+    q:"How should TechFlow provision and manage its environments?",
+    choices:[
+      {cls:'ca',tag:'Best approach',text:"Write Terraform configuration files that define every resource. Anyone on the team can run terraform apply to create an identical environment from scratch in minutes."},
+      {cls:'cb',tag:'Poor approach',text:"A senior engineer manually configures each environment in the AWS console, following a shared checklist document that is updated when someone remembers."},
+    ],
+    results:{
+      ca:{cls:'f-ok',title:'Correct!',body:"IaC eliminates environment drift entirely. Dev, staging, and production are created from the same Terraform files, so they are structurally identical. The configuration lives in Git - every change is reviewed, versioned, and auditable. When the team needs a fourth environment for a security audit, it spins up in 8 minutes."},
+      cb:{cls:'f-er',title:'This is how the staging bug happened.',body:"Manual configuration through a console is error-prone, slow, and impossible to audit properly. The checklist gets stale. The senior engineer who set up staging is now on leave and no one is sure what they did differently. This is exactly the drift problem IaC was designed to eliminate."},
+    }
+  },
+  {
+    hBg:'h-ct',hTitle:'Decision 3: Packaging the application',hSub:'The service needs to run in dev, CI, staging, and production without environment differences.',
+    prog:'a-ct',
+    sit:"TechFlow's payments service works perfectly on the developer's laptop (Python 3.11, specific library versions). The CI server runs Python 3.9. Production runs Python 3.10. Last week a deployment broke because a library behaved differently across environments.",
+    q:"How should TechFlow package the payments service for deployment?",
+    choices:[
+      {cls:'ca',tag:'Best approach',text:"Write a Dockerfile that pins the exact Python version and all dependencies. Build a Docker image in CI. That same image runs in staging and production - identical environment guaranteed."},
+      {cls:'cb',tag:'Poor approach',text:"Write a detailed setup.sh script that installs dependencies on each server. Update it whenever a new library is added."},
+    ],
+    results:{
+      ca:{cls:'f-ok',title:'Correct!',body:"The Docker image is built once and run everywhere - it carries its own Python version, libraries, and runtime. The image that passes QA in staging is byte-for-byte identical to what deploys to production. Kubernetes then handles running multiple instances, rolling updates, and automatic restarts if the service crashes."},
+      cb:{cls:'f-er',title:'This is why the library bug happened.',body:"Setup scripts depend on what is already installed on the server and diverge over time. A new team member adds a library, updates the script, but the production servers were last rebuilt 6 months ago and have a different base state. Containers eliminated this entire class of problem by packaging the runtime with the application."},
+    }
+  },
+  {
+    hBg:'h-cl',hTitle:'Decision 4: Scaling for launch',hSub:'The payments service launches. Traffic is 5x higher than expected.',
+    prog:'a-cl',
+    sit:"TechFlow's payments service is live. On the launch day, traffic hits 500 requests per second - five times the projected load. The two VMs are at 100% CPU. Customers are seeing timeouts.",
+    q:"How should TechFlow's infrastructure respond to the traffic spike?",
+    choices:[
+      {cls:'ca',tag:'Best approach',text:"The Kubernetes cluster is configured with Horizontal Pod Autoscaler. It detects CPU load, automatically adds container replicas, and the cloud provider adds nodes. The service scales in under 2 minutes."},
+      {cls:'cb',tag:'Poor approach',text:"An engineer notices the alerts, logs into the AWS console, manually resizes the VMs to a larger instance type, and brings them back online. This takes 25 minutes."},
+    ],
+    results:{
+      ca:{cls:'f-ok',title:'Correct!',body:"This is cloud computing's core value proposition: elastic, automatic scaling. Kubernetes + cloud auto-scaling means the system responds to demand without human intervention. Customers experience no downtime. After the spike, the cluster scales back down automatically, and TechFlow only pays for the extra capacity it actually used."},
+      cb:{cls:'f-er',title:'25 minutes of partial outage.',body:"Manual scaling is too slow for modern traffic patterns. Spikes happen in seconds. By the time an engineer notices, logs in, and resizes servers, thousands of requests have already failed. Cloud computing was built for exactly this scenario - auto-scaling is a first-class feature, not an afterthought."},
+    }
+  }
+];
+
+let sc4step=0;
+
+function buildSc4(){
+  const body=document.getElementById('scBody4');
+  const startFlip=Math.random()<0.5?1:0;
+  body.innerHTML=sc4.map((s,i)=>{
+    const flip=(i+startFlip)%2===1;
+    const ordered=flip?[s.choices[1],s.choices[0]]:[s.choices[0],s.choices[1]];
+    return `
+    <div class="sc-step${i===0?' active':''}" id="sc4-${i}">
+      <div class="situation">${s.sit}</div>
+      <div class="sc-q">${s.q}</div>
+      <div class="choices2">
+        ${ordered.map((c,ci)=>`
+          <button class="choice2 ${c.cls}" onclick="pickSc4(${i},'${c.cls}')">
+            <span class="c2-tag">${ci===0?'Option A':'Option B'}</span>${c.text}
+          </button>
+        `).join('')}
+      </div>
+      ${Object.keys(s.results).map(k=>`
+        <div class="sc-feedback ${s.results[k].cls}" id="sc4fb-${i}-${k}">
+          <strong>${s.results[k].title}</strong>${s.results[k].body}
+        </div>
+      `).join('')}
+      <div class="sc-nav" id="sc4nav-${i}">
+        ${i<sc4.length-1
+          ?`<button class="btn btn-dark" onclick="nextSc4(${i+1})">Next decision &rarr;</button>`
+          :`<button class="btn btn-dark" onclick="document.getElementById('quiz').scrollIntoView({behavior:'smooth'})">Go to quiz &rarr;</button>`
+        }
+      </div>
+    </div>
+  `;}).join('');
+  const dotColors=['c-vc','c-ia','c-ct','c-cl'];
+  document.getElementById('scDots4').innerHTML=sc4.map((_,i)=>
+    `<div class="dot${i===0?' cur c-vc':''}" id="d4-${i}"></div>`
+  ).join('');
+}
+
+function pickSc4(step,cls){
+  document.getElementById(`sc4fb-${step}-${cls}`).classList.add('shown');
+  document.getElementById(`sc4nav-${step}`).classList.add('shown');
+  document.querySelectorAll(`#sc4-${step} .choice2`).forEach(c=>{
+    c.classList.add('picked');
+    if(c.classList.contains(cls)) c.classList.add('you-picked');
+    if(c.classList.contains('ca')) c.classList.add('reveal-ok');
+    if(c.classList.contains('cb')) c.classList.add('reveal-bad');
+  });
+}
+
+const dotColors=['c-vc','c-ia','c-ct','c-cl'];
+const headBgs=['h-vc','h-ia','h-ct','h-cl'];
+const progA=['a-vc','a-ia','a-ct','a-cl'];
+
+function nextSc4(next){
+  document.querySelectorAll('.sc-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById(`sc4-${next}`).classList.add('active');
+  sc4step=next;
+  document.querySelectorAll('.dot').forEach((d,i)=>{
+    d.className='dot'+(i<next?' done':(i===next?` cur ${dotColors[next]}`:''));
+  });
+  const s=sc4[next];
+  document.getElementById('scHead4').className='sc-head '+s.hBg;
+  document.getElementById('scHead4Title').textContent=s.hTitle;
+  document.getElementById('scHead4Sub').textContent=s.hSub;
+  ['scp0','scp1','scp2','scp3'].forEach((id,i)=>{
+    document.getElementById(id).className='sc-prog-step'+(i<next?' done':(i===next?' '+progA[next]:''));
+  });
+  document.getElementById('scBody4').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// QUIZ
+const qs4=[
+  {
+    q:"What is the main purpose of a branch in Git?",
+    opts:["To back up the repository to a remote server","To create an isolated line of development that does not affect the main codebase","To compress the repository to save disk space","To share code with other developers without merging"],
+    ans:1,
+    exp:"A branch is an independent copy of the codebase where changes can be made in isolation. When the work is complete and reviewed, the branch is merged back into main. This lets multiple developers work simultaneously without interfering with each other."
+  },
+  {
+    q:"What does 'declarative' mean in Infrastructure as Code?",
+    opts:["You write step-by-step instructions for how to build the infrastructure","You describe the desired end state and the tool figures out how to achieve it","You declare a budget limit before provisioning begins","You manually approve each resource before it is created"],
+    ans:1,
+    exp:"Declarative IaC (like Terraform) means you write 'I want 3 VMs with these specs in this region' and the tool handles the how. Imperative IaC (like shell scripts) means you write every step explicitly. Declarative is preferred because it handles drift correction and is idempotent - running it multiple times always converges to the same state."
+  },
+  {
+    q:"What problem do Docker containers primarily solve?",
+    opts:["Slow internet connections between services","Applications behaving differently across environments (dev, staging, production)","The cost of cloud computing","Version control for configuration files"],
+    ans:1,
+    exp:"Containers package the application with its entire runtime environment. The exact same image runs on a developer's laptop, a CI runner, and a production server. This eliminates the 'works on my machine' class of bugs entirely - if it passes tests in the container, it will behave identically in production."
+  },
+  {
+    q:"What is the difference between IaaS and PaaS in cloud computing?",
+    opts:["IaaS is cheaper than PaaS in all scenarios","IaaS gives you raw infrastructure (VMs, networking) you manage yourself; PaaS gives you a platform where you only deploy code","PaaS is only available from AWS; IaaS is available from all providers","IaaS is for internal tools; PaaS is for customer-facing applications"],
+    ans:1,
+    exp:"With IaaS (e.g. AWS EC2) you get virtual machines and must manage the OS, runtime, and middleware yourself. With PaaS (e.g. AWS Elastic Beanstalk, Heroku) you just push your code and the platform handles servers, scaling, and patching. More control with IaaS, more convenience with PaaS."
+  },
+  {
+    q:"A team commits code, which automatically provisions a test environment, builds a Docker image, and deploys it to AWS. Which four technologies made this possible?",
+    opts:["Git, Terraform, Docker, and a cloud provider - all four layers working together","Git and Docker only - the other steps are manual","Terraform and AWS only - Git and Docker are optional","This is only possible with a dedicated DevOps team, not with tools alone"],
+    ans:0,
+    exp:"This describes a complete modern CI/CD pipeline: Git (VCS) triggers the pipeline on commit; Terraform (IaC) provisions the environment; Docker (Containers) packages the app consistently; the cloud provider (Cloud) runs the final deployment at scale. Each layer is essential - removing any one breaks the automation chain."
+  }
+];
+
+let qC4=0,qS4=0,qA4=new Array(qs4.length).fill(null);
+let quizData4=qs4;
+
+function shuffleQuestion4(q){
+  const paired=q.opts.map((o,i)=>({text:o,correct:i===q.ans}));
+  for(let i=paired.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    const tmp=paired[i];paired[i]=paired[j];paired[j]=tmp;
+  }
+  return {q:q.q,exp:q.exp,opts:paired.map(p=>p.text),ans:paired.findIndex(p=>p.correct)};
+}
+
+function buildQuiz4(){
+  quizData4=qs4.map(shuffleQuestion4);
+  document.getElementById('quizCards4').innerHTML=quizData4.map((q,i)=>`
+    <div class="quiz-card${i===0?' shown':''}" id="qc4-${i}">
+      <div class="q-num">Question ${i+1} of ${quizData4.length}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-opts">
+        ${q.opts.map((o,oi)=>`<button class="q-opt" onclick="ansQ4(${i},${oi})">${o}</button>`).join('')}
+      </div>
+      <div class="q-exp" id="qe4-${i}">${q.exp}</div>
+    </div>
+  `).join('');
+}
+
+function ansQ4(qi,oi){
+  if(qA4[qi]!==null)return;
+  qA4[qi]=oi;if(oi===quizData4[qi].ans)qS4++;
+  document.querySelectorAll(`#qc4-${qi} .q-opt`).forEach((b,i)=>{
+    b.classList.add('locked');
+    if(i===quizData4[qi].ans)b.classList.add('correct');
+    else if(i===oi)b.classList.add('wrong');
+  });
+  document.getElementById(`qe4-${qi}`).classList.add('shown');
+  const nb=document.getElementById('nextBtn4');nb.disabled=false;
+  if(qi===quizData4.length-1)nb.textContent='See results \u2192';
+}
+
+function nextQ4(){
+  if(qC4<quizData4.length-1){
+    document.querySelectorAll('.quiz-card').forEach(c=>c.classList.remove('shown'));
+    qC4++;
+    document.getElementById(`qc4-${qC4}`).classList.add('shown');
+    document.getElementById('quizCounter4').textContent=`Question ${qC4+1} of ${quizData4.length}`;
+    document.getElementById('nextBtn4').disabled=true;
+    document.getElementById('nextBtn4').textContent=qC4===quizData4.length-1?'See results \u2192':'Next question \u2192';
+  } else {showResult4();}
+}
+
+function showResult4(){
+  document.getElementById('quizFooter4').style.display='none';
+  document.querySelectorAll('.quiz-card').forEach(c=>c.classList.remove('shown'));
+  const r=document.getElementById('quizResult4');r.classList.add('shown');
+  const pct=Math.round((qS4/quizData4.length)*100);
+  const big=document.getElementById('bigScore4');
+  big.textContent=`${qS4} / ${quizData4.length}`;
+  big.className='big-score '+(pct>=80?'great':pct>=60?'mid':'low');
+  document.getElementById('resultMsg4').textContent=
+    pct===100?'Perfect! You have a clear understanding of all four layers.':
+    pct>=80?'Great work. You understand the key concepts well.':
+    pct>=60?'Good start. Review the concepts section for the areas you found tricky.':
+    'Revisit the tutorial from the beginning and try again - the pipeline section is especially helpful.';
+}
+
+function resetQuiz4(){
+  qC4=0;qS4=0;qA4=new Array(qs4.length).fill(null);
+  document.getElementById('quizFooter4').style.display='flex';
+  document.getElementById('quizResult4').classList.remove('shown');
+  document.getElementById('nextBtn4').disabled=true;
+  document.getElementById('nextBtn4').textContent='Next question \u2192';
+  document.getElementById('quizCounter4').textContent='Question 1 of 5';
+  buildQuiz4();
+}
+
+// INIT
+initDnd4();
+buildSc4();
+buildQuiz4();
+</script>
+</body>
+</html>

@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CIA, Non-Repudiation, Compliance & Standards - Tutorial</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ci:#1E3A8A;--ci-l:#EEF2FA;--ci-m:#3B60C8;
+  --nr:#065F46;--nr-l:#ECFDF5;--nr-m:#059669;
+  --co:#92400E;--co-l:#FEF3C7;--co-m:#D97706;
+  --st:#581C87;--st-l:#F3E8FF;--st-m:#7C3AED;
+  --bg:#FFFFFF;--bg-alt:#F7F8FA;
+  --tx:#111827;--mu:#6B7280;
+  --ok:#15803D;--ok-l:#DCFCE7;
+  --er:#B91C1C;--er-l:#FEE2E2;
+  --bd:#E5E7EB;--r:10px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:#fff;color:var(--tx);line-height:1.6;font-size:16px}
+h1,h2,h3,.sg{font-family:'Space Grotesk',system-ui,sans-serif;line-height:1.2}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.97);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;gap:0.75rem;padding:0 1.5rem;height:52px}
+.nav-logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:0.8rem;
+  display:flex;gap:0.25rem;align-items:center;flex-shrink:0;flex-wrap:wrap}
+.nav-logo .nci{color:var(--ci)}.nav-logo .nnr{color:var(--nr)}
+.nav-logo .nco{color:var(--co)}.nav-logo .nst{color:var(--st-m)}
+.nav-logo .sep{color:var(--mu);font-size:0.65rem}
+nav ul{display:flex;gap:0.05rem;list-style:none;margin-left:auto}
+nav ul a{font-size:0.74rem;font-weight:500;color:var(--mu);text-decoration:none;
+  padding:0.27rem 0.5rem;border-radius:6px;transition:all 0.15s;white-space:nowrap}
+nav ul a:hover{background:var(--bg-alt);color:var(--tx)}
+.prog-bar{position:fixed;top:52px;left:0;right:0;height:2px;background:var(--bd);z-index:99}
+.prog-fill{height:100%;width:0%;transition:width 0.2s;
+  background:linear-gradient(90deg,var(--ci),var(--nr),var(--co),var(--st-m))}
+
+#hero{min-height:88vh;display:flex;flex-direction:column;justify-content:center;
+  align-items:center;text-align:center;padding:4rem 1.5rem}
+.hero-label{font-size:0.7rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--mu);border:1px solid var(--bd);border-radius:20px;padding:0.28rem 0.85rem;
+  display:inline-block;margin-bottom:1rem}
+.hero-title{font-size:clamp(1.7rem,4.6vw,3.2rem);font-weight:700;margin-bottom:0.85rem;line-height:1.2}
+.hero-title .tci{color:var(--ci)}.hero-title .tnr{color:var(--nr)}
+.hero-title .tco{color:var(--co)}.hero-title .tst{color:var(--st-m)}
+.hero-sub{color:var(--mu);font-size:0.97rem;max-width:500px;margin-bottom:2.25rem}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.85rem;margin-bottom:2.25rem;width:100%;max-width:480px}
+.hero-pill{border-radius:var(--r);padding:0.85rem 1rem;text-align:left;border:2px solid}
+.hero-pill.pci{background:var(--ci-l);border-color:var(--ci-m)}
+.hero-pill.pnr{background:var(--nr-l);border-color:var(--nr-m)}
+.hero-pill.pco{background:var(--co-l);border-color:var(--co-m)}
+.hero-pill.pst{background:var(--st-l);border-color:var(--st-m)}
+.hero-pill .hp-tag{font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;display:block;margin-bottom:0.25rem}
+.pci .hp-tag{color:var(--ci)}.pnr .hp-tag{color:var(--nr)}.pco .hp-tag{color:var(--co)}.pst .hp-tag{color:var(--st-m)}
+.hero-pill .hp-name{font-family:'Space Grotesk',sans-serif;font-size:0.88rem;font-weight:700}
+.hero-pill .hp-sub{font-size:0.74rem;color:var(--mu);margin-top:0.15rem}
+
+.btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.65rem 1.5rem;border-radius:8px;
+  font-weight:600;font-size:0.9rem;cursor:pointer;text-decoration:none;border:none;
+  font-family:'Inter',sans-serif;transition:all 0.15s}
+.btn-dark{background:var(--tx);color:#fff}.btn-dark:hover{background:#374151;transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--tx);border:1.5px solid var(--bd)}.btn-outline:hover{border-color:var(--tx)}
+.btn:disabled{opacity:0.45;cursor:not-allowed;transform:none !important}
+
+.sec{padding:4.5rem 1.5rem;max-width:960px;margin:0 auto}
+.sec.alt{max-width:100%;background:var(--bg-alt);padding:4.5rem 1.5rem}
+.sec.alt .inner{max-width:960px;margin:0 auto}
+.sec-label{font-size:0.7rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--mu);margin-bottom:0.55rem}
+.sec-title{font-size:1.75rem;font-weight:700;margin-bottom:0.6rem}
+.sec-sub{color:var(--mu);font-size:0.92rem;max-width:540px;margin-bottom:2rem}
+
+.pillars-tabs{display:flex;gap:0;border:1.5px solid var(--bd);border-radius:8px;overflow:hidden;width:fit-content;margin-bottom:1.75rem;flex-wrap:wrap}
+.pt-btn{padding:0.5rem 1.05rem;font-weight:600;font-size:0.8rem;cursor:pointer;border:none;
+  background:transparent;color:var(--mu);font-family:'Inter',sans-serif;transition:all 0.15s;white-space:nowrap}
+.pt-btn.on-ci{background:var(--ci);color:#fff}.pt-btn.on-nr{background:var(--nr);color:#fff}
+.pt-btn.on-co{background:var(--co);color:#fff}.pt-btn.on-st{background:var(--st-m);color:#fff}
+.pillar-panel{display:none}.pillar-panel.shown{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.pp-explain{border-radius:var(--r);padding:1.6rem;border:2px solid}
+.pp-explain.eci{background:var(--ci-l);border-color:var(--ci)}
+.pp-explain.enr{background:var(--nr-l);border-color:var(--nr)}
+.pp-explain.eco{background:var(--co-l);border-color:var(--co)}
+.pp-explain.est{background:var(--st-l);border-color:var(--st-m)}
+.pp-badge{display:inline-block;padding:0.2rem 0.65rem;border-radius:20px;font-size:0.7rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.85rem}
+.eci .pp-badge{background:var(--ci);color:#fff}.enr .pp-badge{background:var(--nr);color:#fff}
+.eco .pp-badge{background:var(--co);color:#fff}.est .pp-badge{background:var(--st-m);color:#fff}
+.pp-explain h3{font-size:1rem;margin-bottom:0.35rem}
+.pp-explain p{font-size:0.83rem;color:var(--mu);margin-bottom:0.85rem;line-height:1.55}
+.pp-explain ul{list-style:none}
+.pp-explain ul li{font-size:0.81rem;padding:0.27rem 0;border-bottom:1px solid rgba(0,0,0,0.06);
+  display:flex;gap:0.4rem;align-items:flex-start}
+.pp-explain ul li:last-child{border:none}
+.pp-explain ul li::before{content:'→';font-weight:700;flex-shrink:0;font-size:0.74rem;margin-top:0.1rem}
+.eci ul li::before{color:var(--ci)}.enr ul li::before{color:var(--nr)}.eco ul li::before{color:var(--co)}.est ul li::before{color:var(--st-m)}
+.pp-analogy{border-radius:var(--r);padding:1.5rem;border:1.5px solid var(--bd);background:#fff}
+.pp-analogy .an-label{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--mu);margin-bottom:0.6rem}
+.pp-analogy .an-title{font-family:'Space Grotesk',sans-serif;font-size:0.98rem;font-weight:700;margin-bottom:0.5rem}
+.pp-analogy p{font-size:0.83rem;color:var(--mu);line-height:1.6;margin-bottom:0.85rem}
+.an-problem{background:var(--er-l);border-left:3px solid var(--er);padding:0.65rem 0.9rem;border-radius:0 6px 6px 0;font-size:0.8rem;line-height:1.5}
+.an-problem strong{display:block;font-size:0.72rem;color:var(--er);margin-bottom:0.2rem;text-transform:uppercase;letter-spacing:0.06em}
+
+.cia-layout{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start}
+.cia-svg-wrap{position:relative;display:flex;justify-content:center}
+.cia-svg-wrap svg{width:100%;max-width:340px}
+.cia-vertex{cursor:pointer}
+.cia-detail{display:none}.cia-detail.shown{display:block}
+.cia-detail-card{border-radius:var(--r);padding:1.5rem;border:2px solid;height:100%}
+.cia-detail-card.dconf{background:var(--ci-l);border-color:var(--ci)}
+.cia-detail-card.dintg{background:var(--nr-l);border-color:var(--nr)}
+.cia-detail-card.davail{background:var(--co-l);border-color:var(--co)}
+.cia-detail-card .cd-badge{display:inline-block;padding:0.2rem 0.65rem;border-radius:20px;font-size:0.7rem;font-weight:700;margin-bottom:0.85rem}
+.dconf .cd-badge{background:var(--ci);color:#fff}.dintg .cd-badge{background:var(--nr);color:#fff}.davail .cd-badge{background:var(--co);color:#fff}
+.cia-detail-card h3{font-size:0.95rem;margin-bottom:0.35rem}
+.cia-detail-card p{font-size:0.82rem;color:var(--mu);line-height:1.55;margin-bottom:0.9rem}
+.example-list{list-style:none}
+.example-list li{font-size:0.8rem;padding:0.27rem 0;border-bottom:1px solid rgba(0,0,0,0.06);display:flex;gap:0.4rem}
+.example-list li:last-child{border:none}
+.example-list li::before{content:'✓';font-weight:700;flex-shrink:0}
+.dconf .example-list li::before{color:var(--ci)}.dintg .example-list li::before{color:var(--nr)}.davail .example-list li::before{color:var(--co)}
+.threat-tag{display:inline-flex;align-items:center;gap:0.35rem;margin-top:0.6rem;padding:0.35rem 0.75rem;
+  background:var(--er-l);border-radius:6px;font-size:0.75rem;font-weight:600;color:var(--er)}
+.cia-hint{text-align:center;font-size:0.8rem;color:var(--mu);margin-top:1rem;font-style:italic}
+
+.dnd-layout{display:grid;grid-template-columns:1fr 2fr 0.85fr;gap:1.25rem;align-items:start}
+.pool-label{font-size:0.7rem;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:0.08em;text-align:center;margin-bottom:0.5rem}
+.card-pool{display:flex;flex-direction:column;gap:5px}
+.drag-card{background:#fff;border:1.5px solid var(--bd);border-radius:7px;padding:0.48rem 0.72rem;
+  font-size:0.78rem;font-weight:500;cursor:grab;user-select:none;transition:all 0.15s}
+.drag-card:hover{border-color:var(--tx);box-shadow:0 2px 8px rgba(0,0,0,0.08);transform:translateY(-1px)}
+.drag-card.selected{border-color:var(--tx);background:var(--bg-alt);font-weight:600}
+.drag-card.gone{display:none}
+.drop-zones{display:flex;flex-direction:column;gap:0.75rem}
+.dz{min-height:80px;border-radius:var(--r);border:2px dashed var(--bd);padding:0.7rem;transition:all 0.15s}
+.dz.ci-z{border-color:var(--ci);background:var(--ci-l)}
+.dz.nr-z{border-color:var(--nr);background:var(--nr-l)}
+.dz.co-z{border-color:var(--co);background:var(--co-l)}
+.dz.st-z{border-color:var(--st-m);background:var(--st-l)}
+.dz.drag-over{transform:scale(1.01);box-shadow:0 4px 14px rgba(0,0,0,0.09)}
+.dz.clickable:hover{transform:scale(1.01);cursor:pointer}
+.dz-label{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.4rem}
+.ci-z .dz-label{color:var(--ci)}.nr-z .dz-label{color:var(--nr)}.co-z .dz-label{color:var(--co)}.st-z .dz-label{color:var(--st-m)}
+.dz-chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{padding:0.22rem 0.56rem;border-radius:20px;font-size:0.7rem;font-weight:500;cursor:pointer}
+.ci-z .chip{background:var(--ci);color:#fff}.nr-z .chip{background:var(--nr);color:#fff}
+.co-z .chip{background:var(--co);color:#fff}.st-z .chip{background:var(--st-m);color:#fff}
+.chip.correct::after{content:' ✓';font-weight:700}.chip.wrong::after{content:' ✗';font-weight:700}.chip.wrong{opacity:0.55}
+.dnd-sidebar{position:sticky;top:70px}
+.dnd-hint{font-size:0.78rem;color:var(--mu);text-align:center;margin-bottom:0.9rem;line-height:1.5}
+.dnd-result{padding:0.85rem;border-radius:var(--r);font-weight:600;font-size:0.875rem;text-align:center;margin-top:0.75rem;display:none}
+.dnd-result.show{display:block}
+.dnd-result.good{background:var(--ok-l);color:var(--ok)}.dnd-result.bad{background:var(--er-l);color:var(--er)}
+
+.scenario-wrap{background:#fff;border:1.5px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.sc-head{color:#fff;padding:1.2rem 1.5rem}
+.sc-head.hci{background:var(--ci)}.sc-head.hnr{background:var(--nr)}.sc-head.hco{background:var(--co)}.sc-head.hst{background:var(--st-m)}
+.sc-head h3{font-size:0.98rem;margin-bottom:0.25rem}
+.sc-head p{font-size:0.79rem;opacity:0.75}
+.sc-prog{display:flex;border-bottom:1px solid var(--bd)}
+.sc-prog-step{flex:1;padding:0.48rem 0.6rem;font-size:0.68rem;font-weight:600;text-align:center;
+  border-right:1px solid var(--bd);transition:all 0.2s}
+.sc-prog-step:last-child{border:none}
+.sc-prog-step.done{background:var(--bg-alt);color:var(--mu)}
+.sc-prog-step.aci{background:var(--ci-l);color:var(--ci)}.sc-prog-step.anr{background:var(--nr-l);color:var(--nr)}
+.sc-prog-step.aco{background:var(--co-l);color:var(--co)}.sc-prog-step.ast{background:var(--st-l);color:var(--st-m)}
+.sc-body{padding:1.4rem}
+.sc-step{display:none}.sc-step.active{display:block}
+.situation{padding:0.82rem 1.05rem;background:var(--bg-alt);border-left:3px solid var(--tx);
+  border-radius:0 var(--r) var(--r) 0;font-size:0.85rem;font-style:italic;margin-bottom:1.1rem;line-height:1.6}
+.sc-q{font-weight:700;font-size:0.88rem;margin-bottom:0.8rem}
+.choices2{display:grid;grid-template-columns:1fr 1fr;gap:0.65rem}
+.choice2{padding:0.85rem;border-radius:var(--r);border:1.5px solid var(--bd);background:#fff;
+  cursor:pointer;text-align:left;font-size:0.81rem;font-family:'Inter',sans-serif;transition:all 0.15s;line-height:1.45}
+.choice2:hover{box-shadow:0 2px 10px rgba(0,0,0,0.08);transform:translateY(-1px)}
+.c2-tag{font-size:0.66rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:0.3rem}
+.c2-tag{color:var(--mu)}
+.choice2:hover{border-color:var(--tx)}
+.choice2.picked{pointer-events:none}.choice2.faded{opacity:0.32;pointer-events:none}
+.choice2.reveal-ok{border-color:var(--ok);background:var(--ok-l);opacity:1}
+.choice2.reveal-ok .c2-tag{color:var(--ok)}
+.choice2.reveal-bad{border-color:var(--er);background:var(--er-l);opacity:1}
+.choice2.reveal-bad .c2-tag{color:var(--er)}
+.choice2.you-picked{box-shadow:0 0 0 2px var(--tx) inset}
+.sc-feedback{margin-top:1rem;padding:0.95rem 1.1rem;border-radius:var(--r);font-size:0.83rem;
+  line-height:1.6;display:none;border-left:3px solid}
+.sc-feedback.shown{display:block}
+.sc-feedback.fok{background:var(--ok-l);border-color:var(--ok)}.sc-feedback.fok strong{color:var(--ok)}
+.sc-feedback.fer{background:var(--er-l);border-color:var(--er)}.sc-feedback.fer strong{color:var(--er)}
+.sc-feedback strong{display:block;margin-bottom:0.25rem;font-size:0.87rem}
+.sc-nav{display:none;justify-content:flex-end;margin-top:1rem}.sc-nav.shown{display:flex}
+.step-dots{display:flex;gap:5px;padding:0.82rem 1.5rem;border-top:1px solid var(--bd)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--bd);transition:all 0.3s}
+.dot.done{background:var(--tx)}.dot.cur{width:20px;border-radius:4px}
+.dot.dci{background:var(--ci)}.dot.dnr{background:var(--nr)}.dot.dco{background:var(--co)}.dot.dst{background:var(--st-m)}
+
+.quiz-wrap{max-width:660px}
+.quiz-card{background:#fff;border:1.5px solid var(--bd);border-radius:var(--r);padding:1.5rem;display:none}
+.quiz-card.shown{display:block}
+.q-num{font-size:0.7rem;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.4rem}
+.q-text{font-size:0.94rem;font-weight:600;margin-bottom:1.05rem;line-height:1.5}
+.q-opts{display:flex;flex-direction:column;gap:0.4rem}
+.q-opt{padding:0.65rem 0.9rem;border-radius:7px;border:1.5px solid var(--bd);background:#fff;
+  cursor:pointer;font-size:0.83rem;text-align:left;font-family:'Inter',sans-serif;transition:all 0.15s}
+.q-opt:hover:not(.locked){border-color:var(--tx)}
+.q-opt.locked{pointer-events:none}
+.q-opt.correct{background:var(--ok-l);border-color:var(--ok);color:var(--ok);font-weight:600}
+.q-opt.wrong{background:var(--er-l);border-color:var(--er);color:var(--er)}
+.q-exp{margin-top:0.65rem;padding:0.65rem 0.9rem;background:var(--bg-alt);border-radius:7px;
+  font-size:0.78rem;color:var(--mu);line-height:1.6;display:none}
+.q-exp.shown{display:block}
+.quiz-footer{display:flex;justify-content:space-between;align-items:center;margin-top:1.2rem}
+.quiz-counter{font-size:0.8rem;color:var(--mu);font-weight:500}
+.quiz-result{background:var(--bg-alt);border-radius:var(--r);padding:2.5rem;text-align:center;display:none;margin-top:1.5rem}
+.quiz-result.shown{display:block}
+.big-score{font-size:3rem;font-weight:700;margin-bottom:0.4rem}
+.big-score.great{color:var(--ok)}.big-score.mid{color:var(--co)}.big-score.low{color:var(--er)}
+.quiz-result p{color:var(--mu);margin-bottom:1.5rem;font-size:0.88rem}
+
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
+.sum-col{border-radius:var(--r);padding:1.4rem;border:2px solid}
+.sum-col.sci{background:var(--ci-l);border-color:var(--ci)}
+.sum-col.snr{background:var(--nr-l);border-color:var(--nr)}
+.sum-col.sco{background:var(--co-l);border-color:var(--co)}
+.sum-col.sst{background:var(--st-l);border-color:var(--st-m)}
+.sum-col h3{font-size:0.88rem;margin-bottom:0.8rem}
+.sci h3{color:var(--ci)}.snr h3{color:var(--nr)}.sco h3{color:var(--co)}.sst h3{color:var(--st-m)}
+.sum-row{display:flex;gap:0.6rem;margin-bottom:0.42rem;font-size:0.8rem}
+.sum-key{font-weight:600;min-width:88px;flex-shrink:0}
+.std-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;margin-top:0.5rem}
+.std-card{border-radius:var(--r);padding:1.15rem;border:1.5px solid var(--bd);background:#fff}
+.std-card h4{font-size:0.82rem;font-weight:700;margin-bottom:0.2rem}
+.std-card .std-type{font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.5rem;display:block}
+.std-card p{font-size:0.78rem;color:var(--mu);line-height:1.5}
+.mandatory{color:var(--er)}.voluntary{color:var(--nr)}
+.final-box{margin-top:2.5rem;text-align:center;padding:2rem;background:var(--bg-alt);border-radius:var(--r)}
+.final-box p{color:var(--mu);font-size:0.88rem;max-width:500px;margin:0.5rem auto 1.5rem}
+.final-acts{display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap}
+
+@media(max-width:680px){
+  .pillar-panel,.cia-layout,.sum-grid,.std-grid,.choices2,.dnd-layout{grid-template-columns:1fr}
+  nav ul{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <span class="nci">CIA</span><span class="sep">·</span>
+    <span class="nnr">Non-Repudiation</span><span class="sep">·</span>
+    <span class="nco">Compliance</span><span class="sep">·</span>
+    <span class="nst">Standards</span>
+  </div>
+  <ul>
+    <li><a href="#concepts">Concepts</a></li>
+    <li><a href="#triad">CIA Triad</a></li>
+    <li><a href="#drag">Activity</a></li>
+    <li><a href="#scenario">Scenario</a></li>
+    <li><a href="#quiz">Quiz</a></li>
+    <li><a href="#summary">Summary</a></li>
+  </ul>
+</nav>
+<div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+
+<section id="hero">
+  <span class="hero-label">Information Security Fundamentals</span>
+  <h1 class="hero-title sg">
+    <span class="tci">CIA</span> &middot; <span class="tnr">Non-Repudiation</span><br>
+    <span class="tco">Compliance</span> &middot; <span class="tst">Standards</span>
+  </h1>
+  <p class="hero-sub">The foundational principles of information security - what we protect, how we prove accountability, what rules we follow, and which frameworks guide us.</p>
+  <div class="hero-grid">
+    <div class="hero-pill pci">
+      <span class="hp-tag">CIA Triad</span>
+      <div class="hp-name">Confidentiality, Integrity, Availability</div>
+      <div class="hp-sub">The three pillars of information security</div>
+    </div>
+    <div class="hero-pill pnr">
+      <span class="hp-tag">Non-Repudiation</span>
+      <div class="hp-name">Prove who did what</div>
+      <div class="hp-sub">Cryptographic accountability</div>
+    </div>
+    <div class="hero-pill pco">
+      <span class="hp-tag">Compliance</span>
+      <div class="hp-name">Meeting obligations</div>
+      <div class="hp-sub">Legal, regulatory, contractual</div>
+    </div>
+    <div class="hero-pill pst">
+      <span class="hp-tag">Standards</span>
+      <div class="hp-name">Frameworks and regulations</div>
+      <div class="hp-sub">ISO 27001, GDPR, NIST, PCI DSS</div>
+    </div>
+  </div>
+  <a href="#concepts" class="btn btn-dark">Start Learning &darr;</a>
+</section>
+
+<section class="alt" id="concepts">
+  <div class="inner">
+    <p class="sec-label">Part 1 of 5 - Core Concepts</p>
+    <h2 class="sec-title sg">What does each principle mean?</h2>
+    <p class="sec-sub">Select a topic to explore its definition, what problem it solves, and a real-world analogy.</p>
+    <div class="pillars-tabs">
+      <button class="pt-btn on-ci" id="pt0" onclick="showPillar(0)">CIA Triad</button>
+      <button class="pt-btn" id="pt1" onclick="showPillar(1)">Non-Repudiation</button>
+      <button class="pt-btn" id="pt2" onclick="showPillar(2)">Compliance</button>
+      <button class="pt-btn" id="pt3" onclick="showPillar(3)">Standards</button>
+    </div>
+
+    <div class="pillar-panel shown" id="pp0">
+      <div class="pp-explain eci">
+        <span class="pp-badge">CIA Triad</span>
+        <h3 class="sg">The three pillars of information security</h3>
+        <p>Every security decision ultimately protects one or more of three properties. Together they define what it means for information to be secure.</p>
+        <ul>
+          <li><strong>Confidentiality</strong> - only authorized parties can read the data</li>
+          <li><strong>Integrity</strong> - data is accurate and has not been tampered with</li>
+          <li><strong>Availability</strong> - authorized users can access data when needed</li>
+          <li>Achieving all three simultaneously is the core challenge of security</li>
+          <li>Every attack violates at least one pillar - often more than one</li>
+        </ul>
+      </div>
+      <div class="pp-analogy">
+        <div class="an-label">Analogy</div>
+        <div class="an-title sg">A hospital records room</div>
+        <p>A hospital file room needs: a lock so only authorized staff can enter (Confidentiality), tamper-evident folders so no one can alter records undetected (Integrity), and 24/7 access for emergency doctors (Availability). Removing any one of these creates a security failure.</p>
+        <div class="an-problem">
+          <strong>The tension</strong>
+          Maximizing one pillar can undermine another. Making data available to everyone reduces Confidentiality. Encrypting everything with a lost key protects Confidentiality but destroys Availability. Security is the art of balancing all three.
+        </div>
+      </div>
+    </div>
+
+    <div class="pillar-panel" id="pp1">
+      <div class="pp-explain enr">
+        <span class="pp-badge">Non-Repudiation</span>
+        <h3 class="sg">Prove that a specific action occurred and who performed it</h3>
+        <p>Non-repudiation ensures that a party cannot deny having performed an action. It combines proof of origin, proof of delivery, and an unforgeable audit trail - typically using asymmetric cryptography.</p>
+        <ul>
+          <li>Digital signatures - only the private key holder could have signed</li>
+          <li>Tamper-evident audit logs - every action recorded and verifiable</li>
+          <li>PKI certificates - bind identities to cryptographic keys</li>
+          <li>Distinct from authentication - auth proves who you ARE; non-repudiation proves what you DID</li>
+          <li>Used in email (S/MIME), code signing, financial transactions</li>
+        </ul>
+      </div>
+      <div class="pp-analogy">
+        <div class="an-label">Analogy</div>
+        <div class="an-title sg">A signed contract with a notary</div>
+        <p>When you sign a contract before a notary, you cannot later claim you never signed it. The notary's stamp, your signature, and the witness create non-repudiation. A digital signature plays all three roles - and is mathematically stronger than a handwritten one.</p>
+        <div class="an-problem">
+          <strong>Problem it solves</strong>
+          "I never sent that wire transfer order." / "Someone must have used my account." / "I deny ever accessing that file." Non-repudiation makes denial impossible when proof exists.
+        </div>
+      </div>
+    </div>
+
+    <div class="pillar-panel" id="pp2">
+      <div class="pp-explain eco">
+        <span class="pp-badge">Compliance</span>
+        <h3 class="sg">Meeting external security obligations</h3>
+        <p>Compliance means demonstrating that an organization meets a defined set of requirements - whether from law, regulation, contract, or industry standards. It is a minimum baseline, not a security guarantee.</p>
+        <ul>
+          <li>Gap analysis - identify where current controls fall short</li>
+          <li>Control mapping - document which controls meet which requirements</li>
+          <li>Evidence collection - prove controls are operating effectively</li>
+          <li>Audit readiness - internal and external audit processes</li>
+          <li>Compliance does not equal security - a compliant organization can still be breached</li>
+        </ul>
+      </div>
+      <div class="pp-analogy">
+        <div class="an-label">Analogy</div>
+        <div class="an-title sg">A driving test vs being a good driver</div>
+        <p>Passing a driving test proves you meet a minimum legal standard, not that you are an expert in all conditions. Passing a compliance audit proves minimum requirements at a point in time. A company can be fully compliant in January and breached in February.</p>
+        <div class="an-problem">
+          <strong>The critical distinction</strong>
+          Security is ongoing risk management. Compliance is a point-in-time snapshot against fixed criteria. Both matter, but confusing the two is dangerous.
+        </div>
+      </div>
+    </div>
+
+    <div class="pillar-panel" id="pp3">
+      <div class="pp-explain est">
+        <span class="pp-badge">Standards and Regulations</span>
+        <h3 class="sg">Frameworks that define security requirements</h3>
+        <p>Security standards and regulations provide structured sets of controls and requirements. Regulations are legally mandatory. Standards are typically voluntary frameworks - but are often used to demonstrate compliance with regulations.</p>
+        <ul>
+          <li>GDPR - EU regulation for personal data protection (mandatory)</li>
+          <li>HIPAA - US regulation for healthcare data (mandatory in scope)</li>
+          <li>ISO 27001 - international standard for security management (voluntary)</li>
+          <li>NIST CSF - US framework for cybersecurity risk management (voluntary)</li>
+          <li>PCI DSS - payment card industry standard (mandatory if processing cards)</li>
+        </ul>
+      </div>
+      <div class="pp-analogy">
+        <div class="an-label">Analogy</div>
+        <div class="an-title sg">Building codes and architect certification</div>
+        <p>Building codes are regulations - legally required, enforced by inspectors. Architect certification is a standard - voluntary, but widely expected. Security regulations (GDPR, HIPAA) work like building codes. Security standards (ISO 27001, NIST CSF) work like professional certification.</p>
+        <div class="an-problem">
+          <strong>Key rule</strong>
+          Regulations impose legal obligations with penalties. Standards provide guidance and credibility. An organization may choose ISO 27001 voluntarily but has no choice about GDPR if it processes EU personal data.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="triad">
+<section class="sec">
+  <p class="sec-label">Part 2 of 5 - Interactive Deep Dive</p>
+  <h2 class="sec-title sg">The CIA Triad in detail</h2>
+  <p class="sec-sub">Click each vertex of the triangle to explore that pillar - its meaning, controls, and which attacks target it.</p>
+  <div class="cia-layout">
+    <div class="cia-svg-wrap">
+      <svg viewBox="0 0 320 280" xmlns="http://www.w3.org/2000/svg" id="ciaTriangle">
+        <line x1="160" y1="30" x2="40" y2="240" stroke="#CBD5E1" stroke-width="2"/>
+        <line x1="40" y1="240" x2="280" y2="240" stroke="#CBD5E1" stroke-width="2"/>
+        <line x1="280" y1="240" x2="160" y2="30" stroke="#CBD5E1" stroke-width="2"/>
+        <text x="160" y="142" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="700" fill="#9CA3AF">CIA</text>
+        <text x="160" y="156" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="700" fill="#9CA3AF">TRIAD</text>
+        <g class="cia-vertex" id="vConf" onclick="selectCIA('conf')">
+          <circle cx="160" cy="30" r="26" fill="#EEF2FA" stroke="#1E3A8A" stroke-width="2.5"/>
+          <text x="160" y="25" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1E3A8A">CONF-</text>
+          <text x="160" y="37" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1E3A8A">IDENTIALITY</text>
+        </g>
+        <g class="cia-vertex" id="vIntg" onclick="selectCIA('intg')">
+          <circle cx="40" cy="240" r="26" fill="#ECFDF5" stroke="#065F46" stroke-width="2.5"/>
+          <text x="40" y="236" text-anchor="middle" font-size="9.5" font-weight="700" fill="#065F46">INTEG-</text>
+          <text x="40" y="248" text-anchor="middle" font-size="9.5" font-weight="700" fill="#065F46">RITY</text>
+        </g>
+        <g class="cia-vertex" id="vAvail" onclick="selectCIA('avail')">
+          <circle cx="280" cy="240" r="26" fill="#FEF3C7" stroke="#C2410C" stroke-width="2.5"/>
+          <text x="280" y="236" text-anchor="middle" font-size="9.5" font-weight="700" fill="#C2410C">AVAIL-</text>
+          <text x="280" y="248" text-anchor="middle" font-size="9.5" font-weight="700" fill="#C2410C">ABILITY</text>
+        </g>
+      </svg>
+      <div class="cia-hint">Click a vertex to explore</div>
+    </div>
+    <div>
+      <div class="cia-detail shown" id="cd-conf">
+        <div class="cia-detail-card dconf">
+          <span class="cd-badge">Confidentiality</span>
+          <h3 class="sg">Only authorized parties can access the information</h3>
+          <p>Confidentiality ensures that data is not disclosed to unauthorized individuals, processes, or systems - whether in storage, transit, or during processing.</p>
+          <ul class="example-list">
+            <li>AES-256 encryption of data at rest</li>
+            <li>TLS/HTTPS for data in transit</li>
+            <li>Role-based access control (RBAC)</li>
+            <li>Need-to-know data classification</li>
+            <li>Multi-factor authentication</li>
+          </ul>
+          <div class="threat-tag">&#9888; Attacked by: Data exfiltration, eavesdropping, insider threats</div>
+        </div>
+      </div>
+      <div class="cia-detail" id="cd-intg">
+        <div class="cia-detail-card dintg">
+          <span class="cd-badge">Integrity</span>
+          <h3 class="sg">Data is accurate and has not been tampered with</h3>
+          <p>Integrity ensures that information remains correct and complete, and that any unauthorized modification - accidental or deliberate - can be detected.</p>
+          <ul class="example-list">
+            <li>SHA-256 / SHA-3 cryptographic hashing</li>
+            <li>Digital signatures on files and messages</li>
+            <li>Checksum verification on downloads</li>
+            <li>Database transaction logs</li>
+            <li>Version control and change management</li>
+          </ul>
+          <div class="threat-tag" style="background:var(--er-l);color:var(--er)">&#9888; Attacked by: Man-in-the-middle, SQL injection, ransomware</div>
+        </div>
+      </div>
+      <div class="cia-detail" id="cd-avail">
+        <div class="cia-detail-card davail">
+          <span class="cd-badge">Availability</span>
+          <h3 class="sg">Authorized users can access the system when they need it</h3>
+          <p>Availability ensures that systems and data are accessible to authorized users on demand. Downtime - whether from attacks, failures, or misconfigurations - violates availability.</p>
+          <ul class="example-list">
+            <li>Redundant servers and failover systems</li>
+            <li>DDoS mitigation services (Cloudflare, AWS Shield)</li>
+            <li>Regular backup and disaster recovery testing</li>
+            <li>Load balancing across multiple zones</li>
+            <li>Defined Recovery Time Objectives (RTO)</li>
+          </ul>
+          <div class="threat-tag" style="background:var(--er-l);color:var(--er)">&#9888; Attacked by: DDoS attacks, ransomware, hardware failure</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
+<section class="alt" id="drag">
+  <div class="inner">
+    <p class="sec-label">Part 3 of 5 - Activity</p>
+    <h2 class="sec-title sg">Sort the security controls</h2>
+    <p class="sec-sub">Drag each control into the correct principle - or click to select, then click a zone. Place all items, then check your answers.</p>
+    <div class="dnd-layout">
+      <div>
+        <div class="pool-label">Controls to sort</div>
+        <div class="card-pool" id="cardPool"></div>
+      </div>
+      <div class="drop-zones">
+        <div class="dz ci-z" id="dzCI" ondragover="onDO(event)" ondrop="onDrop(event,'ci')" ondragleave="onDL(event)" onclick="onZC('ci')">
+          <div class="dz-label">CIA Triad</div><div class="dz-chips" id="chipsCI"></div>
+        </div>
+        <div class="dz nr-z" id="dzNR" ondragover="onDO(event)" ondrop="onDrop(event,'nr')" ondragleave="onDL(event)" onclick="onZC('nr')">
+          <div class="dz-label">Non-Repudiation</div><div class="dz-chips" id="chipsNR"></div>
+        </div>
+        <div class="dz co-z" id="dzCO" ondragover="onDO(event)" ondrop="onDrop(event,'co')" ondragleave="onDL(event)" onclick="onZC('co')">
+          <div class="dz-label">Compliance</div><div class="dz-chips" id="chipsCO"></div>
+        </div>
+        <div class="dz st-z" id="dzST" ondragover="onDO(event)" ondrop="onDrop(event,'st')" ondragleave="onDL(event)" onclick="onZC('st')">
+          <div class="dz-label">Standards &amp; Regulations</div><div class="dz-chips" id="chipsST"></div>
+        </div>
+      </div>
+      <div class="dnd-sidebar">
+        <p class="dnd-hint">Click a card to select, then click the right zone. Click a placed chip to return it.</p>
+        <button class="btn btn-dark" style="width:100%" id="checkBtn" onclick="checkDnd()" disabled>Check answers</button>
+        <button class="btn btn-outline" style="width:100%;margin-top:0.5rem;display:none" id="resetBtn" onclick="resetDnd()">Try again</button>
+        <div class="dnd-result" id="dndResult"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="scenario">
+<section class="sec">
+  <p class="sec-label">Part 4 of 5 - Scenario</p>
+  <h2 class="sec-title sg">MedCore faces a security crisis</h2>
+  <p class="sec-sub">MedCore is a healthcare startup storing patient records. Follow them through four decisions - one for each security principle.</p>
+  <div class="scenario-wrap">
+    <div class="sc-head hci" id="scHead">
+      <h3 id="scTitle">Decision 1: Responding to a breach</h3>
+      <p id="scSub">MedCore discovers that patient records have been accessed without authorization.</p>
+    </div>
+    <div class="sc-prog" id="scProg">
+      <div class="sc-prog-step aci" id="sp0">1. CIA</div>
+      <div class="sc-prog-step" id="sp1">2. Non-Repudiation</div>
+      <div class="sc-prog-step" id="sp2">3. Compliance</div>
+      <div class="sc-prog-step" id="sp3">4. Standards</div>
+    </div>
+    <div class="sc-body" id="scBody"></div>
+    <div class="step-dots" id="scDots"></div>
+  </div>
+</section>
+</div>
+
+<section class="alt" id="quiz">
+  <div class="inner">
+    <p class="sec-label">Part 5 of 5 - Knowledge Check</p>
+    <h2 class="sec-title sg">Test what you have learned</h2>
+    <p class="sec-sub">Five questions covering all four principles. Explanation provided after each answer.</p>
+    <div class="quiz-wrap">
+      <div id="quizCards"></div>
+      <div class="quiz-footer" id="quizFooter">
+        <span class="quiz-counter" id="quizCounter">Question 1 of 5</span>
+        <button class="btn btn-dark" id="nextBtn" onclick="nextQ()" disabled>Next question &rarr;</button>
+      </div>
+      <div class="quiz-result" id="quizResult">
+        <div class="big-score" id="bigScore"></div>
+        <p id="resultMsg"></p>
+        <button class="btn btn-outline" onclick="resetQuiz()">Retry quiz</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="summary">
+  <p class="sec-label">Reference - Quick Cheat Sheet</p>
+  <h2 class="sec-title sg">Everything at a glance</h2>
+  <div class="sum-grid">
+    <div class="sum-col sci">
+      <h3 class="sg">CIA Triad</h3>
+      <div class="sum-row"><span class="sum-key">Confidentiality</span><span>Prevent unauthorized access</span></div>
+      <div class="sum-row"><span class="sum-key">Integrity</span><span>Prevent unauthorized modification</span></div>
+      <div class="sum-row"><span class="sum-key">Availability</span><span>Ensure authorized access</span></div>
+      <div class="sum-row"><span class="sum-key">Key tools</span><span>Encryption, hashing, redundancy</span></div>
+      <div class="sum-row"><span class="sum-key">Remember</span><span>Every attack violates at least one pillar</span></div>
+    </div>
+    <div class="sum-col snr">
+      <h3 class="sg">Non-Repudiation</h3>
+      <div class="sum-row"><span class="sum-key">Definition</span><span>Prove who did what, undeniably</span></div>
+      <div class="sum-row"><span class="sum-key">Mechanism</span><span>Digital signatures (asymmetric crypto)</span></div>
+      <div class="sum-row"><span class="sum-key">Key tools</span><span>PKI, S/MIME, code signing, audit logs</span></div>
+      <div class="sum-row"><span class="sum-key">vs Auth</span><span>Auth = who you ARE now; NR = what you DID</span></div>
+      <div class="sum-row"><span class="sum-key">Use cases</span><span>Email signing, transactions, contracts</span></div>
+    </div>
+    <div class="sum-col sco">
+      <h3 class="sg">Compliance</h3>
+      <div class="sum-row"><span class="sum-key">Definition</span><span>Meeting defined external requirements</span></div>
+      <div class="sum-row"><span class="sum-key">Process</span><span>Gap analysis, controls, evidence, audit</span></div>
+      <div class="sum-row"><span class="sum-key">Key roles</span><span>CISO, DPO, Compliance Officer</span></div>
+      <div class="sum-row"><span class="sum-key">Warning</span><span>Compliance &ne; security</span></div>
+      <div class="sum-row"><span class="sum-key">Remember</span><span>It is a point-in-time snapshot</span></div>
+    </div>
+    <div class="sum-col sst">
+      <h3 class="sg">Standards &amp; Regulations</h3>
+      <div class="sum-row"><span class="sum-key">Regulations</span><span>Mandatory (GDPR, HIPAA, PCI DSS)</span></div>
+      <div class="sum-row"><span class="sum-key">Standards</span><span>Voluntary frameworks (ISO 27001, NIST)</span></div>
+      <div class="sum-row"><span class="sum-key">ISO 27001</span><span>ISMS - holistic security management</span></div>
+      <div class="sum-row"><span class="sum-key">NIST CSF</span><span>Identify, Protect, Detect, Respond, Recover</span></div>
+      <div class="sum-row"><span class="sum-key">GDPR</span><span>EU personal data - fines up to 4% revenue</span></div>
+    </div>
+  </div>
+  <h3 class="sg" style="margin-top:2.5rem;margin-bottom:0.75rem;font-size:1.05rem">Key standards and regulations</h3>
+  <div class="std-grid">
+    <div class="std-card">
+      <h4>ISO/IEC 27001</h4>
+      <span class="std-type voluntary">Voluntary standard</span>
+      <p>International standard for establishing, implementing, and maintaining an Information Security Management System (ISMS). Certifiable by accredited auditors.</p>
+    </div>
+    <div class="std-card">
+      <h4>GDPR</h4>
+      <span class="std-type mandatory">Mandatory regulation (EU)</span>
+      <p>General Data Protection Regulation. Applies to any organization processing EU personal data regardless of location. Fines up to &euro;20M or 4% of global annual turnover.</p>
+    </div>
+    <div class="std-card">
+      <h4>NIST Cybersecurity Framework</h4>
+      <span class="std-type voluntary">Voluntary framework (US)</span>
+      <p>Five-function model: Identify, Protect, Detect, Respond, Recover. Widely adopted globally as a risk management reference.</p>
+    </div>
+    <div class="std-card">
+      <h4>PCI DSS</h4>
+      <span class="std-type mandatory">Mandatory (if processing cards)</span>
+      <p>Payment Card Industry Data Security Standard. Mandatory for any organization that stores, processes, or transmits payment card data.</p>
+    </div>
+    <div class="std-card">
+      <h4>HIPAA</h4>
+      <span class="std-type mandatory">Mandatory regulation (US)</span>
+      <p>Health Insurance Portability and Accountability Act. Protects patient health information (PHI) in the United States.</p>
+    </div>
+    <div class="std-card">
+      <h4>SOC 2</h4>
+      <span class="std-type voluntary">Voluntary audit report</span>
+      <p>Auditing framework based on five Trust Service Criteria: Security, Availability, Processing Integrity, Confidentiality, and Privacy. Common for SaaS companies.</p>
+    </div>
+  </div>
+  <div class="final-box">
+    <h3 class="sg" style="font-size:1.1rem">Tutorial complete!</h3>
+    <p>These four principles underpin every information security decision. The CIA Triad defines what you protect. Non-Repudiation ensures accountability. Compliance meets your obligations. Standards and regulations provide the structured frameworks within which all of this operates.</p>
+    <div class="final-acts">
+      <a href="#hero" class="btn btn-outline">Restart tutorial</a>
+      <a href="#quiz" class="btn btn-dark">Retake the quiz</a>
+    </div>
+  </div>
+</section>
+
+<footer style="background:#0D1B2A;padding:2.5rem 1.5rem;text-align:center">
+  <div style="max-width:280px;margin:0 auto">
+    <p style="font-size:0.68rem;color:#8892A4;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.65rem">Prepared by</p>
+    <div style="display:flex;align-items:center;justify-content:center;gap:0.55rem;margin-bottom:0.55rem">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" stroke="#D4523A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M19.5 7.125L18 8.625" stroke="#D4523A" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:1.35rem;font-weight:700;color:#D4523A;letter-spacing:0.04em">MR. Rostami</span>
+    </div>
+    <p style="font-size:0.68rem;color:#8892A4;letter-spacing:0.1em;text-transform:uppercase">DevSecOps Lab Series</p>
+  </div>
+</footer>
+
+<script>
+window.addEventListener('scroll', function () {
+  var p = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+  document.getElementById('progFill').style.width = Math.min(p, 100) + '%';
+});
+
+var pillarClasses = ['on-ci', 'on-nr', 'on-co', 'on-st'];
+function showPillar(i) {
+  var tabs = document.querySelectorAll('.pt-btn');
+  for (var j = 0; j < tabs.length; j++) {
+    tabs[j].className = 'pt-btn' + (j === i ? ' ' + pillarClasses[j] : '');
+  }
+  var panels = document.querySelectorAll('.pillar-panel');
+  for (var k = 0; k < panels.length; k++) {
+    panels[k].className = 'pillar-panel' + (k === i ? ' shown' : '');
+  }
+}
+
+function selectCIA(id) {
+  var details = document.querySelectorAll('.cia-detail');
+  for (var i = 0; i < details.length; i++) { details[i].classList.remove('shown'); }
+  document.getElementById('cd-' + id).classList.add('shown');
+  var vMap = { conf: 'vConf', intg: 'vIntg', avail: 'vAvail' };
+  var circles = document.querySelectorAll('.cia-vertex circle');
+  for (var j = 0; j < circles.length; j++) {
+    circles[j].setAttribute('r', '26');
+    circles[j].style.filter = '';
+  }
+  var active = document.querySelector('#' + vMap[id] + ' circle');
+  active.setAttribute('r', '30');
+  active.style.filter = 'drop-shadow(0 0 6px rgba(0,0,0,0.25))';
+}
+
+var dndData = [
+  { id: 'a1', text: 'AES-256 encryption of stored records', ans: 'ci' },
+  { id: 'a2', text: 'SHA-256 hash to verify file integrity', ans: 'ci' },
+  { id: 'a3', text: 'Redundant servers across data centers', ans: 'ci' },
+  { id: 'b1', text: 'Digital signature on outgoing emails', ans: 'nr' },
+  { id: 'b2', text: 'Tamper-evident append-only audit log', ans: 'nr' },
+  { id: 'b3', text: 'PKI certificate for code signing', ans: 'nr' },
+  { id: 'c1', text: 'Gap analysis before regulatory audit', ans: 'co' },
+  { id: 'c2', text: 'Evidence binder for external auditors', ans: 'co' },
+  { id: 'c3', text: 'Mandatory annual penetration test', ans: 'co' },
+  { id: 'd1', text: 'Implementing ISO 27001 ISMS', ans: 'st' },
+  { id: 'd2', text: 'Mapping controls to NIST CSF', ans: 'st' },
+  { id: 'd3', text: 'GDPR Article 32 technical measures', ans: 'st' }
+];
+var placed = { ci: [], nr: [], co: [], st: [] };
+var sel = null, drag = null, checkedDnd = false;
+
+function initDnd() {
+  placed = { ci: [], nr: [], co: [], st: [] };
+  sel = null; drag = null; checkedDnd = false;
+  var pool = document.getElementById('cardPool');
+  pool.innerHTML = '';
+  var shuffled = dndData.slice().sort(function () { return Math.random() - 0.5; });
+  shuffled.forEach(function (item) {
+    var el = document.createElement('div');
+    el.className = 'drag-card';
+    el.id = 'dc-' + item.id;
+    el.textContent = item.text;
+    el.draggable = true;
+    el.addEventListener('dragstart', function () { drag = item.id; });
+    el.addEventListener('dragend', function () { drag = null; });
+    el.addEventListener('click', function () { selCard(item.id); });
+    pool.appendChild(el);
+  });
+  ['CI', 'NR', 'CO', 'ST'].forEach(function (z) {
+    document.getElementById('chips' + z).innerHTML = '';
+  });
+  document.getElementById('dndResult').className = 'dnd-result';
+  document.getElementById('checkBtn').disabled = true;
+  document.getElementById('resetBtn').style.display = 'none';
+  var zones = document.querySelectorAll('.dz');
+  for (var i = 0; i < zones.length; i++) { zones[i].classList.remove('clickable'); }
+}
+
+function selCard(id) {
+  if (checkedDnd) return;
+  var was = sel === id;
+  var cards = document.querySelectorAll('.drag-card');
+  for (var i = 0; i < cards.length; i++) { cards[i].classList.remove('selected'); }
+  var zones = document.querySelectorAll('.dz');
+  for (var j = 0; j < zones.length; j++) { zones[j].classList.remove('clickable'); }
+  if (was) { sel = null; return; }
+  sel = id;
+  document.getElementById('dc-' + id).classList.add('selected');
+  for (var k = 0; k < zones.length; k++) { zones[k].classList.add('clickable'); }
+}
+function onZC(zone) { if (!checkedDnd && sel) place(sel, zone); }
+function onDO(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function onDL(e) { e.currentTarget.classList.remove('drag-over'); }
+function onDrop(e, zone) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (drag) place(drag, zone);
+}
+function place(id, zone) {
+  ['ci', 'nr', 'co', 'st'].forEach(function (z) {
+    var i = placed[z].indexOf(id);
+    if (i > -1) {
+      placed[z].splice(i, 1);
+      var c = document.querySelector('#chips' + z.toUpperCase() + ' [data-id="' + id + '"]');
+      if (c) c.remove();
+    }
+  });
+  placed[zone].push(id);
+  var item = dndData.filter(function (d) { return d.id === id; })[0];
+  var chip = document.createElement('div');
+  chip.className = 'chip';
+  chip.dataset.id = id;
+  chip.textContent = item.text;
+  chip.title = 'Click to remove';
+  chip.onclick = function () { rmChip(id, zone); };
+  document.getElementById('chips' + zone.toUpperCase()).appendChild(chip);
+  var pc = document.getElementById('dc-' + id);
+  if (pc) pc.classList.add('gone');
+  sel = null;
+  var cards = document.querySelectorAll('.drag-card');
+  for (var i = 0; i < cards.length; i++) { cards[i].classList.remove('selected'); }
+  var zones = document.querySelectorAll('.dz');
+  for (var j = 0; j < zones.length; j++) { zones[j].classList.remove('clickable'); }
+  updateCheckBtn();
+}
+function rmChip(id, zone) {
+  if (checkedDnd) return;
+  placed[zone] = placed[zone].filter(function (x) { return x !== id; });
+  var c = document.querySelector('#chips' + zone.toUpperCase() + ' [data-id="' + id + '"]');
+  if (c) c.remove();
+  var pc = document.getElementById('dc-' + id);
+  if (pc) pc.classList.remove('gone');
+  updateCheckBtn();
+}
+function updateCheckBtn() {
+  var total = placed.ci.length + placed.nr.length + placed.co.length + placed.st.length;
+  document.getElementById('checkBtn').disabled = total < dndData.length;
+}
+function checkDnd() {
+  checkedDnd = true;
+  var correct = 0;
+  dndData.forEach(function (item) {
+    var zone = ['ci', 'nr', 'co', 'st'].filter(function (z) { return placed[z].indexOf(item.id) > -1; })[0];
+    if (!zone) return;
+    var chip = document.querySelector('#chips' + zone.toUpperCase() + ' [data-id="' + item.id + '"]');
+    if (!chip) return;
+    var ok = zone === item.ans;
+    chip.classList.add(ok ? 'correct' : 'wrong');
+    if (ok) correct++;
+  });
+  var pct = Math.round((correct / dndData.length) * 100);
+  var r = document.getElementById('dndResult');
+  r.textContent = correct + ' / ' + dndData.length + ' correct (' + pct + '%)';
+  r.className = 'dnd-result show ' + (pct >= 70 ? 'good' : 'bad');
+  document.getElementById('checkBtn').disabled = true;
+  document.getElementById('resetBtn').style.display = 'block';
+}
+function resetDnd() { initDnd(); }
+
+var scenarios = [
+  {
+    hClass: 'hci', hTitle: 'Decision 1: Responding to the breach',
+    hSub: 'Unauthorized access to patient records has been detected.',
+    prog: 'aci',
+    sit: "MedCore's security team receives an alert: 4,200 patient records were accessed by an unknown external party overnight. Patient names, diagnoses, and medication histories are involved. The team must identify which CIA pillar was violated and respond appropriately.",
+    q: 'Which CIA pillar was primarily violated, and what is the most important immediate action?',
+    choices: [
+      { cls: 'ca', tag: 'Option A', text: 'Confidentiality was violated - unauthorized access occurred. Revoke the compromised credentials, isolate affected systems, and begin forensic investigation.' },
+      { cls: 'cb', tag: 'Option B', text: 'Availability was violated - the system was down during the breach. Restart the servers and restore from backup to bring services back online quickly.' }
+    ],
+    results: {
+      ca: { cls: 'fok', title: 'Correct.', body: 'Confidentiality was violated - data was accessed by an unauthorized party. The system was running (Availability was fine) and records were not modified (Integrity was likely intact). Revoking credentials and isolating systems is correct. Rushing to restore services before investigating risks leaving the same vulnerability open.' },
+      cb: { cls: 'fer', title: 'Incorrect - Availability was not the issue.', body: 'The systems were running normally - the breach occurred because someone accessed them, not because they were down. Restarting servers without investigating could destroy forensic evidence and leave the attack vector open for re-entry.' }
+    }
+  },
+  {
+    hClass: 'hnr', hTitle: 'Decision 2: Proving accountability',
+    hSub: "A doctor claims she never accessed a patient's psychiatric records.",
+    prog: 'anr',
+    sit: "Three weeks later, a complaint arrives: a patient's psychiatric diagnosis was leaked to their employer. Dr. Almeida's credentials were used to access the record at 02:14 AM. She claims she was asleep and never logged in.",
+    q: 'What system would give MedCore the strongest evidence to resolve this dispute?',
+    choices: [
+      { cls: 'ca', tag: 'Option A', text: 'A tamper-evident audit log signed with a server-side digital signature, recording every access with timestamp, credential, IP, and session token - verifiable by a third party.' },
+      { cls: 'cb', tag: 'Option B', text: 'Ask the IT administrator who maintains the logs whether the access record looks genuine based on his experience with the system.' }
+    ],
+    results: {
+      ca: { cls: 'fok', title: 'Correct.', body: 'This is non-repudiation in action. A cryptographically signed, tamper-evident log proves credentials were used and cannot be altered after the fact, and can be independently verified. Whether Dr. Almeida was actually asleep (credential theft) or logged in herself, the log is admissible evidence.' },
+      cb: { cls: 'fer', title: 'Incorrect - human testimony is not non-repudiation.', body: "An administrator's opinion about whether a log 'looks genuine' carries no cryptographic proof and is easily disputed. Non-repudiation requires a mechanism - typically digital signatures - that makes denial mathematically impossible, not just implausible." }
+    }
+  },
+  {
+    hClass: 'hco', hTitle: 'Decision 3: Understanding compliance obligations',
+    hSub: 'MedCore wants to partner with a US hospital network.',
+    prog: 'aco',
+    sit: "A large US hospital network wants to integrate MedCore's platform. Their legal team asks: 'Are you HIPAA compliant?' The CEO asks the security team what this actually requires.",
+    q: 'What does HIPAA compliance actually require MedCore to do?',
+    choices: [
+      { cls: 'ca', tag: 'Option A', text: 'Conduct a risk analysis, implement administrative, physical, and technical safeguards for PHI, sign a Business Associate Agreement, and document all controls with evidence.' },
+      { cls: 'cb', tag: 'Option B', text: 'Install antivirus software on all laptops and set up two-factor authentication for all staff accounts - these are the core technical requirements for healthcare data.' }
+    ],
+    results: {
+      ca: { cls: 'fok', title: 'Correct.', body: 'HIPAA compliance is a comprehensive program: a formal risk analysis, documented policies, physical and technical safeguards, staff training, a signed Business Associate Agreement, and ongoing audit and review. Antivirus and MFA are a tiny fraction of the full obligation.' },
+      cb: { cls: 'fer', title: 'Incorrect - this is dangerously incomplete.', body: 'Antivirus and MFA are basic hygiene, not HIPAA compliance. HIPAA requires a structured risk analysis, documented policies, physical safeguards, workforce training, incident response plans, Business Associate Agreements, and regular audits.' }
+    }
+  },
+  {
+    hClass: 'hst', hTitle: 'Decision 4: Demonstrating trustworthiness at scale',
+    hSub: 'MedCore wants to expand to European hospital clients.',
+    prog: 'ast',
+    sit: 'MedCore is HIPAA-compliant for the US market and wants to sell to hospitals in Germany and the Netherlands. European procurement teams ask for evidence of a systematic security approach, specifically mentioning ISO 27001.',
+    q: "Which approach best serves MedCore's goal of winning European enterprise clients?",
+    choices: [
+      { cls: 'ca', tag: 'Option A', text: 'Pursue ISO 27001 certification. It demonstrates a systematic, audited Information Security Management System and directly satisfies the procurement requirement.' },
+      { cls: 'cb', tag: 'Option B', text: 'Write a detailed internal security policy document and share it with potential clients as evidence of security posture - faster and free, unlike certification.' }
+    ],
+    results: {
+      ca: { cls: 'fok', title: 'Correct.', body: "ISO 27001 is independently audited and certified - clients do not have to take MedCore's word for it. It is internationally recognized in European markets and maps directly to GDPR requirements, which MedCore must also meet." },
+      cb: { cls: 'fer', title: 'Incorrect - self-attestation carries no weight with enterprise procurement.', body: 'A company presenting its own policy document as proof of security is like awarding itself a certificate. Enterprise procurement in regulated healthcare requires independent third-party certification, which ISO 27001 provides and a self-written document does not.' }
+    }
+  }
+];
+
+var scDotColors = ['dci', 'dnr', 'dco', 'dst'];
+var scProgClasses = ['aci', 'anr', 'aco', 'ast'];
+
+function buildScenario() {
+  var body = document.getElementById('scBody');
+  var html = '';
+  scenarios.forEach(function (s, i) {
+    html += '<div class="sc-step' + (i === 0 ? ' active' : '') + '" id="sc-' + i + '">';
+    html += '<div class="situation">' + s.sit + '</div>';
+    html += '<div class="sc-q">' + s.q + '</div>';
+    html += '<div class="choices2">';
+    var shuffledChoices = s.choices.slice().sort(function () { return Math.random() - 0.5; });
+    shuffledChoices.forEach(function (c, ci) {
+      var posLabel = ci === 0 ? 'Option A' : 'Option B';
+      html += '<button class="choice2 ' + c.cls + '" onclick="pickSc(' + i + ",'" + c.cls + "')\">";
+      html += '<span class="c2-tag">' + posLabel + '</span>' + c.text + '</button>';
+    });
+    html += '</div>';
+    Object.keys(s.results).forEach(function (k) {
+      var r = s.results[k];
+      html += '<div class="sc-feedback ' + r.cls + '" id="scfb-' + i + '-' + k + '">';
+      html += '<strong>' + r.title + '</strong>' + r.body + '</div>';
+    });
+    html += '<div class="sc-nav" id="scnav-' + i + '">';
+    if (i < scenarios.length - 1) {
+      html += '<button class="btn btn-dark" onclick="nextSc(' + (i + 1) + ')">Next decision &rarr;</button>';
+    } else {
+      html += "<button class=\"btn btn-dark\" onclick=\"document.getElementById('quiz').scrollIntoView({behavior:'smooth'})\">Go to quiz &rarr;</button>";
+    }
+    html += '</div></div>';
+  });
+  body.innerHTML = html;
+
+  var dotsHtml = '';
+  scenarios.forEach(function (s, i) {
+    dotsHtml += '<div class="dot' + (i === 0 ? ' cur dci' : '') + '" id="scD-' + i + '"></div>';
+  });
+  document.getElementById('scDots').innerHTML = dotsHtml;
+}
+function pickSc(step, cls) {
+  document.getElementById('scfb-' + step + '-' + cls).classList.add('shown');
+  document.getElementById('scnav-' + step).classList.add('shown');
+  var choices = document.querySelectorAll('#sc-' + step + ' .choice2');
+  for (var i = 0; i < choices.length; i++) {
+    var el = choices[i];
+    el.classList.add('picked');
+    if (el.classList.contains(cls)) { el.classList.add('you-picked'); }
+    if (el.classList.contains('ca')) { el.classList.add('reveal-ok'); }
+    if (el.classList.contains('cb')) { el.classList.add('reveal-bad'); }
+  }
+}
+function nextSc(next) {
+  var steps = document.querySelectorAll('.sc-step');
+  for (var i = 0; i < steps.length; i++) { steps[i].classList.remove('active'); }
+  document.getElementById('sc-' + next).classList.add('active');
+  var dots = document.querySelectorAll('.dot');
+  for (var j = 0; j < dots.length; j++) {
+    if (j < next) { dots[j].className = 'dot done'; }
+    else if (j === next) { dots[j].className = 'dot cur ' + scDotColors[next]; }
+    else { dots[j].className = 'dot'; }
+  }
+  var s = scenarios[next];
+  document.getElementById('scHead').className = 'sc-head ' + s.hClass;
+  document.getElementById('scTitle').textContent = s.hTitle;
+  document.getElementById('scSub').textContent = s.hSub;
+  var stepIds = ['sp0', 'sp1', 'sp2', 'sp3'];
+  for (var k = 0; k < stepIds.length; k++) {
+    var el = document.getElementById(stepIds[k]);
+    if (k < next) { el.className = 'sc-prog-step done'; }
+    else if (k === next) { el.className = 'sc-prog-step ' + scProgClasses[next]; }
+    else { el.className = 'sc-prog-step'; }
+  }
+  document.getElementById('scBody').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+var qs = [
+  {
+    q: "A ransomware attack encrypts all files on a hospital's server, making them inaccessible to doctors. Which CIA pillar does this primarily violate?",
+    opts: [
+      'Confidentiality only - the attackers can now read the files',
+      'Availability only - doctors cannot access the files',
+      'Both Integrity and Availability - files are modified and inaccessible',
+      'Confidentiality and Integrity - attackers accessed and changed the data'
+    ],
+    ans: 1,
+    exp: 'Ransomware encrypts files, making them inaccessible - this is an Availability violation. Attackers typically cannot read the encrypted data, so Confidentiality is not violated. Integrity may be technically affected, but the immediate and primary impact is loss of Availability.'
+  },
+  {
+    q: 'What is the key difference between authentication and non-repudiation?',
+    opts: [
+      'Authentication uses passwords; non-repudiation uses biometrics',
+      'Authentication proves who you ARE right now; non-repudiation proves what a specific party DID in the past',
+      'Non-repudiation is a stronger form of authentication',
+      'Authentication is for humans; non-repudiation is for systems'
+    ],
+    ans: 1,
+    exp: 'Authentication answers: "Is this person who they claim to be right now?" Non-repudiation answers: "Can this party deny having performed this specific action?" A digital signature provides non-repudiation because only the private key holder could have produced it.'
+  },
+  {
+    q: 'MedCore passes its annual HIPAA audit in March. In April it suffers a major data breach. What does this demonstrate?',
+    opts: [
+      'The auditor made errors during the March assessment',
+      'HIPAA is not an effective regulation and should be replaced',
+      'Compliance is a point-in-time snapshot - it does not guarantee ongoing security',
+      'The breach must have been caused by a zero-day attack, which compliance cannot prevent'
+    ],
+    ans: 2,
+    exp: 'Compliance is a snapshot assessment against defined criteria at a point in time. Security is an ongoing process of risk management. A compliant organization can still be breached if new vulnerabilities emerge or threats evolve after the audit.'
+  },
+  {
+    q: 'A company wants to demonstrate its security posture to European enterprise clients. Which approach carries the most credibility?',
+    opts: [
+      'A detailed internal security policy document signed by the CEO',
+      'An ISO 27001 certificate from an accredited certification body',
+      'A written self-assessment against the NIST Cybersecurity Framework',
+      'A penetration testing report from the previous year'
+    ],
+    ans: 1,
+    exp: 'ISO 27001 certification is issued by an independent accredited certification body after a rigorous audit and cannot be self-declared. European enterprise procurement teams specifically request it. The other options carry no independent third-party verification.'
+  },
+  {
+    q: 'Which of the following is a mandatory regulation rather than a voluntary framework?',
+    opts: ['ISO/IEC 27001', 'NIST Cybersecurity Framework', 'SOC 2', 'GDPR'],
+    ans: 3,
+    exp: 'GDPR is EU law - mandatory for any organization processing personal data of EU residents, with fines up to \u20ac20 million or 4% of global annual turnover. ISO 27001, NIST CSF, and SOC 2 are voluntary, though widely expected by clients.'
+  }
+];
+
+var qC = 0, qS = 0, qA = new Array(qs.length).fill(null);
+
+function buildQuiz() {
+  var html = '';
+  qs.forEach(function (q, i) {
+    html += '<div class="quiz-card' + (i === 0 ? ' shown' : '') + '" id="qc-' + i + '">';
+    html += '<div class="q-num">Question ' + (i + 1) + ' of ' + qs.length + '</div>';
+    html += '<div class="q-text">' + q.q + '</div>';
+    html += '<div class="q-opts">';
+    q.opts.forEach(function (o, oi) {
+      html += '<button class="q-opt" onclick="ansQ(' + i + ',' + oi + ')">' + o + '</button>';
+    });
+    html += '</div>';
+    html += '<div class="q-exp" id="qe-' + i + '">' + q.exp + '</div>';
+    html += '</div>';
+  });
+  document.getElementById('quizCards').innerHTML = html;
+}
+function ansQ(qi, oi) {
+  if (qA[qi] !== null) return;
+  qA[qi] = oi;
+  if (oi === qs[qi].ans) qS++;
+  var opts = document.querySelectorAll('#qc-' + qi + ' .q-opt');
+  for (var i = 0; i < opts.length; i++) {
+    opts[i].classList.add('locked');
+    if (i === qs[qi].ans) opts[i].classList.add('correct');
+    else if (i === oi) opts[i].classList.add('wrong');
+  }
+  document.getElementById('qe-' + qi).classList.add('shown');
+  var nb = document.getElementById('nextBtn');
+  nb.disabled = false;
+  if (qi === qs.length - 1) nb.textContent = 'See results \u2192';
+}
+function nextQ() {
+  if (qC < qs.length - 1) {
+    var cards = document.querySelectorAll('.quiz-card');
+    for (var i = 0; i < cards.length; i++) { cards[i].classList.remove('shown'); }
+    qC++;
+    document.getElementById('qc-' + qC).classList.add('shown');
+    document.getElementById('quizCounter').textContent = 'Question ' + (qC + 1) + ' of ' + qs.length;
+    document.getElementById('nextBtn').disabled = true;
+    document.getElementById('nextBtn').textContent = (qC === qs.length - 1) ? 'See results \u2192' : 'Next question \u2192';
+  } else {
+    showResult();
+  }
+}
+function showResult() {
+  document.getElementById('quizFooter').style.display = 'none';
+  var cards = document.querySelectorAll('.quiz-card');
+  for (var i = 0; i < cards.length; i++) { cards[i].classList.remove('shown'); }
+  var r = document.getElementById('quizResult');
+  r.classList.add('shown');
+  var pct = Math.round((qS / qs.length) * 100);
+  var big = document.getElementById('bigScore');
+  big.textContent = qS + ' / ' + qs.length;
+  big.className = 'big-score ' + (pct >= 80 ? 'great' : pct >= 60 ? 'mid' : 'low');
+  document.getElementById('resultMsg').textContent =
+    pct === 100 ? 'Perfect! You have a clear grasp of all four security principles.' :
+    pct >= 80 ? 'Great work. You understand the key distinctions well.' :
+    pct >= 60 ? 'Good start. Review the CIA Triad and Compliance sections for the areas you found tricky.' :
+    'Revisit the tutorial - the CIA triangle and scenario sections are especially helpful.';
+}
+function resetQuiz() {
+  qC = 0; qS = 0; qA = new Array(qs.length).fill(null);
+  document.getElementById('quizFooter').style.display = 'flex';
+  document.getElementById('quizResult').classList.remove('shown');
+  document.getElementById('nextBtn').disabled = true;
+  document.getElementById('nextBtn').textContent = 'Next question \u2192';
+  document.getElementById('quizCounter').textContent = 'Question 1 of 5';
+  buildQuiz();
+}
+
+initDnd();
+buildScenario();
+buildQuiz();
+</script>
+</body>
+</html>
