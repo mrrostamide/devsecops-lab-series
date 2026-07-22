@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Map the Breach — MITRE ATT&CK Reinforcement Lab</title>
+<style>
+  :root{
+    --ink:#1c2a33;
+    --paper:#f7f4ec;
+    --paper-2:#ffffff;
+    --rule:#d8cfba;
+    --brand:#0f5d52;
+    --brand-2:#c96a2e;
+    --brand-2-tint:#fbe9dc;
+    --brand-tint:#e2efe9;
+    --highlight:#fff1b8;
+    --shadow: 4px 4px 0 rgba(28,42,51,0.12);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% 8%, rgba(15,93,82,0.06), transparent 40%),
+      radial-gradient(circle at 85% 92%, rgba(201,106,46,0.06), transparent 40%),
+      var(--paper);
+    color:var(--ink);
+    font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+    line-height:1.55;
+    padding: 32px 16px 80px;
+  }
+
+  .wrap{max-width:880px; margin:0 auto;}
+
+  mark{
+    background:var(--highlight);
+    color:inherit;
+    padding:0 3px;
+    border-radius:2px;
+  }
+
+  header.masthead{
+    border:2px solid var(--ink);
+    background:var(--paper-2);
+    box-shadow: var(--shadow);
+    padding: 28px 32px;
+    margin-bottom: 28px;
+    position:relative;
+  }
+  header.masthead h1{
+    margin:0 0 8px;
+    font-size: 34px;
+    letter-spacing: 0.5px;
+  }
+  header.masthead p.sub{
+    margin:0;
+    color:#54636b;
+    font-size:15px;
+    font-style:italic;
+  }
+
+  /* ===== Quick Reference ===== */
+  .quick-ref{
+    border:2px solid var(--brand);
+    background:var(--brand-tint);
+    border-radius:6px;
+    margin-bottom:20px;
+    padding:0;
+  }
+  .quick-ref summary{
+    cursor:pointer;
+    padding:14px 20px;
+    font-family:'Courier New', monospace;
+    font-weight:bold;
+    font-size:13.5px;
+    letter-spacing:0.5px;
+    color:var(--brand);
+    list-style:none;
+  }
+  .quick-ref summary::-webkit-details-marker{ display:none; }
+  .quick-ref summary::before{ content:"▸ "; }
+  .quick-ref[open] summary::before{ content:"▾ "; }
+  .quick-ref-body{
+    padding: 4px 24px 20px;
+    border-top:1px solid rgba(15,93,82,0.25);
+  }
+  .qr-link{ font-size:14px; margin: 14px 0 18px; }
+  .qr-link a{ color:var(--brand-2); font-weight:bold; }
+  .tactic-glossary{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 24px;
+    margin:0 0 14px;
+  }
+  .tactic-glossary dt{
+    font-family:'Courier New', monospace;
+    font-weight:bold;
+    font-size:12.5px;
+    color:var(--ink);
+    margin-top:8px;
+  }
+  .tactic-glossary dd{
+    margin:2px 0 0;
+    font-size:13.5px;
+    color:#3f4d54;
+  }
+  .qr-note{
+    font-size:12.5px;
+    font-style:italic;
+    color:#54636b;
+    border-top:1px dashed rgba(15,93,82,0.3);
+    padding-top:10px;
+    margin:0 0 14px;
+  }
+  .qr-note:last-child{ margin-bottom:0; }
+  .qr-sub{
+    font-family:'Courier New', monospace;
+    font-size:12.5px;
+    letter-spacing:0.5px;
+    color:var(--brand);
+    font-weight:bold;
+    margin:0 0 10px;
+  }
+  .matrix-scroll{
+    overflow-x:auto;
+    margin-bottom:14px;
+    border:1px solid var(--brand);
+    border-radius:4px;
+  }
+  table.mini-matrix{
+    border-collapse:collapse;
+    width:100%;
+    min-width:980px;
+    font-size:12px;
+  }
+  table.mini-matrix th{
+    background:var(--brand);
+    color:#fff;
+    font-family:'Courier New', monospace;
+    font-weight:bold;
+    letter-spacing:0.3px;
+    padding:8px 10px;
+    text-align:left;
+    white-space:nowrap;
+  }
+  table.mini-matrix td{
+    background:#fffef9;
+    padding:9px 10px;
+    border-top:1px solid var(--rule);
+    color:#3f4d54;
+    white-space:nowrap;
+  }
+  .matrix-task-intro{ font-size:14px; margin:0 0 16px; }
+  table.build-matrix th{ background:var(--brand-2); }
+  table.build-matrix td{ padding:8px; white-space:normal; }
+  .matrix-cell{
+    width:100%;
+    min-width:140px;
+    font-family: Georgia, serif;
+    font-size:13.5px;
+    padding:8px 10px;
+    border:1.5px dashed #b8ab8d;
+    border-radius:4px;
+    background:#fffef9;
+  }
+  .matrix-cell:focus{ outline:2px solid var(--brand-2); border-style:solid; }
+  @media (max-width: 600px){
+    .tactic-glossary{ grid-template-columns: 1fr; }
+  }
+
+  /* ===== Tabs ===== */
+  .tabs input[type="radio"]{ position:absolute; opacity:0; pointer-events:none; }
+
+  .tab-labels{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    border-bottom:2px solid var(--ink);
+    margin-bottom:0;
+  }
+  .tab-labels label{
+    display:inline-block;
+    padding:12px 20px;
+    font-family:'Courier New', monospace;
+    font-weight:bold;
+    font-size:13.5px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    background:var(--rule);
+    color:#6b6250;
+    border:2px solid var(--ink);
+    border-bottom:none;
+    border-radius:6px 6px 0 0;
+    cursor:pointer;
+    transform:translateY(4px);
+    transition:transform .15s ease, background .15s ease, color .15s ease;
+  }
+  .tab-labels label:hover{ transform:translateY(1px); }
+
+  #tab1:checked ~ .tab-labels label[for="tab1"],
+  #tab2:checked ~ .tab-labels label[for="tab2"]{
+    background:var(--paper-2);
+    color:var(--ink);
+    transform:translateY(0);
+    border-bottom:2px solid var(--paper-2);
+  }
+
+  .tab-panels{
+    border:2px solid var(--ink);
+    border-top:none;
+    background:var(--paper-2);
+    padding:36px 32px 24px;
+  }
+  .panel{ display:none; animation: fade .25s ease; }
+  @keyframes fade{ from{opacity:0;} to{opacity:1;} }
+
+  #tab1:checked ~ .tab-panels #panel1,
+  #tab2:checked ~ .tab-panels #panel2{ display:block; }
+
+  /* ===== Scenario context box ===== */
+  .context-box{
+    background: var(--brand-tint);
+    border:2px solid var(--brand);
+    border-radius:4px;
+    padding:22px 26px;
+    margin-bottom:34px;
+    position:relative;
+  }
+  .context-box .tag{
+    font-family:'Courier New', monospace;
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--brand);
+    font-weight:bold;
+    display:block;
+    margin-bottom:8px;
+  }
+  .context-box h2{
+    margin:0 0 12px;
+    font-size:24px;
+    color:var(--brand);
+  }
+  .context-box p{ margin:0 0 10px; }
+  .context-box p:last-child{ margin-bottom:0; }
+
+  .timeline{
+    list-style:none;
+    margin: 0 0 34px;
+    padding:0;
+    border-left:3px solid var(--brand-2);
+  }
+  .timeline li{
+    position:relative;
+    padding:6px 0 6px 26px;
+    margin-bottom:2px;
+    font-size:15px;
+  }
+  .timeline li::before{
+    content:"";
+    position:absolute;
+    left:-8px;
+    top:14px;
+    width:13px;
+    height:13px;
+    border-radius:50%;
+    background:var(--brand-2);
+    border:2px solid var(--paper-2);
+  }
+  .timeline li .ts{
+    font-family:'Courier New', monospace;
+    font-weight:bold;
+    color:var(--brand-2);
+    margin-right:8px;
+  }
+
+  /* ===== Section headers ===== */
+  .section-label{
+    font-family:'Courier New', monospace;
+    font-size:12px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:#fff;
+    background:var(--ink);
+    display:inline-block;
+    padding:5px 12px;
+    border-radius:3px;
+    margin: 8px 0 18px;
+  }
+
+  /* ===== Task cards / MCQ ===== */
+  .task-card{
+    border:1px solid var(--rule);
+    border-left:5px solid var(--ink);
+    background: #fffdf8;
+    padding:20px 24px;
+    margin-bottom:30px;
+    border-radius:2px;
+  }
+  .task-card .q{
+    font-weight:bold;
+    margin:0 0 14px;
+    font-size:16px;
+  }
+  .task-card .q .qnum{
+    display:inline-block;
+    background:var(--ink);
+    color:#fff;
+    font-family:'Courier New', monospace;
+    font-size:12px;
+    padding:2px 8px;
+    border-radius:3px;
+    margin-right:8px;
+    vertical-align:middle;
+  }
+
+  fieldset{ border:none; margin:0; padding:0; }
+
+  .opt{ display:block; margin-bottom:9px; }
+  .opt input[type="radio"]{ position:absolute; opacity:0; width:1px; height:1px; }
+  .opt label{
+    display:block;
+    padding:10px 14px;
+    border:1.5px solid var(--rule);
+    border-radius:5px;
+    cursor:pointer;
+    background:var(--paper-2);
+    transition: background .15s ease, border-color .15s ease;
+    font-size:14.5px;
+  }
+  .opt label:hover{ border-color:var(--brand); }
+  .opt input:checked + label{
+    background:var(--brand-tint);
+    border-color:var(--brand);
+    font-weight:bold;
+  }
+
+  .justify-label{
+    display:block;
+    font-family:'Courier New', monospace;
+    font-size:12px;
+    letter-spacing:0.5px;
+    color:#6b6250;
+    margin:14px 0 6px;
+  }
+  .justify-box{
+    width:100%;
+    font-family: Georgia, serif;
+    font-size:14px;
+    padding:10px 12px;
+    border:1.5px dashed #b8ab8d;
+    border-radius:5px;
+    resize:vertical;
+    background:#fffef9;
+    min-height:52px;
+  }
+  .justify-box:focus{ outline:2px solid var(--brand); border-style:solid; }
+
+  .status-flag{
+    display:inline-block;
+    font-family:'Courier New', monospace;
+    font-size:11.5px;
+    letter-spacing:1px;
+    padding:3px 10px;
+    border-radius:3px;
+    background:var(--rule);
+    color:#6b6250;
+    margin-bottom:14px;
+  }
+  fieldset:valid .status-flag{ background:#dff2df; color:#2f8f3e; }
+  fieldset:valid .status-flag::before{ content:"✓ "; }
+  fieldset:invalid .status-flag::before{ content:"○ "; }
+  fieldset:valid .status-flag::after{ content:" answered + justified"; }
+  fieldset:invalid .status-flag::after{ content:" not yet complete"; }
+
+  /* Open-ended prompts */
+  .open-ended{
+    background: var(--brand-2-tint);
+    border:1.5px dashed var(--brand-2);
+    border-radius:4px;
+    padding:18px 22px;
+    margin-bottom:30px;
+  }
+  .open-ended .section-label{ background:var(--brand-2); }
+  .open-ended ol{ margin:0; padding-left:20px; }
+  .open-ended li{ margin-bottom:16px; }
+  .open-ended li:last-child{ margin-bottom:0; }
+  .write-box{
+    width:100%;
+    font-family: Georgia, serif;
+    font-size:14px;
+    padding:12px 14px;
+    margin-top:8px;
+    border:1px dashed #b8ab8d;
+    border-radius:4px;
+    background:#fffef9;
+    min-height:80px;
+    resize:vertical;
+  }
+  .write-box:focus{ outline:2px solid var(--brand-2); border-style:solid; }
+
+  .back-top{
+    display:inline-block;
+    margin-top:10px;
+    font-family:'Courier New', monospace;
+    font-size:12.5px;
+    color:var(--brand);
+    text-decoration:none;
+    border-bottom:1px dotted var(--brand);
+  }
+  .back-top:hover{ color:var(--brand-2); border-color:var(--brand-2); }
+
+  footer{
+    text-align:center;
+    margin-top:36px;
+    font-family:'Courier New', monospace;
+    font-size:12px;
+    color:#9c927a;
+    letter-spacing:1px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap tabs">
+
+  <input type="radio" name="tabset" id="tab1" checked>
+  <input type="radio" name="tabset" id="tab2">
+
+  <header class="masthead" id="top">
+    <h1>Map the Breach</h1>
+    <p class="sub">A MITRE ATT&amp;CK Reinforcement Lab — Tactic and Technique Recognition in Practice</p>
+  </header>
+
+  <details class="quick-ref">
+    <summary>📖 Quick Reference — ATT&amp;CK Tactics (click to expand — stays available on both scenarios)</summary>
+    <div class="quick-ref-body">
+      <p class="qr-link">Full framework: <a href="https://attack.mitre.org" target="_blank" rel="noopener">attack.mitre.org</a> — Tactics run across the top of the matrix (the attacker's <em>goal</em> at each stage); Techniques and Sub-techniques are listed underneath each Tactic (the specific <em>method</em> used to achieve it).</p>
+      <dl class="tactic-glossary">
+        <dt>Reconnaissance</dt><dd>Gathering information to plan an attack.</dd>
+        <dt>Resource Development</dt><dd>Building or acquiring infrastructure, accounts, or tools to use later.</dd>
+        <dt>Initial Access</dt><dd>Getting a first foothold inside the target environment.</dd>
+        <dt>Execution</dt><dd>Running attacker-controlled code on a system.</dd>
+        <dt>Persistence</dt><dd>Keeping access alive across reboots, logoffs, or other interruptions.</dd>
+        <dt>Privilege Escalation</dt><dd>Gaining higher-level permissions than initially obtained.</dd>
+        <dt>Defense Evasion</dt><dd>Avoiding detection by security tools and defenders.</dd>
+        <dt>Credential Access</dt><dd>Stealing account names, passwords, or keys.</dd>
+        <dt>Discovery</dt><dd>Learning about the systems, accounts, and network layout.</dd>
+        <dt>Lateral Movement</dt><dd>Moving from one system to another within the network.</dd>
+        <dt>Collection</dt><dd>Gathering the data the attacker is ultimately after.</dd>
+        <dt>Command and Control</dt><dd>Communicating with and directing compromised systems.</dd>
+        <dt>Exfiltration</dt><dd>Getting stolen data out of the network.</dd>
+        <dt>Impact</dt><dd>Manipulating, interrupting, or destroying systems or data.</dd>
+      </dl>
+
+      <p class="qr-note">These definitions describe the <em>category</em> only — matching a specific event to a Tactic or Technique still takes reasoning about what the attacker was doing at that moment.</p>
+
+      <p class="qr-sub">The Matrix, visually — Tactics as columns, one example Technique per column:</p>
+      <div class="matrix-scroll">
+        <table class="mini-matrix">
+          <tr>
+            <th>Recon</th><th>Resource Dev</th><th>Initial Access</th><th>Execution</th><th>Persistence</th><th>Priv. Escalation</th><th>Defense Evasion</th><th>Credential Access</th><th>Discovery</th><th>Lateral Movement</th><th>Collection</th><th>C2</th><th>Exfiltration</th><th>Impact</th>
+          </tr>
+          <tr>
+            <td>Active Scanning</td><td>Acquiring Infrastructure</td><td>Phishing</td><td>Scripting Interpreter Abuse</td><td>Scheduled Task</td><td>Exploiting a Vulnerability</td><td>Disabling Security Tools</td><td>OS Credential Dumping</td><td>Account Discovery</td><td>Remote Desktop Protocol</td><td>Data Staging</td><td>Remote Access Software</td><td>Exfiltration Over Web Service</td><td>Resource Hijacking</td>
+          </tr>
+        </table>
+      </div>
+      <p class="qr-note">Real intrusions rarely use every column — an attack "moves" left to right through only the tactics it needs, which is exactly what you'll trace in each scenario below.</p>
+    </div>
+  </details>
+
+  <div class="tab-labels">
+    <label for="tab1">Scenario 1</label>
+    <label for="tab2">Scenario 2</label>
+  </div>
+
+  <div class="tab-panels">
+
+    <!-- ================= SCENARIO 1 ================= -->
+    <div class="panel" id="panel1">
+
+      <div class="context-box">
+        <span class="tag">Scenario Brief</span>
+        <h2>The Contractor's Laptop</h2>
+        <p>A mid-sized logistics firm's SOC receives an alert three days after a routine vendor onboarding.
+        A contractor's laptop, freshly issued and connected to the corporate VPN, begins exhibiting <mark>unusual
+        behavior</mark>. The following is pieced together from EDR telemetry, VPN logs, and email gateway records.</p>
+      </div>
+
+      <ol class="timeline">
+        <li><span class="ts">09:14</span>Contractor receives an email titled "Updated Vendor Compliance Form" with an attached Excel file containing a <mark>macro</mark>. The macro is <strong>enabled by the user</strong>.</li>
+        <li><span class="ts">09:16</span>A <strong>PowerShell</strong> process spawns from Excel and <mark>downloads a second-stage payload</mark> from a remote IP.</li>
+        <li><span class="ts">09:20</span>A new <mark>scheduled task</mark> named <code>WinUpdateCheck</code> is created, set to run the payload at <strong>every system startup</strong>.</li>
+        <li><span class="ts">11:45</span>The compromised host <mark>queries Active Directory for domain admin accounts</mark> using built-in <code>net</code> commands.</li>
+        <li><span class="ts">14:02</span>An <strong>RDP session</strong> is initiated from the contractor's laptop to a finance department file server using <mark>credentials harvested earlier that day</mark>.</li>
+        <li><span class="ts">16:30</span>Roughly 2GB of files from a "Payroll" share are <mark>compressed into a password-protected archive</mark> and staged in a temp directory.</li>
+        <li><span class="ts">17:10</span>The archive is <mark>uploaded via HTTPS POST</mark> to a cloud storage domain <strong>not on the corporate allow-list</strong>.</li>
+      </ol>
+
+      <span class="section-label">Part 1 — Tactic Matching</span>
+
+      <div class="task-card">
+        <fieldset>
+          <p class="q"><span class="qnum">Q1</span>Event 1 — the macro is opened and enabled. Which Tactic does this represent?</p>
+          <span class="status-flag"></span>
+          <div class="opt"><input type="radio" name="s1q1" id="s1q1a" required><label for="s1q1a">Execution</label></div>
+          <div class="opt"><input type="radio" name="s1q1" id="s1q1b"><label for="s1q1b">Persistence</label></div>
+          <div class="opt"><input type="radio" name="s1q1" id="s1q1c"><label for="s1q1c">Collection</label></div>
+          <label class="justify-label">Why this Tactic? (one sentence)</label>
+          <textarea class="justify-box" required minlength="15" placeholder="Explain your reasoning..."></textarea>
+        </fieldset>
+      </div>
+
+      <div class="task-card">
+        <fieldset>
+          <p class="q"><span class="qnum">Q2</span>Event 2 — PowerShell downloads a payload. Which Tactic fits best?</p>
+          <span class="status-flag"></span>
+          <div class="opt"><input type="radio" name="s1q2" id="s1q2a" required><label for="s1q2a">Discovery</label></div>
+          <div class="opt"><input type="radio" name="s1q2" id="s1q2b"><label for="s1q2b">Execution</label></div>
+          <div class="opt"><input type="radio" name="s1q2" id="s1q2c"><label for="s1q2c">Exfiltration</label></div>
+          <label class="justify-label">Why this Tactic?</label>
+          <textarea class="justify-box" required minlength="15" placeholder="Explain your reasoning..."></textarea>
+        </fieldset>
+      </div>
+
+      <div class="task-card">
+        <fieldset>
+          <p class="q"><span class="qnum">Q3</span>Event 3 — a scheduled task is created to survive reboots.</p>
+          <span class="status-flag"></span>
+          <div class="opt"><input type="radio" name="s1q3" id="s1q3a" required><label for="s1q3a">Privilege Escalation</label></div>
+          <div class="opt"><input type="radio" name="s1q3" id="s1q3b"><label for="s1q3b">Persistence</label></div>
+          <div class="opt"><input type="radio" name="s1q3" id="s1q3c"><label for="s1q3c">Initial Access</label></div>
+          <label class="justify-label">Why this Tactic?</label>
+          <textarea class="justify-box" required minlength="15" placeholder="Explain your reasoning..."></textarea>
+        </fieldset>
+      </div>
+
+      <div class="task-card">
+        <fieldset>
+          <p class="q"><span class="qnum">Q4</span>Event 4 — enumerating domain admin accounts.</p>
+          <span class="status-flag"></span>
+          <div class="opt"><input type="radio" name="s1q4" id="s1q4a" required><label for="s1q4a">Discovery</label></div>
+          <div class="opt"><input type="radio" name="s1q4" id="s1q4b"><label for="s1q4b">Lateral Movement</label></div>
+          <div class="opt"><input type="radio" name="s1q4" id="s1q4c"><label for="s1q4c">Collection</label></div>
+          <label class="justify-label">Why this Tactic?</label>
+          <textarea class="justify-box" required minlength="15" placeholder="Explain your reasoning..."></textarea>
+        </fieldset>
+      </div>
+
+      <div class="task-card">
+        <fieldset>
+          <p class="q"><span class="qnum">Q5</span>Event 5 — RDP session into the finance file server.</p>
+          <span class="status-flag"></span>
+          <div class="opt"><input type="radio" name="s1q5" id="s1q5a" required><label for="s1q5a">Lateral Movement</label></div>
+          <div class="opt"><input type="radio" name="s1q5" id="s1q5b"><label for="s1q5b">Command and Control</label></div>
+          <div class="opt"><input type="radio" name="s1q5" id="s1q5c"><label for="s1q5c">Persistence</label></div>
+          <label class="justify-label">Why this Tactic?</label>
+          <textarea class="justify-box" required minlength="15" placeholder="Explain your reasoning..."></textarea>
+        </fieldset>
+      </div>
+
+      <div class="task-card">
+        <fieldset>
+          <p class="q"><span class="qnum">Q6</span>Event 6 — files compressed into a password-protected archive.</p>
+          <span class="status-flag"></span>
+          <div class="opt"><input type="radio" name="s1q6" id="s1q6a" required><label for="s1q6a">Exfiltration</label></div>
+          <div class="opt"><input type="radio" name="s1q6" id="s1q6b"><label for="s1q6b">Collection</label></div>
+          <div class="opt"><input type="radio" name="s1q6" id="s1q6c"><label for="s1q6c">Impact</label></div>
+          <label class="justify-label">Why this Tactic?</label>
+          <textarea class="justify-box" required minlength="15" placeholder="Explain your reasoning..."></textarea>
+        </fieldset>
+      </div>
+
+      <div class="task-card">
+        <fieldset>
+          <p class="q"><span class="qnum">Q7</span>Event 7 — the archive is uploaded to an external cloud storage domain.</p>
+          <span class="status-flag"></span>
+          <div class="opt"><input type="radio" name="s1q7" id="s1q7a" required><label for="s1q7a">Collection</label></div>
+          <div class="opt"><input type="radio" name="s1q7" id="s1q7b"><label for="s1q7b">Exfiltration</label></div>
+          <div class="opt"><input type="radio" name="s1q7" id="s1q7c"><label for="s1q7c">Command and Control</label></div>
+          <label class="justify-label">Why this Tactic?</label>
+          <textarea class="justify-box" required minlength="15" placeholder="Explain your reasoning..."></textarea>
+        </fieldset>
+      </div>
+
+      <span class="section-label">Part 2 — Technique Matching</span>
+
+      <div class="task-card">
+        <fieldset>
+          <p class="q"><span class="qnum">Q8</span>Which technique best describes the macro being opened and run?</p>
+          <span class="status-flag"></span>
+          <div class="opt"><input type="radio" name="s1q8" id="s1q8a" required><label for="s1q8a">Malicious File Execution by User</label></div>
+          <div class="opt"><input type="radio" name="s1q8" id="s1q8b"><label for="s1q8b">Exploiting a Software Vulnerability</label></div>
+          <div class="opt"><input type="radio" name="s1q8" id="s1q8c"><label for="s1q8c">Password Guessing</label></div>
+          <label class="justify-label">Why this technique?</label>
+          <textarea class="justify-box" required minlength="15" placeholder="Explain your reasoning..."></textarea>
+        </fieldset>
+      </div>
+
+      <div class="task-card">
+        <fieldset>
+          <p class="q"><span class="qnum">Q9</span>Which technique best describes the PowerShell-based download?</p>
+          <span class="status-flag"></span>
+          <div class="opt"><input type="radio" name="s1q9" id="s1q9a" required><label for="s1q9a">Scripting Interpreter Abuse</label></div>
+          <div class="opt"><input type="radio" name="s1q9" id="s1q9b"><label for="s1q9b">Network Sniffing</label></div>
+          <div class="opt"><input type="radio" name="s1q9" id="s1q9c"><label for="s1q9c">Disk Wiping</label></div>
+          <label class="justify-label">Why this technique?</label>
+          <textarea class="justify-box" required minlength="15" placeholder="Explain your reasoning..."></textarea>
+        </fieldset>
+      </div>
+
+      <div class="task-card">
+        <fieldset>
+          <p class="q"><span class="qnum">Q10</span>Which technique best describes the scheduled task creation?</p>
+          <span class="status-flag"></span>
+          <div class="opt"><input type="radio" name="s1q10" id="s1q10a" required><label for="s1q10a">Scheduled Task for Persistence</label></div>
+          <div class="opt"><input type="radio" name="s1q10" id="s1q10b"><label for="s1q10b">Firewall Rule Modification</label></div>
+          <div class="opt"><input type="radio" name="s1q10" id="s1q10c"><label for="s1q10c">Data Encryption</label></div>
+          <label class="justify-label">Why this technique?</label>
+          <textarea class="justify-box" required minlength="15" placeholder="Explain your reasoning..."></textarea>
+        </fieldset>
+      </div>
+
+      <div class="task-card">
+        <fieldset>
+          <p class="q"><span class="qnum">Q11</span>Which technique best describes the Active Directory enumeration?</p>
+          <span class="status-flag"></span>
+          <div class="opt"><input type="radio" name="s1q11" id="s1q11a" required><label for="s1q11a">Discovering Accounts on the Network</label></div>
+          <div class="opt"><input type="radio" name="s1q11" id="s1q11b"><label for="s1q11b">Encrypting Files for Ransom</label></div>
+          <div class="opt"><input type="radio" name="s1q11" id="s1q11c"><label for="s1q11c">Modifying System Logs</label></div>
+          <label class="justify-label">Why this technique?</label>
+          <textarea class="justify-box" required minlength="15" placeholder="Explain your reasoning..."></textarea>
+        </fieldset>
+      </div>
+
+      <div class="task-card">
+        <fieldset>
+          <p class="q"><span class="qnum">Q12</span>Which technique best describes the RDP session to the file server?</p>
+          <span class="status-flag"></span>
+          <div class="opt"><input type="radio" name="s1q12" id="s1q12a" required><label for="s1q12a">Moving Between Systems Using Remote Desktop</label></div>
+          <div class="opt"><input type="radio" name="s1q12" id="s1q12b"><label for="s1q12b">Installing a Backdoor</label></div>
+          <div class="opt"><input type="radio" name="s1q12" id="s1q12c"><label for="s1q12c">Deleting Backups</label></div>
+          <label class="justify-label">Why this technique?</label>
+          <textarea class="justify-box" required minlength="15" placeholder="Explain your reasoning..."></textarea>
+        </fieldset>
+      </div>
+
+      <div class="task-card">
+        <fieldset>
+          <p class="q"><span class="qnum">Q13</span>Which technique best describes archiving the payroll files?</p>
+          <span class="status-flag"></span>
+          <div class="opt"><input type="radio" name="s1q13" id="s1q13a" required><label for="s1q13a">Compressing Data Before Theft</label></div>
+          <div class="opt"><input type="radio" name="s1q13" id="s1q13b"><label for="s1q13b">Destroying Data</label></div>
+          <div class="opt"><input type="radio" name="s1q13" id="s1q13c"><label for="s1q13c">Creating a Decoy File</label></div>
+          <label class="justify-label">Why this technique?</label>
+          <textarea class="justify-box" required minlength="15" placeholder="Explain your reasoning..."></textarea>
+        </fieldset>
+      </div>
+
+      <div class="task-card">
+        <fieldset>
+          <p class="q"><span class="qnum">Q14</span>Which technique best describes the final upload to external cloud storage?</p>
+          <span class="status-flag"></span>
+          <div class="opt"><input type="radio" name="s1q14" id="s1q14a" required><label for="s1q14a">Sending Stolen Data to an Outside Server</label></div>
+          <div class="opt"><input type="radio" name="s1q14" id="s1q14b"><label for="s1q14b">Receiving Commands from an Attacker</label></div>
+          <div class="opt"><input type="radio" name="s1q14" id="s1q14c"><label for="s1q14c">Restoring from Backup</label></div>
+          <label class="justify-label">Why this technique?</label>
+          <textarea class="justify-box" required minlength="15" placeholder="Explain your reasoning..."></textarea>
+        </fieldset>
+      </div>
+
+      <div class="open-ended">
+        <span class="section-label">Open-Ended Reasoning</span>
+        <ol>
+          <li>Put the seven events in order and describe, in your own words, the overall "story" of the attack — what did the attacker want, and how did each step get them closer to it?
+            <textarea class="write-box" placeholder="Write your answer here..."></textarea>
+          </li>
+          <li>Pick the <strong>two</strong> stages of this attack you think were the easiest for the IT team to have caught early. For each one, note what should have looked suspicious and one simple change the company could make to prevent or catch it next time.
+            <textarea class="write-box" placeholder="Write your answer here..."></textarea>
+          </li>
+        </ol>
+      </div>
+
+      <div class="open-ended">
+        <span class="section-label">Build the Matrix</span>
+        <p class="matrix-task-intro">This incident touched six Tactics. Using the Technique you identified for each event in Part 2, fill in the matching cell below so the full attack path reads left to right, the way it would on the real ATT&amp;CK Matrix.</p>
+        <div class="matrix-scroll">
+          <table class="mini-matrix build-matrix">
+            <tr>
+              <th>Execution</th><th>Persistence</th><th>Discovery</th><th>Lateral Movement</th><th>Collection</th><th>Exfiltration</th>
+            </tr>
+            <tr>
+              <td><input type="text" class="matrix-cell" placeholder="Technique..."></td>
+              <td><input type="text" class="matrix-cell" placeholder="Technique..."></td>
+              <td><input type="text" class="matrix-cell" placeholder="Technique..."></td>
+              <td><input type="text" class="matrix-cell" placeholder="Technique..."></td>
+              <td><input type="text" class="matrix-cell" placeholder="Technique..."></td>
+              <td><input type="text" class="matrix-cell" placeholder="Technique..."></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <a class="back-top" href="#top">↑ Back to Top</a>
+    </div>
+
+    <!-- ================= SCENARIO 2 ================= -->
+    <div class="panel" id="panel2">
+
+      <div class="context-box">
+        <span class="tag">Scenario Brief</span>
+        <h2>The Forgotten Key</h2>
+        <p>A junior developer at a startup is working late to finish a feature before a demo. To save time,
+        they <mark>hardcode an AWS access key</mark> directly into a Python script so they can test against the cloud
+        environment, then push the code to the team's GitHub repository — which, without realizing it, is
+        <strong>set to public</strong>. The key is meant only for a low-privilege testing account, but it was
+        <mark>accidentally granted broader permissions</mark> months ago and never fixed.</p>
+      </div>
+
+      <ol class="timeline">
+        <li><span class="ts">22:14</span>Developer commits <code>deploy_test.py</code> containing the AWS access key and secret, and pushes to the <mark>public GitHub repo</mark>.</li>
+        <li><span class="ts">22:19</span>An <strong>automated bot</strong> that continuously scans public GitHub repositories for exposed credentials <mark>finds the key</mark>.</li>
+        <li><span class="ts">22:31</span>The stolen key is used to <mark>log into the AWS account</mark> via the command line from an unfamiliar location.</li>
+        <li><span class="ts">22:40</span>The attacker <strong>lists all S3 buckets and EC2 instances</strong> associated with the account to see what's available.</li>
+        <li><span class="ts">23:02</span>Several large EC2 instances are <mark>launched in a region the company doesn't normally use</mark> — later found to be for <strong>cryptocurrency mining</strong>.</li>
+        <li><span class="ts">09:15 (+1)</span>Finance flags an <mark>unusual cloud billing spike</mark> alert; the team investigates and finds the new instances and the exposed key.</li>
+      </ol>
+
+      <span class="section-label">Part 1 — Tactic Matching</span>
+
+      <div class="task-card">
+        <fieldset>
+          <p class="q"><span class="qnum">Q1</span>The bot finding the exposed key on GitHub represents the attacker's:</p>
+          <span class="status-flag"></span>
+          <div class="opt"><input type="radio" name="s2q1" id="s2q1a" required><label for="s2q1a">Initial Access</label></div>
+          <div class="opt"><input type="radio" name="s2q1" id="s2q1b"><label for="s2q1b">Reconnaissance</label></div>
+          <div class="opt"><input type="radio" name="s2q1" id="s2q1c"><label for="s2q1c">Persistence</label></div>
+          <label class="justify-label">Why this Tactic?</label>
+          <textarea class="justify-box" required minlength="15" placeholder="Explain your reasoning..."></textarea>
+        </fieldset>
+      </div>
+
+      <div class="task-card">
+        <fieldset>
+          <p class="q"><span class="qnum">Q2</span>Logging into AWS using the stolen key is:</p>
+          <span class="status-flag"></span>
+          <div class="opt"><input type="radio" name="s2q2" id="s2q2a" required><label for="s2q2a">Initial Access</label></div>
+          <div class="opt"><input type="radio" name="s2q2" id="s2q2b"><label for="s2q2b">Privilege Escalation</label></div>
+          <div class="opt"><input type="radio" name="s2q2" id="s2q2c"><label for="s2q2c">Exfiltration</label></div>
+          <label class="justify-label">Why this Tactic?</label>
+          <textarea class="justify-box" required minlength="15" placeholder="Explain your reasoning..."></textarea>
+        </fieldset>
+      </div>
+
+      <div class="task-card">
+        <fieldset>
+          <p class="q"><span class="qnum">Q3</span>Listing all S3 buckets and EC2 instances is:</p>
+          <span class="status-flag"></span>
+          <div class="opt"><input type="radio" name="s2q3" id="s2q3a" required><label for="s2q3a">Discovery</label></div>
+          <div class="opt"><input type="radio" name="s2q3" id="s2q3b"><label for="s2q3b">Collection</label></div>
+          <div class="opt"><input type="radio" name="s2q3" id="s2q3c"><label for="s2q3c">Command and Control</label></div>
+          <label class="justify-label">Why this Tactic?</label>
+          <textarea class="justify-box" required minlength="15" placeholder="Explain your reasoning..."></textarea>
+        </fieldset>
+      </div>
+
+      <div class="task-card">
+        <fieldset>
+          <p class="q"><span class="qnum">Q4</span>Launching new EC2 instances for cryptocurrency mining is best classified as:</p>
+          <span class="status-flag"></span>
+          <div class="opt"><input type="radio" name="s2q4" id="s2q4a" required><label for="s2q4a">Impact</label></div>
+          <div class="opt"><input type="radio" name="s2q4" id="s2q4b"><label for="s2q4b">Lateral Movement</label></div>
+          <div class="opt"><input type="radio" name="s2q4" id="s2q4c"><label for="s2q4c">Defense Evasion</label></div>
+          <label class="justify-label">Why this Tactic?</label>
+          <textarea class="justify-box" required minlength="15" placeholder="Explain your reasoning..."></textarea>
+        </fieldset>
+      </div>
+
+      <span class="section-label">Part 2 — Technique Matching</span>
+
+      <div class="task-card">
+        <fieldset>
+          <p class="q"><span class="qnum">Q5</span>Using a real, working AWS key that was never meant to be public is an example of:</p>
+          <span class="status-flag"></span>
+          <div class="opt"><input type="radio" name="s2q5" id="s2q5a" required><label for="s2q5a">Valid Accounts</label></div>
+          <div class="opt"><input type="radio" name="s2q5" id="s2q5b"><label for="s2q5b">Phishing</label></div>
+          <div class="opt"><input type="radio" name="s2q5" id="s2q5c"><label for="s2q5c">Brute Force</label></div>
+          <label class="justify-label">Why this technique?</label>
+          <textarea class="justify-box" required minlength="15" placeholder="Explain your reasoning..."></textarea>
+        </fieldset>
+      </div>
+
+      <div class="task-card">
+        <fieldset>
+          <p class="q"><span class="qnum">Q6</span>A bot that automatically scans public code repositories for secrets is performing:</p>
+          <span class="status-flag"></span>
+          <div class="opt"><input type="radio" name="s2q6" id="s2q6a" required><label for="s2q6a">Active Scanning (Reconnaissance)</label></div>
+          <div class="opt"><input type="radio" name="s2q6" id="s2q6b"><label for="s2q6b">Malware Delivery</label></div>
+          <div class="opt"><input type="radio" name="s2q6" id="s2q6c"><label for="s2q6c">Social Engineering</label></div>
+          <label class="justify-label">Why this technique?</label>
+          <textarea class="justify-box" required minlength="15" placeholder="Explain your reasoning..."></textarea>
+        </fieldset>
+      </div>
+
+      <div class="task-card">
+        <fieldset>
+          <p class="q"><span class="qnum">Q7</span>Spinning up cloud resources to mine cryptocurrency using someone else's account/budget is an example of:</p>
+          <span class="status-flag"></span>
+          <div class="opt"><input type="radio" name="s2q7" id="s2q7a" required><label for="s2q7a">Resource Hijacking</label></div>
+          <div class="opt"><input type="radio" name="s2q7" id="s2q7b"><label for="s2q7b">Data Destruction</label></div>
+          <div class="opt"><input type="radio" name="s2q7" id="s2q7c"><label for="s2q7c">Defacement</label></div>
+          <label class="justify-label">Why this technique?</label>
+          <textarea class="justify-box" required minlength="15" placeholder="Explain your reasoning..."></textarea>
+        </fieldset>
+      </div>
+
+      <div class="open-ended">
+        <span class="section-label">Open-Ended Reasoning</span>
+        <ol>
+          <li>Walk through this incident in your own words: what mistake started the chain of events, and what did the attacker gain at each step?
+            <textarea class="write-box" placeholder="Write your answer here..."></textarea>
+          </li>
+          <li>This attack didn't involve any malware, phishing email, or password guessing — the attacker simply used a key that was left in the open. Why do you think exposed credentials like this are one of the most common ways cloud environments get compromised?
+            <textarea class="write-box" placeholder="Write your answer here..."></textarea>
+          </li>
+          <li>Pick <strong>two</strong> points in this timeline where the incident could have been prevented or caught much earlier. For each one, describe in plain terms what should have been in place (a tool, a habit, a setting) to stop it there.
+            <textarea class="write-box" placeholder="Write your answer here..."></textarea>
+          </li>
+          <li>The key only had "low-privilege testing" permissions in theory, but had broader access in practice. Why does this gap between intended and actual permissions matter, even if a leaked key seems low-risk at first glance?
+            <textarea class="write-box" placeholder="Write your answer here..."></textarea>
+          </li>
+        </ol>
+      </div>
+
+      <div class="open-ended">
+        <span class="section-label">Build the Matrix</span>
+        <p class="matrix-task-intro">This incident touched four Tactics. Using the Technique you identified for each event in Part 2, fill in the matching cell below so the full attack path reads left to right, the way it would on the real ATT&amp;CK Matrix.</p>
+        <div class="matrix-scroll">
+          <table class="mini-matrix build-matrix">
+            <tr>
+              <th>Reconnaissance</th><th>Initial Access</th><th>Discovery</th><th>Impact</th>
+            </tr>
+            <tr>
+              <td><input type="text" class="matrix-cell" placeholder="Technique..."></td>
+              <td><input type="text" class="matrix-cell" placeholder="Technique..."></td>
+              <td><input type="text" class="matrix-cell" placeholder="Technique..."></td>
+              <td><input type="text" class="matrix-cell" placeholder="Technique..."></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <a class="back-top" href="#top">↑ Back to Top</a>
+    </div>
+
+  </div>
+
+  <footer>Prepared by: MR. Rostami</footer>
+
+</div>
+</body>
+</html>
