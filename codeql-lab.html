@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeQL Hands-On Lab</title>
+<style>
+  :root {
+    --bg: #f4f6f9;
+    --card-bg: #ffffff;
+    --accent: #2b6cb0;
+    --accent-dark: #1a4971;
+    --accent-light: #ebf4ff;
+    --text: #1a202c;
+    --text-soft: #4a5568;
+    --border: #d9e2ec;
+    --code-bg: #0f172a;
+    --code-text: #e2e8f0;
+    --correct: #2f855a;
+    --correct-bg: #f0fff4;
+    --incorrect: #c53030;
+    --incorrect-bg: #fff5f5;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  header.site-header {
+    background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+    color: #ffffff;
+    padding: 36px 20px 28px;
+    text-align: center;
+  }
+
+  header.site-header h1 { margin: 0 0 8px; font-size: 1.9em; }
+  header.site-header p { margin: 0 auto; font-size: 1.05em; opacity: 0.92; max-width: 700px; }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 0 20px 60px; }
+
+  .tabs { margin-top: 24px; }
+
+  .tab-nav {
+    display: flex;
+    gap: 8px;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+  }
+
+  .tab-nav label {
+    padding: 12px 20px;
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-soft);
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  input[type="radio"].tab-radio { display: none; }
+
+  #tab1:checked ~ .tab-nav label[for="tab1"],
+  #tab2:checked ~ .tab-nav label[for="tab2"] {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+  }
+
+  .tab-content { display: none; }
+  #tab1:checked ~ .tab-content#content1,
+  #tab2:checked ~ .tab-content#content2 { display: block; }
+
+  .context-box {
+    background: var(--accent-light);
+    border-left: 6px solid var(--accent);
+    border-radius: 8px;
+    padding: 22px 24px;
+    margin-bottom: 30px;
+  }
+
+  .context-box h2 { margin: 0 0 10px; color: var(--accent-dark); font-size: 1.35em; }
+  .context-box p { margin: 0 0 8px; color: var(--text); }
+  .context-box p:last-child { margin-bottom: 0; }
+
+  h3.section-heading {
+    color: var(--accent-dark);
+    margin-top: 34px;
+    margin-bottom: 14px;
+    font-size: 1.15em;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
+  }
+
+  .code-block {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 18px 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.92em;
+    margin-bottom: 24px;
+    white-space: pre;
+  }
+
+  .code-label {
+    font-size: 0.8em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-soft);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .code-comment { color: #94a3b8; }
+
+  .step-box {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+  }
+
+  .step-box .step-tag {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.75em;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    letter-spacing: 0.03em;
+  }
+
+  .snippet-inline {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 14px 16px;
+    border-radius: 8px;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 0.9em;
+    margin-bottom: 14px;
+    white-space: pre;
+  }
+
+  /* --- Sorting practice widget (drag & drop) --- */
+  .sort-widget {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 22px;
+    margin-bottom: 20px;
+  }
+
+  .sort-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .sort-instructions {
+    margin: 0 0 16px;
+    color: var(--text-soft);
+    font-size: 0.95em;
+  }
+
+  ul.sort-list {
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 0;
+    min-height: 10px;
+  }
+
+  ul.sort-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--code-bg);
+    color: var(--code-text);
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 0.9em;
+    padding: 12px 14px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    border: 2px solid transparent;
+    white-space: pre;
+    cursor: grab;
+    transition: border-color 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  ul.sort-list li:active { cursor: grabbing; }
+
+  ul.sort-list li.dragging {
+    opacity: 0.35;
+    transform: scale(0.98);
+  }
+
+  ul.sort-list li.drop-target-above {
+    box-shadow: 0 -3px 0 0 var(--accent);
+  }
+
+  ul.sort-list li.correct-pos { border-color: var(--correct); }
+  ul.sort-list li.incorrect-pos { border-color: var(--incorrect); }
+
+  .drag-handle {
+    flex-shrink: 0;
+    color: #64748b;
+    font-size: 1em;
+    letter-spacing: -2px;
+    user-select: none;
+  }
+
+  .sort-line-text { flex: 1; overflow-x: auto; }
+
+  .sort-buttons { display: flex; gap: 6px; flex-shrink: 0; }
+
+  .sort-buttons button {
+    background: #334155;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    width: 26px;
+    height: 26px;
+    cursor: pointer;
+    font-size: 0.8em;
+  }
+
+  .sort-buttons button:hover { background: var(--accent); }
+
+  .sort-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+  .toolbar-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 18px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95em;
+  }
+
+  .toolbar-btn:hover { background: var(--accent-dark); }
+
+  .toolbar-btn.secondary {
+    background: #ffffff;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+
+  .toolbar-btn.secondary:hover { background: var(--accent-light); }
+
+  .sort-feedback {
+    display: none;
+    margin-top: 14px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 0.92em;
+  }
+
+  .sort-feedback.correct { background: var(--correct-bg); color: var(--correct); border: 1px solid var(--correct); }
+  .sort-feedback.incorrect { background: var(--incorrect-bg); color: var(--incorrect); border: 1px solid var(--incorrect); }
+
+  .sort-progress {
+    font-size: 0.85em;
+    color: var(--text-soft);
+    font-weight: 600;
+  }
+
+  /* --- Task cards (MCQ) --- */
+  .task-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px 24px;
+    margin-bottom: 30px;
+  }
+
+  .task-card .task-title {
+    font-weight: 700;
+    color: var(--accent-dark);
+    margin-bottom: 14px;
+    font-size: 1.05em;
+  }
+
+  .mcq-option {
+    display: block;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    background: #fafcff;
+  }
+
+  .mcq-option:hover { background: var(--accent-light); }
+
+  input[type="radio"].mcq-radio { margin-right: 10px; }
+
+  .feedback {
+    display: none;
+    margin-top: 6px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 0.92em;
+  }
+
+  .feedback.correct { background: var(--correct-bg); color: var(--correct); border: 1px solid var(--correct); }
+  .feedback.incorrect { background: var(--incorrect-bg); color: var(--incorrect); border: 1px solid var(--incorrect); }
+
+  #s1q1a:checked ~ .feedback.fb-s1q1a,
+  #s1q1b:checked ~ .feedback.fb-s1q1b,
+  #s1q1c:checked ~ .feedback.fb-s1q1c,
+  #s1q1d:checked ~ .feedback.fb-s1q1d,
+  #s1q2a:checked ~ .feedback.fb-s1q2a,
+  #s1q2b:checked ~ .feedback.fb-s1q2b,
+  #s1q2c:checked ~ .feedback.fb-s1q2c,
+  #s1q2d:checked ~ .feedback.fb-s1q2d,
+  #s2q1a:checked ~ .feedback.fb-s2q1a,
+  #s2q1b:checked ~ .feedback.fb-s2q1b,
+  #s2q1c:checked ~ .feedback.fb-s2q1c,
+  #s2q1d:checked ~ .feedback.fb-s2q1d,
+  #s2q2a:checked ~ .feedback.fb-s2q2a,
+  #s2q2b:checked ~ .feedback.fb-s2q2b,
+  #s2q2c:checked ~ .feedback.fb-s2q2c,
+  #s2q2d:checked ~ .feedback.fb-s2q2d {
+    display: block;
+  }
+
+  .back-to-top {
+    display: inline-block;
+    margin-top: 10px;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.92em;
+  }
+
+  .back-to-top:hover { text-decoration: underline; }
+
+  footer.site-footer {
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--text-soft);
+    font-size: 0.9em;
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+  }
+
+  @media (max-width: 520px) {
+    ul.sort-list li { font-size: 0.8em; }
+  }
+</style>
+</head>
+<body>
+
+<a id="top"></a>
+
+<header class="site-header">
+  <h1>CodeQL Hands-On Lab</h1>
+  <p>Learn how CodeQL scans source code for dangerous patterns — by building real queries yourself.</p>
+</header>
+
+<div class="container">
+
+  <div class="tabs">
+    <input type="radio" name="tabgroup" id="tab1" class="tab-radio" checked>
+    <input type="radio" name="tabgroup" id="tab2" class="tab-radio">
+
+    <div class="tab-nav">
+      <label for="tab1">Scenario 1: strcpy</label>
+      <label for="tab2">Scenario 2: gets</label>
+    </div>
+
+    <!-- ============ SCENARIO 1 ============ -->
+    <div class="tab-content" id="content1">
+
+      <div class="context-box">
+        <h2>Scenario 1 — Spotting an Unsafe C Function</h2>
+        <p>Some C functions, like <code>strcpy</code>, copy data without checking whether it actually fits in the destination. If the input is larger than the buffer, it overflows — this can crash a program or, in the worst case, let an attacker run their own code.</p>
+        <p>CodeQL can scan an entire codebase and automatically flag every single call to a risky function like this, instead of a human having to read every line by hand.</p>
+      </div>
+
+      <h3 class="section-heading">The Vulnerable Code</h3>
+      <div class="code-label">vulnerable.c</div>
+      <div class="code-block">#include &lt;string.h&gt;
+
+void copy_input(char *user_input) {
+    char buffer[64];
+    strcpy(buffer, user_input);  <span class="code-comment">// no size check here</span>
+}</div>
+
+      <h3 class="section-heading">Building the Query, Step by Step</h3>
+
+      <div class="step-box">
+        <span class="step-tag">STEP 1 — Plain English</span>
+        <p style="margin:0;">"Look at every function call in the program. If the function being called is named <code>strcpy</code>, flag it."</p>
+      </div>
+
+      <div class="step-box">
+        <span class="step-tag">STEP 2 — Pseudocode</span>
+        <div class="snippet-inline">FOR EACH function_call IN program:
+    IF function_call.name == "strcpy":
+        REPORT function_call AS "unsafe"</div>
+      </div>
+
+      <div class="sort-widget">
+        <div class="sort-header-row">
+          <span class="step-tag">STEP 3 — Build the Real Query</span>
+          <span class="sort-progress" id="sort1-progress">0 / 4 in place</span>
+        </div>
+        <p class="sort-instructions"><strong>Drag the lines</strong> (using the <span class="drag-handle" style="color:var(--text-soft);">⠿</span> handle) into the correct order, or use the ▲ / ▼ buttons. The border turns green the instant a line is in its correct spot.</p>
+
+        <ul class="sort-list" id="sort1-list">
+          <li draggable="true" data-order="3"><span class="drag-handle">⠿</span><span class="sort-line-text">where call.getTarget().hasName("strcpy")</span><span class="sort-buttons"><button type="button" aria-label="move up" onclick="moveItem(this,-1)">&#9650;</button><button type="button" aria-label="move down" onclick="moveItem(this,1)">&#9660;</button></span></li>
+          <li draggable="true" data-order="1"><span class="drag-handle">⠿</span><span class="sort-line-text">import cpp</span><span class="sort-buttons"><button type="button" aria-label="move up" onclick="moveItem(this,-1)">&#9650;</button><button type="button" aria-label="move down" onclick="moveItem(this,1)">&#9660;</button></span></li>
+          <li draggable="true" data-order="4"><span class="drag-handle">⠿</span><span class="sort-line-text">select call, "Unsafe use of strcpy"</span><span class="sort-buttons"><button type="button" aria-label="move up" onclick="moveItem(this,-1)">&#9650;</button><button type="button" aria-label="move down" onclick="moveItem(this,1)">&#9660;</button></span></li>
+          <li draggable="true" data-order="2"><span class="drag-handle">⠿</span><span class="sort-line-text">from FunctionCall call</span><span class="sort-buttons"><button type="button" aria-label="move up" onclick="moveItem(this,-1)">&#9650;</button><button type="button" aria-label="move down" onclick="moveItem(this,1)">&#9660;</button></span></li>
+        </ul>
+
+        <div class="sort-toolbar">
+          <button type="button" class="toolbar-btn" onclick="checkOrder('sort1-list','sort1-feedback','sort1-progress')">Check My Order</button>
+          <button type="button" class="toolbar-btn secondary" onclick="shuffleList('sort1-list','sort1-feedback','sort1-progress')">Shuffle &amp; Retry</button>
+        </div>
+        <div id="sort1-feedback" class="sort-feedback"></div>
+      </div>
+
+      <h3 class="section-heading">Tasks</h3>
+
+      <div class="task-card">
+        <div class="task-title">Task 1 (Multiple Choice): Why is <code>strcpy</code> dangerous?</div>
+
+        <input type="radio" name="s1q1" id="s1q1a" class="mcq-radio" style="display:none;">
+        <input type="radio" name="s1q1" id="s1q1b" class="mcq-radio" style="display:none;">
+        <input type="radio" name="s1q1" id="s1q1c" class="mcq-radio" style="display:none;">
+        <input type="radio" name="s1q1" id="s1q1d" class="mcq-radio" style="display:none;">
+
+        <label class="mcq-option" for="s1q1a">A) It runs slower than other string functions</label>
+        <label class="mcq-option" for="s1q1b">B) It does not check whether the input fits in the destination buffer</label>
+        <label class="mcq-option" for="s1q1c">C) It only works with numbers, not text</label>
+        <label class="mcq-option" for="s1q1d">D) It requires a special compiler flag to use</label>
+
+        <div class="feedback fb-s1q1a incorrect">Not quite — speed isn't the issue here. Think about what happens if the input is bigger than the buffer.</div>
+        <div class="feedback fb-s1q1b correct">Correct! <code>strcpy</code> copies blindly, with no check on the destination buffer's size — that's what causes overflow.</div>
+        <div class="feedback fb-s1q1c incorrect">Not quite — <code>strcpy</code> is specifically for copying text (strings). Try again.</div>
+        <div class="feedback fb-s1q1d incorrect">Not quite — this isn't about compiler settings. Think about buffer sizes.</div>
+      </div>
+
+      <div class="task-card">
+        <div class="task-title">Task 2 (Multiple Choice): In the query, what does the <code>where</code> line do?</div>
+
+        <input type="radio" name="s1q2" id="s1q2a" class="mcq-radio" style="display:none;">
+        <input type="radio" name="s1q2" id="s1q2b" class="mcq-radio" style="display:none;">
+        <input type="radio" name="s1q2" id="s1q2c" class="mcq-radio" style="display:none;">
+        <input type="radio" name="s1q2" id="s1q2d" class="mcq-radio" style="display:none;">
+
+        <label class="mcq-option" for="s1q2a">A) It imports the C/C++ analysis library</label>
+        <label class="mcq-option" for="s1q2b">B) It prints the final report to the screen</label>
+        <label class="mcq-option" for="s1q2c">C) It filters the function calls down to only the ones named "strcpy"</label>
+        <label class="mcq-option" for="s1q2d">D) It compiles the C program</label>
+
+        <div class="feedback fb-s1q2a incorrect">Not quite — that's the job of the <code>import cpp</code> line, not <code>where</code>.</div>
+        <div class="feedback fb-s1q2b incorrect">Not quite — printing results is the job of the <code>select</code> line.</div>
+        <div class="feedback fb-s1q2c correct">Correct! <code>where</code> is the filter — out of every function call, it keeps only the ones matching the condition (name is "strcpy").</div>
+        <div class="feedback fb-s1q2d incorrect">Not quite — CodeQL doesn't compile the program in this step; it queries an already-built database of the code.</div>
+      </div>
+
+      <a class="back-to-top" href="#top">&#8593; Back to Top</a>
+    </div>
+
+    <!-- ============ SCENARIO 2 ============ -->
+    <div class="tab-content" id="content2">
+
+      <div class="context-box">
+        <h2>Scenario 2 — Another Unsafe Function: <code>gets</code></h2>
+        <p><code>gets</code> reads a line of text from the keyboard into a buffer — but unlike <code>strcpy</code>, it doesn't even take a size argument to (mis)use. It has absolutely no way to know how big the destination buffer is, so it will keep writing for as long as the user keeps typing.</p>
+        <p>This function is so dangerous that it was formally removed from the C language standard in 2011. Let's write a CodeQL query to catch it, using the same pattern from Scenario 1.</p>
+      </div>
+
+      <h3 class="section-heading">The Vulnerable Code</h3>
+      <div class="code-label">vulnerable2.c</div>
+      <div class="code-block">#include &lt;stdio.h&gt;
+
+void read_input(void) {
+    char buffer[64];
+    gets(buffer);  <span class="code-comment">// no size limit at all — always risky</span>
+}</div>
+
+      <h3 class="section-heading">Building the Query, Step by Step</h3>
+
+      <div class="step-box">
+        <span class="step-tag">STEP 1 — Plain English</span>
+        <p style="margin:0;">"Look at every function call in the program. If the function being called is named <code>gets</code>, flag it."</p>
+      </div>
+
+      <div class="step-box">
+        <span class="step-tag">STEP 2 — Pseudocode</span>
+        <div class="snippet-inline">FOR EACH function_call IN program:
+    IF function_call.name == "gets":
+        REPORT function_call AS "unsafe"</div>
+      </div>
+
+      <div class="sort-widget">
+        <div class="sort-header-row">
+          <span class="step-tag">STEP 3 — Build the Real Query</span>
+          <span class="sort-progress" id="sort2-progress">0 / 4 in place</span>
+        </div>
+        <p class="sort-instructions">Same idea as Scenario 1, but this time the query targets <code>gets</code>. <strong>Drag the lines</strong> into order, or use the ▲ / ▼ buttons.</p>
+
+        <ul class="sort-list" id="sort2-list">
+          <li draggable="true" data-order="4"><span class="drag-handle">⠿</span><span class="sort-line-text">select call, "Unsafe use of gets"</span><span class="sort-buttons"><button type="button" aria-label="move up" onclick="moveItem(this,-1)">&#9650;</button><button type="button" aria-label="move down" onclick="moveItem(this,1)">&#9660;</button></span></li>
+          <li draggable="true" data-order="2"><span class="drag-handle">⠿</span><span class="sort-line-text">from FunctionCall call</span><span class="sort-buttons"><button type="button" aria-label="move up" onclick="moveItem(this,-1)">&#9650;</button><button type="button" aria-label="move down" onclick="moveItem(this,1)">&#9660;</button></span></li>
+          <li draggable="true" data-order="1"><span class="drag-handle">⠿</span><span class="sort-line-text">import cpp</span><span class="sort-buttons"><button type="button" aria-label="move up" onclick="moveItem(this,-1)">&#9650;</button><button type="button" aria-label="move down" onclick="moveItem(this,1)">&#9660;</button></span></li>
+          <li draggable="true" data-order="3"><span class="drag-handle">⠿</span><span class="sort-line-text">where call.getTarget().hasName("gets")</span><span class="sort-buttons"><button type="button" aria-label="move up" onclick="moveItem(this,-1)">&#9650;</button><button type="button" aria-label="move down" onclick="moveItem(this,1)">&#9660;</button></span></li>
+        </ul>
+
+        <div class="sort-toolbar">
+          <button type="button" class="toolbar-btn" onclick="checkOrder('sort2-list','sort2-feedback','sort2-progress')">Check My Order</button>
+          <button type="button" class="toolbar-btn secondary" onclick="shuffleList('sort2-list','sort2-feedback','sort2-progress')">Shuffle &amp; Retry</button>
+        </div>
+        <div id="sort2-feedback" class="sort-feedback"></div>
+      </div>
+
+      <h3 class="section-heading">Tasks</h3>
+
+      <div class="task-card">
+        <div class="task-title">Task 1 (Multiple Choice): Why is <code>gets</code> considered even more dangerous than <code>strcpy</code>?</div>
+
+        <input type="radio" name="s2q1" id="s2q1a" class="mcq-radio" style="display:none;">
+        <input type="radio" name="s2q1" id="s2q1b" class="mcq-radio" style="display:none;">
+        <input type="radio" name="s2q1" id="s2q1c" class="mcq-radio" style="display:none;">
+        <input type="radio" name="s2q1" id="s2q1d" class="mcq-radio" style="display:none;">
+
+        <label class="mcq-option" for="s2q1a">A) It only works on Windows</label>
+        <label class="mcq-option" for="s2q1b">B) It has no size parameter at all — there isn't even a limit a programmer could set</label>
+        <label class="mcq-option" for="s2q1c">C) It is slower than other input functions</label>
+        <label class="mcq-option" for="s2q1d">D) It cannot read strings longer than 8 characters</label>
+
+        <div class="feedback fb-s2q1a incorrect">Not quite — <code>gets</code> is standard C and isn't tied to one operating system.</div>
+        <div class="feedback fb-s2q1b correct">Correct! With <code>strcpy</code> a programmer could at least switch to the safer <code>strncpy</code> and set a limit. <code>gets</code> has no size parameter to set at all — it was removed from the C standard in 2011 for this reason.</div>
+        <div class="feedback fb-s2q1c incorrect">Not quite — speed isn't the safety concern here.</div>
+        <div class="feedback fb-s2q1d incorrect">Not quite — <code>gets</code> has no length limit, which is exactly the problem; it will read as many characters as it's given.</div>
+      </div>
+
+      <div class="task-card">
+        <div class="task-title">Task 2 (Multiple Choice): To adapt the Scenario 1 query so it finds <code>gets</code> instead of <code>strcpy</code>, what would you change?</div>
+
+        <input type="radio" name="s2q2" id="s2q2a" class="mcq-radio" style="display:none;">
+        <input type="radio" name="s2q2" id="s2q2b" class="mcq-radio" style="display:none;">
+        <input type="radio" name="s2q2" id="s2q2c" class="mcq-radio" style="display:none;">
+        <input type="radio" name="s2q2" id="s2q2d" class="mcq-radio" style="display:none;">
+
+        <label class="mcq-option" for="s2q2a">A) Change <code>import cpp</code> to <code>import c</code></label>
+        <label class="mcq-option" for="s2q2b">B) Change the text inside <code>hasName(...)</code> from "strcpy" to "gets"</label>
+        <label class="mcq-option" for="s2q2c">C) Change <code>FunctionCall</code> to <code>Call</code></label>
+        <label class="mcq-option" for="s2q2d">D) Nothing — the exact same query already matches both functions</label>
+
+        <div class="feedback fb-s2q2a incorrect">Not quite — <code>import cpp</code> loads the C/C++ analysis library; it doesn't need to change for this.</div>
+        <div class="feedback fb-s2q2b correct">Correct! Only the name inside <code>hasName(...)</code> needs to change. This shows how one small, reusable query pattern can be pointed at many different risky functions.</div>
+        <div class="feedback fb-s2q2c incorrect">Not quite — <code>FunctionCall</code> still correctly represents "a call to a function" for <code>gets</code> too.</div>
+        <div class="feedback fb-s2q2d incorrect">Not quite — the query filters by an exact function name, so it needs to be updated to match <code>gets</code>.</div>
+      </div>
+
+      <a class="back-to-top" href="#top">&#8593; Back to Top</a>
+    </div>
+
+  </div>
+</div>
+
+<footer class="site-footer">
+  Prepared by: MR. Rostami
+</footer>
+
+<script>
+var draggedItem = null;
+
+document.querySelectorAll('.sort-list').forEach(function(list) {
+  list.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    if (!draggedItem) return;
+    var afterElement = getDragAfterElement(list, e.clientY);
+    if (afterElement == null) {
+      list.appendChild(draggedItem);
+    } else {
+      list.insertBefore(draggedItem, afterElement);
+    }
+  });
+
+  list.querySelectorAll('li').forEach(function(li) {
+    li.addEventListener('dragstart', function() {
+      draggedItem = li;
+      setTimeout(function() { li.classList.add('dragging'); }, 0);
+    });
+    li.addEventListener('dragend', function() {
+      li.classList.remove('dragging');
+      draggedItem = null;
+      liveUpdate(list.id);
+    });
+  });
+});
+
+function getDragAfterElement(container, y) {
+  var els = Array.prototype.filter.call(container.querySelectorAll('li:not(.dragging)'), function(el) { return true; });
+  var closest = { offset: Number.NEGATIVE_INFINITY, element: null };
+  els.forEach(function(child) {
+    var box = child.getBoundingClientRect();
+    var offset = y - box.top - box.height / 2;
+    if (offset < 0 && offset > closest.offset) {
+      closest = { offset: offset, element: child };
+    }
+  });
+  return closest.element;
+}
+
+function moveItem(button, direction) {
+  var li = button.closest('li');
+  var list = li.parentElement;
+  if (direction === -1 && li.previousElementSibling) {
+    list.insertBefore(li, li.previousElementSibling);
+  } else if (direction === 1 && li.nextElementSibling) {
+    list.insertBefore(li.nextElementSibling, li);
+  }
+  liveUpdate(list.id);
+}
+
+function liveUpdate(listId) {
+  var progressId = listId.replace('-list', '-progress');
+  var progress = document.getElementById(progressId);
+  if (!progress) return;
+  var list = document.getElementById(listId);
+  var items = Array.prototype.slice.call(list.children);
+  var correctCount = 0;
+  items.forEach(function(li, idx) {
+    li.classList.remove('correct-pos', 'incorrect-pos');
+    if (li.getAttribute('data-order') === String(idx + 1)) {
+      li.classList.add('correct-pos');
+      correctCount++;
+    }
+  });
+  progress.textContent = correctCount + ' / ' + items.length + ' in place';
+}
+
+function checkOrder(listId, feedbackId, progressId) {
+  var list = document.getElementById(listId);
+  var items = Array.prototype.slice.call(list.children);
+  var feedback = document.getElementById(feedbackId);
+  var progress = document.getElementById(progressId);
+  var allCorrect = true;
+  var correctCount = 0;
+
+  items.forEach(function(li, idx) {
+    li.classList.remove('correct-pos', 'incorrect-pos');
+    if (li.getAttribute('data-order') === String(idx + 1)) {
+      li.classList.add('correct-pos');
+      correctCount++;
+    } else {
+      li.classList.add('incorrect-pos');
+      allCorrect = false;
+    }
+  });
+
+  progress.textContent = correctCount + ' / ' + items.length + ' in place';
+  feedback.style.display = 'block';
+  if (allCorrect) {
+    feedback.textContent = 'Correct! That is the right order for the query. Try "Shuffle & Retry" to practice again.';
+    feedback.className = 'sort-feedback correct';
+  } else {
+    feedback.textContent = 'Not quite yet — lines outlined in red are out of place. Drag them (or use the arrows) and check again.';
+    feedback.className = 'sort-feedback incorrect';
+  }
+}
+
+function shuffleList(listId, feedbackId, progressId) {
+  var list = document.getElementById(listId);
+  var items = Array.prototype.slice.call(list.children);
+  for (var i = items.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = items[i]; items[i] = items[j]; items[j] = tmp;
+  }
+  items.forEach(function(li) {
+    li.classList.remove('correct-pos', 'incorrect-pos');
+    list.appendChild(li);
+  });
+  var feedback = document.getElementById(feedbackId);
+  feedback.style.display = 'none';
+  liveUpdate(listId);
+}
+</script>
+
+</body>
+</html>
